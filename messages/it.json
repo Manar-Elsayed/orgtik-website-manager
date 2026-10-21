@@ -257,7 +257,7 @@
     "noMatchBody": "Prova un’altra ricerca o un altro filtro.",
     "notFound": "Questa voce non esiste",
     "back": "Torna a {area}",
-    "slugHelp": "{host}{path}",
+    "slugHelp": "orgtik.ch{path}",
     "shared": "Comune a tutte le lingue",
     "sharedNote": "Si imposta in inglese; vale per tutte le lingue.",
     "iconHelp": "L’icona Phosphor mostrata dal sito, ad esempio ph-palette.",
@@ -1739,8 +1739,8 @@
     "issuesFound": "Problemi rilevati",
     "seeIssues": "Vedi i problemi da correggere su {page}",
     "all": "Tutte",
-    "ok": "Nessun problema rilevato",
-    "allGood": "Nessun problema rilevato",
+    "ok": "Tutto a posto",
+    "allGood": "Niente da correggere qui",
     "colPage": "Pagina",
     "colType": "Tipo",
     "colStatus": "Stato",
@@ -1758,15 +1758,7 @@
       "noSocialImage": "Nessuna immagine per i link condivisi",
       "imageNoAlt": "Immagine principale senza descrizione",
       "focusMissing": "Nessuna frase chiave principale",
-      "keywordsMissing": "Nessuna parola chiave",
-      "titleShort": "Titolo sotto i 30 caratteri",
-      "descriptionDuplicate": "Stessa descrizione di un’altra pagina",
-      "socialImageDefault": "Usa l’immagine di condivisione predefinita del sito",
-      "canonicalHost": "Canonical su un altro sito",
-      "canonicalUnreachable": "Indirizzo canonical non presente sul sito",
-      "canonicalOther": "Il canonical indica un’altra pagina",
-      "canonicalSitemap": "Nella sitemap ma canonical altrove",
-      "schemaInvalid": "Dati strutturati incompleti"
+      "keywordsMissing": "Nessuna parola chiave"
     },
     "redirectsTitle": "Reindirizzamenti",
     "redirectsDescription": "Vecchi indirizzi e dove portano ora, perché link e risultati di ricerca funzionino.",
@@ -1907,9 +1899,7 @@
       "addressUsedOn": "{pages} usa già questo indirizzo. Cambiane uno perché ogni pagina possa essere trovata.",
       "focusTooManyWords": "Questa frase chiave ha {count} parole. Limitala a {max}.",
       "keywordTooManyWords": "{count} parole. Tieni ogni parola chiave entro {max} parole.",
-      "keywordsTooLong": "Più di {max} parole: {keywords}. Accorciale.",
-      "editSearchResult": "Modifica il risultato di ricerca: titolo e descrizione",
-      "editSocialPreview": "Modifica l’anteprima del link: titolo, descrizione e immagine"
+      "keywordsTooLong": "Più di {max} parole: {keywords}. Accorciale."
     },
     "fromArchive": "Contenuto archiviato",
     "showAllPages": "Mostra tutte le pagine",
@@ -1920,16 +1910,14 @@
       "description": "Ogni pagina con qualcosa da correggere per i risultati di ricerca, i link condivisi o i lettori di schermo, raggruppata come nell’editor SEO. Le pagine sul sito vengono prima.",
       "tabs": {
         "all": "Tutti i problemi",
-        "images": "Immagini",
-        "technical": "Tecnico"
+        "images": "Immagini"
       },
       "why": {
         "all": "Ogni pagina con almeno un problema. Correggi prima quelle sul sito.",
         "search": "Titolo e descrizione: ciò che le persone leggono in un risultato di ricerca prima di cliccare.",
         "keywords": "La frase chiave principale e le parole chiave su cui si basano i controlli dell’editor e la pianificazione del team.",
         "sharing": "L’immagine mostrata quando la pagina viene pubblicata sui social o in una chat.",
-        "images": "Le descrizioni dell’immagine principale, lette dai lettori di schermo e dalla ricerca immagini.",
-        "technical": "Indirizzi canonical e dati strutturati: quale indirizzo i motori devono considerare l’originale e le informazioni aggiuntive che possono leggere."
+        "images": "Le descrizioni dell’immagine principale, lette dai lettori di schermo e dalla ricerca immagini."
       },
       "colIssues": "Problemi",
       "colStatus": "Stato",
@@ -1940,15 +1928,14 @@
       "fixIn": "Apri {page} per correggere: {issue}",
       "allLanguages": "Tutte",
       "showAllPages": "Mostra tutte le pagine",
-      "empty": "Nessun problema rilevato",
+      "empty": "Niente da correggere qui",
       "emptyFiltered": "Nessuna pagina corrisponde a questi filtri.",
       "clearFilters": "Cancella filtri",
       "issueFilter": "Problemi",
       "duplicateHint": {
         "title": "Stesso titolo di {pages}",
         "address": "Stesso indirizzo di {pages}",
-        "focus": "Parola chiave duplicata: è anche la frase chiave di {pages}. Cambiala.",
-        "description": "Stessa descrizione di {pages}"
+        "focus": "Parola chiave duplicata: è anche la frase chiave di {pages}. Cambiala."
       }
     },
     "languageNotPublic": "{language} non è attivata per il sito",
@@ -1965,49 +1952,6 @@
       "disabled": "Conservato qui, ma non reindirizza più i visitatori."
     },
     "openOnSite": "Apri {path} sul sito",
-    "health": {
-      "ran": "Controllo completato: {checked} righe controllate, {errors} con problemi, {guidance} solo con suggerimenti",
-      "runFailed": "Impossibile eseguire il controllo. Riprova.",
-      "lastRun": "Ultimo controllo {time}: {checked} righe, {errors} con problemi, {guidance} solo con suggerimenti.",
-      "changedSince": "Il contenuto è cambiato da allora. Esegui di nuovo il controllo.",
-      "notRunYet": "Nessun controllo eseguito. L’elenco qui sotto è sempre aggiornato; Esegui controllo registra il risultato e l’ora.",
-      "cards": {
-        "titleMissing": "Titolo SEO mancante",
-        "titleDuplicate": "Titoli duplicati",
-        "descriptionMissing": "Meta description mancante",
-        "descriptionDuplicate": "Descrizioni duplicate",
-        "noSocialImage": "Immagine Open Graph mancante",
-        "other": "Altri problemi"
-      },
-      "legend": "Una pagina può avere più problemi e conta in ciascuno. I problemi arancioni vanno corretti; quelli grigi sono suggerimenti, da guardare ma non un verdetto. Nessun problema rilevato significa che la pagina ha superato questi controlli, non tutti i fattori dei motori di ricerca.",
-      "searchLabel": "Cerca per nome della pagina o indirizzo",
-      "issueFilter": "Problema",
-      "levelFilter": "Stato del controllo",
-      "level": {
-        "error": "Con problemi da correggere",
-        "guidance": "Solo suggerimenti",
-        "ok": "Nessun problema rilevato"
-      },
-      "emptyFiltered": "Nessuna pagina corrisponde a questi filtri.",
-      "emptyHelp": "Tutte le pagine controllate hanno superato i controlli disponibili.",
-      "preview": "Anteprima",
-      "previewOf": "Anteprima di {page} nei risultati di ricerca e come link condiviso",
-      "previewNote": "Un’approssimazione: motori di ricerca e social network possono tagliare o cambiare ciò che mostrano.",
-      "editSeo": "Modifica SEO",
-      "detail": {
-        "canonicalHost": "Punta a {value}",
-        "canonicalUnreachable": "{value} non è un indirizzo servito dal sito",
-        "canonicalOther": "Indica {value} come originale",
-        "canonicalSitemap": "La sitemap elenca questo indirizzo mentre indica un altro come originale"
-      },
-      "duplicateWith": {
-        "title": "Stesso titolo di",
-        "description": "Stessa descrizione di",
-        "address": "Stesso indirizzo di",
-        "focus": "Stessa frase chiave di"
-      },
-      "andMore": "e altri {count}"
-    },
     "live": {
       "title": "Sito online",
       "helpRedirects": "I reindirizzamenti salvati qui arrivano sul sito quando viene pubblicato. Questa scheda confronta il sito con queste impostazioni.",

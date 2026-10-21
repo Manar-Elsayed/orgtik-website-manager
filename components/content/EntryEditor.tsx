@@ -158,8 +158,6 @@ function Editor({ entry, type, seoOnly = false }: { entry: Entry; type: ContentT
   const can = (permission: string) => (!viewing || permission.endsWith(":view")) && (!seoOnly || !permission.startsWith("content:")) && permitted(permission);
   const images = useMediaQuery({ kind: "image", pageSize: 100 });
   const indexing = useIndexingQuery(undefined, { skip: !can("seo:view") });
-  // Previews show the address on the site's canonical host ("orgtik-site.vercel.app/work/…").
-  const siteHost = (indexing.data?.settings.canonicalHost ?? "https://orgtik.ch").replace(/^https?:\/\//, "");
   const me = useMeQuery();
   const site = useSiteQuery();
   const contentLocales = (site.data?.locales.filter(locale=>locale.enabled).map(locale=>locale.code) ?? LOCALES) as Locale[];
@@ -1107,7 +1105,6 @@ function Editor({ entry, type, seoOnly = false }: { entry: Entry; type: ContentT
                                 old: type.path(liveSlug, familySlug),
                               })
                             : t("slugHelp", {
-                                host: siteHost,
                                 path: type.path(slug, familySlug),
                               })
                       }
@@ -1124,7 +1121,7 @@ function Editor({ entry, type, seoOnly = false }: { entry: Entry; type: ContentT
                       <Input
                         dir="ltr"
                         disabled={!editable || type.fixedAddress}
-                        value={type.fixedAddress ? `${siteHost}${slug}` : slug}
+                        value={type.fixedAddress ? `orgtik.ch${slug}` : slug}
                         onChange={(e) => setSlugEdit(e.target.value)}
                       />
                     </Field>
@@ -1137,8 +1134,7 @@ function Editor({ entry, type, seoOnly = false }: { entry: Entry; type: ContentT
                   lang={lang}
                   seo={seo as SeoBlock}
                   english={(entry.content.seo.en ?? {}) as SeoBlock}
-                  address={`${siteHost}${lang === "en" ? "" : `/${lang}`}${previewPath === "/" ? "" : previewPath}`}
-                  titleTemplate={indexing.data?.site?.titleTemplate}
+                  address={`orgtik.ch${previewPath === "/" ? "" : previewPath}`}
                   slug={
                     type.fixedAddress
                       ? (previewPath.split("/").pop() ?? "")

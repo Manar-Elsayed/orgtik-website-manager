@@ -152,111 +152,36 @@ function makeLibrary({ seed, store, now, uploads, demo = false, locales, site, p
   // Every language the site has switched on, published or not, so gaps are fixed before a language
   // goes live. Without a site list (tests, packaged tools), the public languages.
   const checkedLocales = () => locales?.() ?? settings.publicLocales;
-  const CHECKS = ["titleMissing", "titleShort", "titleLong", "titleDuplicate", "descriptionMissing", "descriptionShort", "descriptionLong", "descriptionDuplicate", "addressDuplicate", "focusDuplicate", "noSocialImage", "socialImageDefault", "imageNoAlt", "canonicalHost", "canonicalUnreachable", "canonicalOther", "canonicalSitemap", "schemaInvalid"];
-  // Errors stop a page from showing well; guidance (lengths, a shared default image, a canonical
-  // that names another page on purpose) is worth a look but isn't a verdict on the page.
-  const GUIDANCE = new Set(["titleShort", "titleLong", "descriptionShort", "descriptionLong", "focusDuplicate", "socialImageDefault", "canonicalOther"]);
-  const severityOf = (check) => (GUIDANCE.has(check) ? "guidance" : "error");
-  // The summary cards the client asked for; everything else is counted under "other issues".
-  const MAIN_CHECKS = ["titleMissing", "titleDuplicate", "descriptionMissing", "descriptionDuplicate", "noSocialImage"];
-  // Lengths are what a search result shows: the site's title template applied, as the site renders it.
-  const LIMITS = { titleShort: 30, titleLong: 60, descriptionShort: 50, descriptionLong: 160 };
-  // Required properties for the structured data types pages most often add by hand.
-  const SCHEMA_REQUIRED = {
-    FAQPage: ["mainEntity"], Question: ["name", "acceptedAnswer"], Answer: ["text"], HowTo: ["name", "step"],
-    Article: ["headline"], BlogPosting: ["headline"], NewsArticle: ["headline"], Event: ["name", "startDate", "location"],
-    Product: ["name"], Service: ["name"], Organization: ["name"], LocalBusiness: ["name", "address"], WebPage: ["name"],
-    BreadcrumbList: ["itemListElement"], VideoObject: ["name", "thumbnailUrl", "uploadDate"], Review: ["itemReviewed", "author"],
-  };
-  function schemaProblems(jsonLd) {
-    if (jsonLd == null) return [];
-    const nodes = Array.isArray(jsonLd) ? jsonLd : Array.isArray(jsonLd["@graph"]) ? jsonLd["@graph"] : [jsonLd];
-    const out = [];
-    nodes.forEach((node, i) => {
-      if (!node || typeof node !== "object" || Array.isArray(node)) return out.push(`#${i + 1}: not an object`);
-      const types = [node["@type"]].flat().filter((x) => typeof x === "string" && x.trim());
-      if (!types.length) return out.push(`#${i + 1}: @type is missing`);
-      for (const type of types) for (const key of SCHEMA_REQUIRED[type] ?? []) {
-        const v = node[key];
-        if (v == null || (typeof v === "string" && !v.trim()) || (Array.isArray(v) && !v.length)) out.push(`${type}: ${key} is missing`);
-      }
-      if (types.includes("FAQPage")) for (const q of [node.mainEntity].flat().filter(Boolean)) if (!q?.name || !(q.acceptedAnswer?.text)) { out.push("FAQPage: a question needs name and acceptedAnswer.text"); break; }
-    });
-    return out;
-  }
-  const renderedTitle = (own, name) => {
-    const template = site?.()?.titleTemplate ?? "{page} | OrgTik";
-    const [before, after] = template.split("{page}");
-    const wrapped = own && (before || after) && own.startsWith(before) && own.endsWith(after ?? "");
-    return wrapped ? own : template.replace("{page}", own || name);
-  };
-  const urlOf = (locale, path) => settings.canonicalHost + (locale === "en" ? "" : `/${locale}`) + (path === "/" && locale !== "en" ? "" : path);
-  // Two pages competing for one search result: the same title, description, address or focus keyphrase in one language.
-  const DUPLICATES = { title: "titleDuplicate", description: "descriptionDuplicate", address: "addressDuplicate", focus: "focusDuplicate" };
+  const CHECKS = ["titleMissing", "titleLong", "titleDuplicate", "descriptionMissing", "descriptionShort", "descriptionLong", "addressDuplicate", "focusDuplicate", "noSocialImage", "imageNoAlt"];
+  // Two pages competing for one search result: the same title, address or focus keyphrase in one language.
+  const DUPLICATES = { title: "titleDuplicate", address: "addressDuplicate", focus: "focusDuplicate" };
   function health() {
     const rows = [];
-    const seen = { title: new Map(), description: new Map(), address: new Map(), focus: new Map() };
+    const seen = { title: new Map(), address: new Map(), focus: new Map() };
     const note = (kind, value, index) => { if (value) seen[kind].set(value, [...(seen[kind].get(value) ?? []), index]); };
-    // Addresses the site serves today, and which page each belongs to, for the canonical checks.
-    const served = new Map([...store.entries.values()].filter((e) => ADDRESS[e.type] && e.live && e.workflow.visibility === "live").map((e) => [ADDRESS[e.type](e, e.live, liveOnly), e]));
-    const defaultImage = site?.()?.defaultOgImage ?? null;
     for (const e of store.entries.values()) {
       if (!ADDRESS[e.type]) continue;
       const c = current(e);
       if (c.seo?.en?.robots === "noindex" && c.seo?.en?.inSitemap === false) continue; // sign-in and the like
-      const name = plain(c.locales.en?.name ?? c.name ?? e.id);
       for (const l of checkedLocales()) {
         const seo = c.seo?.[l] ?? {};
-        const en = c.seo?.en ?? {};
         const title = String(seo.title ?? "").trim();
         const description = String(seo.description ?? "").trim();
         const keywords = Array.isArray(seo.keywords) ? seo.keywords.filter((k) => String(k ?? "").trim()).length : 0;
-        const rendered = title ? renderedTitle(title, name) : "";
         const issues = [];
-        const details = {};
         if (!title) issues.push("titleMissing");
-        else if (rendered.length < LIMITS.titleShort) issues.push("titleShort");
-        else if (rendered.length > LIMITS.titleLong) issues.push("titleLong");
+        else if (title.length > 60) issues.push("titleLong");
         if (!description) issues.push("descriptionMissing");
-        else if (description.length < LIMITS.descriptionShort) issues.push("descriptionShort");
-        else if (description.length > LIMITS.descriptionLong) issues.push("descriptionLong");
-        // The image a shared link shows, in the site's order: this language, English, the page's image, the site default.
-        const ownImage = seo.ogImage || en.ogImage || c.image?.src || null;
-        if (!ownImage && !defaultImage) issues.push("noSocialImage");
-        else if (!ownImage) issues.push("socialImageDefault");
+        else if (description.length < 50) issues.push("descriptionShort");
+        else if (description.length > 160) issues.push("descriptionLong");
+        if (!seo.ogImage && !c.image?.src) issues.push("noSocialImage");
         if (c.image?.src && !c.image.alt?.[l]?.trim()) issues.push("imageNoAlt");
-        // Canonical: only a page's own setting can go wrong; without one the site points at the page itself.
-        const path = ADDRESS[e.type](e, c, store.entries);
-        const self = urlOf(l, path);
-        const canonical = String(seo.canonical ?? "").trim();
-        if (canonical && canonical !== self) {
-          let target = null;
-          try { target = new URL(canonical); } catch { /* the editor only saves https addresses */ }
-          const host = new URL(settings.canonicalHost);
-          if (!target || target.host !== host.host) { issues.push("canonicalHost"); details.canonicalHost = [canonical]; }
-          else {
-            const at = target.pathname.replace(/^\/(ar|de|fr|it)(?=\/|$)/, "") || "/";
-            const owner = served.get(at);
-            if (!owner) { issues.push("canonicalUnreachable"); details.canonicalUnreachable = [canonical]; }
-            else if (owner.id !== e.id) { issues.push("canonicalOther"); details.canonicalOther = [plain(owner.live.locales?.en?.name ?? owner.live.name ?? owner.id)]; }
-            // The sitemap would list an address that names another one as the original.
-            if ((seo.inSitemap ?? en.inSitemap) !== false) { issues.push("canonicalSitemap"); details.canonicalSitemap = [self, canonical]; }
-          }
-        }
-        const schema = schemaProblems(seo.jsonLd);
-        if (schema.length) { issues.push("schemaInvalid"); details.schemaInvalid = schema; }
         // Duplicates are per language: the same brand title in two languages is expected.
-        const focus = String(seo.focus ?? "").trim().toLowerCase();
+        const path = ADDRESS[e.type](e, c, store.entries), focus = String(seo.focus ?? "").trim().toLowerCase();
         note("title", title && `${l}:${title.toLowerCase()}`, rows.length);
-        note("description", description && `${l}:${description.toLowerCase()}`, rows.length);
         note("address", `${l}:${path}`, rows.length);
         note("focus", focus && `${l}:${focus}`, rows.length);
-        const ogImage = seo.ogImage || en.ogImage || c.image?.src || defaultImage || null;
-        rows.push({
-          id: e.id, type: e.type, name, path, url: self, locale: l, title, renderedTitle: rendered, titleLength: rendered.length, descriptionLength: description.length, keywords, focus: String(seo.focus ?? "").trim(),
-          issues, details, duplicates: {}, state: e.draft ? e.workflow.state : "published", updatedAt: e.workflow.updatedAt ?? null,
-          preview: { url: canonical || self, title: rendered || renderedTitle(String(en.title ?? "").trim(), name), description: description || String(en.description ?? "").trim(), ogTitle: String(seo.ogTitle ?? "").trim() || rendered, ogDescription: String(seo.ogDescription ?? "").trim() || description, ogImage },
-        });
+        rows.push({ id: e.id, type: e.type, name: plain(c.locales.en?.name ?? c.name ?? e.id), path, locale: l, title, titleLength: title.length, descriptionLength: description.length, keywords, focus: String(seo.focus ?? "").trim(), issues, duplicates: {}, state: e.draft ? e.workflow.state : "published" });
       }
     }
     // Each duplicate names the other pages, so the hint can say where the title or phrase is already used.
@@ -268,26 +193,10 @@ function makeLibrary({ seed, store, now, uploads, demo = false, locales, site, p
         rows[i].duplicates[kind] = idx.filter((j) => rows[j].id !== rows[i].id).map((j) => ({ id: rows[j].id, type: rows[j].type, name: rows[j].name, path: rows[j].path }));
       }
     }
-    for (const row of rows) {
-      row.issues = CHECKS.filter((k) => row.issues.includes(k));
-      row.level = row.issues.some((k) => severityOf(k) === "error") ? "error" : row.issues.length ? "guidance" : "ok";
-    }
+    for (const row of rows) row.issues = CHECKS.filter((k) => row.issues.includes(k));
     const counts = Object.fromEntries(CHECKS.map((k) => [k, rows.filter((r) => r.issues.includes(k)).length]));
     return { rows, counts, healthy: rows.filter((r) => !r.issues.length).length };
   }
-  // "Other issues": anything beyond the five headline checks.
-  const hasOther = (row) => row.issues.some((k) => !MAIN_CHECKS.includes(k));
-  // Run check: the results are always live; a run records what they were and when, so the page can
-  // say when it was last checked and whether content changed since.
-  let healthRun = null;
-  function runHealth(who) {
-    const { rows, counts } = health();
-    healthRun = { at: now(), by: who.key, checked: rows.length, errors: rows.filter((r) => r.level === "error").length, guidance: rows.filter((r) => r.level === "guidance").length, healthy: rows.filter((r) => r.level === "ok").length, counts };
-    log(who.key, "seo_check", "site", "seo", { errors: healthRun.errors });
-    return healthRun;
-  }
-  const lastChange = () => [...store.entries.values()].reduce((max, e) => (e.workflow.updatedAt && e.workflow.updatedAt > max ? e.workflow.updatedAt : max), "");
-  const healthRunState = () => (healthRun ? { ...healthRun, changedSince: lastChange() > healthRun.at } : null);
   // What the SEO editor warns about while typing: other pages in this language already using the
   // title, focus keyphrase or address.
   function seoConflicts({ entry, lang, title, focus }) {
@@ -305,16 +214,15 @@ function makeLibrary({ seed, store, now, uploads, demo = false, locales, site, p
   // sections (search results, keywords, shared links) and the content editor's image, one row per
   // page with the languages that have something to fix.
   const SEO_GROUPS = {
-    search: ["titleMissing", "titleShort", "titleLong", "titleDuplicate", "descriptionMissing", "descriptionShort", "descriptionLong", "descriptionDuplicate", "addressDuplicate"],
+    search: ["titleMissing", "titleLong", "titleDuplicate", "descriptionMissing", "descriptionShort", "descriptionLong", "addressDuplicate"],
     keywords: ["focusMissing", "focusDuplicate", "keywordsMissing"],
-    sharing: ["noSocialImage", "socialImageDefault"],
+    sharing: ["noSocialImage"],
     images: ["imageNoAlt"],
-    technical: ["canonicalHost", "canonicalUnreachable", "canonicalOther", "canonicalSitemap", "schemaInvalid"],
   };
   const SEO_ISSUES = Object.values(SEO_GROUPS).flat();
   function missingSeo() {
     const pages = new Map();
-    for (const { issues, duplicates, details, preview, level, ...row } of health().rows) {
+    for (const { issues, duplicates, ...row } of health().rows) {
       const e = store.entries.get(row.id), seo = current(e).seo?.[row.locale] ?? {};
       const found = [...issues, ...(String(seo.focus ?? "").trim() ? [] : ["focusMissing"]), ...(row.keywords ? [] : ["keywordsMissing"])];
       const page = pages.get(row.id) ?? { id: row.id, type: row.type, name: row.name, path: row.path, title: row.title, state: row.state, visibility: e.workflow.visibility, updatedAt: e.workflow.updatedAt, languages: [], issues: [], byLanguage: {}, duplicates: {} };
@@ -587,6 +495,23 @@ function makeLibrary({ seed, store, now, uploads, demo = false, locales, site, p
     }
     return urls.sort((a, b) => a.loc.localeCompare(b.loc));
   }
+  // Canonical addresses that can't be right, for Validate indexing settings: one on another website,
+  // or one the site doesn't serve. A canonical naming another live page is a choice, not a problem.
+  function canonicalProblems() {
+    const urls = indexingUrls();
+    const host = new URL(settings.canonicalHost).host;
+    const trim = (s) => s.replace(/\/+$/, "");
+    const served = new Set(urls.map((u) => trim(u.loc)));
+    const out = [];
+    for (const u of urls) {
+      if (u.canonicalSelf) continue;
+      let target = null;
+      try { target = new URL(u.canonical); } catch { /* the editor only saves https addresses */ }
+      if (!target || target.host !== host) out.push({ id: u.id, locale: u.locale, kind: "otherHost", canonical: u.canonical });
+      else if (!served.has(trim(target.origin + target.pathname))) out.push({ id: u.id, locale: u.locale, kind: "notServed", canonical: u.canonical });
+    }
+    return out;
+  }
   // The sitemap the website publishes: only what search engines may index, each at its own address.
   const sitemap = () => indexingUrls().filter((u) => u.inSitemap).map(({ loc, lastmod, type, id }) => ({ loc, lastmod: String(lastmod ?? "").slice(0, 10), type, id }));
   // robots.txt: as written here when someone has, otherwise generated from the site-wide setting.
@@ -637,14 +562,14 @@ function makeLibrary({ seed, store, now, uploads, demo = false, locales, site, p
     return { settings };
   }
 
-  const exportState = () => ({ data: clone({ media: [...media], redirects: [...redirects], settings, healthRun, lastPublish, lastValidation, demoVersion: 3 }), sequences: { nextMedia, nextRedirect } });
+  const exportState = () => ({ data: clone({ media: [...media], redirects: [...redirects], settings, lastPublish, lastValidation, demoVersion: 3 }), sequences: { nextMedia, nextRedirect } });
   const validateState = value => {
     const incoming = codec.object(value), rows = codec.mapRows(incoming.data?.media), redirects_ = codec.mapRows(incoming.data?.redirects), settings_ = codec.object(incoming.data?.settings);
     if (!Number.isSafeInteger(settings_.version) || !Array.isArray(settings_.history) || !Array.isArray(settings_.publicLocales)) throw codec.fail("Website Manager SEO settings are incomplete.");
-    return { data: { media: rows, redirects: redirects_, settings: settings_, healthRun: incoming.data.healthRun ?? null, lastPublish: incoming.data.lastPublish ?? null, lastValidation: incoming.data.lastValidation ?? null, demoVersion: incoming.data.demoVersion ?? 0 }, sequences: { nextMedia: codec.sequence(incoming.sequences?.nextMedia, rows, "md"), nextRedirect: codec.sequence(incoming.sequences?.nextRedirect, redirects_, "rd") } };
+    return { data: { media: rows, redirects: redirects_, settings: settings_, lastPublish: incoming.data.lastPublish ?? null, lastValidation: incoming.data.lastValidation ?? null, demoVersion: incoming.data.demoVersion ?? 0 }, sequences: { nextMedia: codec.sequence(incoming.sequences?.nextMedia, rows, "md"), nextRedirect: codec.sequence(incoming.sequences?.nextRedirect, redirects_, "rd") } };
   };
-  const importState = value => { const incoming = validateState(value); codec.replaceMap(media, incoming.data.media); codec.replaceMap(redirects, incoming.data.redirects); codec.replaceObject(settings, incoming.data.settings); healthRun = incoming.data.healthRun; lastPublish = incoming.data.lastPublish; lastValidation = incoming.data.lastValidation; nextMedia = incoming.sequences.nextMedia; nextRedirect = incoming.sequences.nextRedirect; if (incoming.data.demoVersion < 1) ensureDemo(); else if (demo && incoming.data.demoVersion < 2) require("./seed/workflow-examples").mediaExamples(media); if (demo && incoming.data.demoVersion < 3) require("./seed/demo-states").redirectStatusExamples(redirects); };
-  return { media, redirects, settings, mediaOut, resolveMedia, updateMedia, addUpload, removeMedia, serverRedirects, redirectProblems, executionOf, expectedTest, recordTest, normPath, applyRedirect, QUERY_MODES, recordPublish, lastPublish: () => lastPublish, recordValidation, lastValidation: () => lastValidation, health, CHECKS, GUIDANCE, MAIN_CHECKS, hasOther, runHealth, healthRunState, missingSeo, SEO_GROUPS, checkedLocales, seoConflicts, saveRedirect, removeRedirect, REDIRECT_STATUSES, sitemap, indexingUrls, robots, generatedRobots, robotsWarnings, robotsTools, setRobots, sitePublicLocales, setVisibility, setCanonicalHost, RIGHTS, keepAddresses, previewAddresses, exportState, importState, validateState };
+  const importState = value => { const incoming = validateState(value); codec.replaceMap(media, incoming.data.media); codec.replaceMap(redirects, incoming.data.redirects); codec.replaceObject(settings, incoming.data.settings); lastPublish = incoming.data.lastPublish; lastValidation = incoming.data.lastValidation; nextMedia = incoming.sequences.nextMedia; nextRedirect = incoming.sequences.nextRedirect; if (incoming.data.demoVersion < 1) ensureDemo(); else if (demo && incoming.data.demoVersion < 2) require("./seed/workflow-examples").mediaExamples(media); if (demo && incoming.data.demoVersion < 3) require("./seed/demo-states").redirectStatusExamples(redirects); };
+  return { media, redirects, settings, mediaOut, resolveMedia, updateMedia, addUpload, removeMedia, serverRedirects, redirectProblems, executionOf, expectedTest, recordTest, normPath, applyRedirect, QUERY_MODES, recordPublish, lastPublish: () => lastPublish, recordValidation, lastValidation: () => lastValidation, health, CHECKS, missingSeo, SEO_GROUPS, checkedLocales, seoConflicts, saveRedirect, removeRedirect, REDIRECT_STATUSES, sitemap, indexingUrls, canonicalProblems, robots, generatedRobots, robotsWarnings, robotsTools, setRobots, sitePublicLocales, setVisibility, setCanonicalHost, RIGHTS, keepAddresses, previewAddresses, exportState, importState, validateState };
 }
 
 module.exports = { makeLibrary };

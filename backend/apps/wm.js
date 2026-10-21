@@ -139,7 +139,7 @@ module.exports = {
       // Media issues come from the library: files in use without a description or clear rights.
       const mediaIssues = [...lib.media.values()].filter((m) => lib.mediaOut(m).issues.some((i) => i !== "unused")).length;
       const newLeads = [...ops.leads.values()].filter((l) => l.status === "new").length;
-      ok(res, { queue: { ...store.queue(who(req)), seoIssues: lib.health().rows.filter((row) => row.level === "error").length, mediaIssues, newLeads } }, { generatedAt: new Date().toISOString() });
+      ok(res, { queue: { ...store.queue(who(req)), seoIssues: lib.health().counts.descriptionMissing, mediaIssues, newLeads } }, { generatedAt: new Date().toISOString() });
     });
 
     // Test control: the seed as the website has it, without Claude's suggestions (flows that count
@@ -684,25 +684,14 @@ module.exports = {
       // Every page is checked once per language; the summary cards count the chosen language.
       const checked = req.query.lang ? h.rows.filter((row) => row.locale === req.query.lang) : h.rows;
       const issue = String(req.query.issue ?? "");
-      if (issue && !["none", "any", "other", ...lib.CHECKS].includes(issue)) return fail(res, 422, "invalid_issue", "Unknown SEO check.");
-      // "none" lists the pages that pass every check, "any" the pages with at least one issue, "other"
-      // the pages with an issue beyond the five headline checks (the summary cards).
-      let rows = issue === "none" ? checked.filter((r) => !r.issues.length) : issue === "any" ? checked.filter((r) => r.issues.length) : issue === "other" ? checked.filter(lib.hasOther) : issue ? checked.filter((r) => r.issues.includes(issue)) : checked;
-      // Check status: errors, guidance only, or no issues found.
-      const level = String(req.query.level ?? "");
-      if (level && !["error", "guidance", "ok"].includes(level)) return fail(res, 422, "invalid_level", "Unknown check status.");
-      if (level) rows = rows.filter((r) => r.level === level);
+      // "none" lists the pages that pass every check, "any" the pages with at least one issue (the summary cards).
+      let rows = issue === "none" ? checked.filter((r) => !r.issues.length) : issue === "any" ? checked.filter((r) => r.issues.length) : issue ? checked.filter((r) => r.issues.includes(issue)) : checked;
       const search = String(req.query.search ?? "").trim().toLowerCase();
       if (search) rows = rows.filter(row => `${row.name} ${row.path} ${row.title}`.toLowerCase().includes(search));
       if (req.query.kind) rows = rows.filter(row => row.type === req.query.kind);
       const result = page(req, rows);
       const counts = Object.fromEntries(lib.CHECKS.map((k) => [k, checked.filter((r) => r.issues.includes(k)).length]));
-      ok(res, result.rows, { ...result.meta, counts, other: checked.filter(lib.hasOther).length, healthy: checked.filter((r) => !r.issues.length).length, checked: checked.length, guidance: [...lib.GUIDANCE], locales: lib.checkedLocales(), lastRun: lib.healthRunState() });
-    });
-    // Run check: records the current results and when; the list itself is always computed live.
-    app.post("/v2/admin/seo/health/run", need("seo:view"), (req, res) => {
-      lib.runHealth(who(req));
-      ok(res, lib.healthRunState());
+      ok(res, result.rows, { ...result.meta, counts, healthy: checked.filter((r) => !r.issues.length).length, checked: checked.length, locales: lib.checkedLocales() });
     });
     // Pages, per language, whose meta title, meta description or keywords are empty.
     app.get("/v2/admin/seo/missing", need("seo:view"), (req, res) => {
@@ -854,9 +843,8 @@ module.exports = {
       add("noindexInSitemap", noindexInSitemap.length ? "warn" : "pass", { count: noindexInSitemap.length }, noindexInSitemap.length ? "/seo/indexing?warning=noindexInSitemap#sitemap" : null);
       const canonicalElsewhere = urls.filter((u) => u.warnings.includes("canonicalElsewhere"));
       add("canonicalInSitemap", canonicalElsewhere.length ? "warn" : "pass", { count: canonicalElsewhere.length }, canonicalElsewhere.length ? "/seo/indexing?warning=canonicalElsewhere#sitemap" : null);
-      const health = lib.health().rows;
-      const canonicalErrors = health.filter((r) => r.issues.some((i) => ["canonicalHost", "canonicalUnreachable", "canonicalSitemap"].includes(i)));
-      add("canonicals", canonicalErrors.length ? "fail" : "pass", { count: canonicalErrors.length }, canonicalErrors.length ? "/seo?issue=" + canonicalErrors[0].issues.find((i) => i.startsWith("canonical")) : null);
+      const canonicalErrors = lib.canonicalProblems();
+      add("canonicals", canonicalErrors.length ? "fail" : "pass", { count: canonicalErrors.length }, canonicalErrors.length ? "/seo/indexing?warning=canonicalElsewhere#sitemap" : null);
       const robotsWarn = lib.robotsWarnings(lib.robots());
       const blocking = robotsWarn.filter((w) => ["blocksHome", "blocksIndexable", "tooLong"].includes(w.kind));
       add("robots", blocking.length ? "fail" : robotsWarn.length ? "warn" : "pass", { count: robotsWarn.length, kinds: robotsWarn.map((w) => w.kind).join(", ") }, robotsWarn.length ? "/seo/indexing#robots" : null);
