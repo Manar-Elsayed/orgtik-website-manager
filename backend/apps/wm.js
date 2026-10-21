@@ -118,7 +118,7 @@ module.exports = {
     const store = makeStore(() => new Date().toISOString(), { demo: true });
     // Metadata restoration must not delete existing bytes during a build/cold start.
     const UPLOADS = ctx.uploadsDir || path.join(__dirname, "wm", "uploads");
-    const lib = makeLibrary({ seed: store.seed, store, now: () => new Date().toISOString(), uploads: UPLOADS, demo: true, locales: () => ops.site.locales.filter((l) => l.enabled).map((l) => l.code), site: () => ops.site });
+    const lib = makeLibrary({ seed: store.seed, store, now: () => new Date().toISOString(), uploads: UPLOADS, demo: true, locales: () => ops.site.locales.filter((l) => l.enabled).map((l) => l.code), publicLocales: () => ops.site.locales.filter((l) => l.public).map((l) => l.code), site: () => ops.site });
     const ops = makeOps({ store, now: () => new Date().toISOString() });
     const previews = new Map();
     const submissions = require("./wm/ideas").ideaSubmissions(store.ideas);
@@ -804,16 +804,84 @@ module.exports = {
       lib.removeRedirect(x, who(req));
       res.status(204).end();
     });
-    app.get("/v2/admin/seo/indexing", need("seo:view"), (req, res) => {
-      ok(res, { settings: { ...lib.settings, history: lib.settings.history.map((h) => ({ ...h, by: person(h.by) })) }, site: { titleTemplate: ops.site.titleTemplate, defaultOgImage: ops.site.defaultOgImage ?? null }, urls: lib.indexingUrls(), sitemap: lib.sitemap(), robots: lib.robots() });
-    });
+    // Indexing: the site-wide policy and what it does to each page, the sitemap the website will
+    // publish, robots.txt (written here or generated) and the last validation.
+    const indexingOut = () => {
+      const urls = lib.indexingUrls();
+      const en = urls.filter((u) => u.locale === "en");
+      return {
+        settings: { ...lib.settings, robotsCustom: typeof lib.settings.robotsTxt === "string", history: lib.settings.history.map((h) => ({ ...h, by: person(h.by) })) },
+        site: { titleTemplate: ops.site.titleTemplate, defaultOgImage: ops.site.defaultOgImage ?? null },
+        publicLocales: lib.sitePublicLocales(),
+        urls,
+        sitemap: lib.sitemap(),
+        robots: lib.robots(),
+        robotsGenerated: lib.generatedRobots(),
+        robotsWarnings: lib.robotsWarnings(lib.robots()),
+        // What switching the site-wide setting would really do: pages set to index become
+        // indexable; pages set to noindex stay out, whatever the site-wide setting.
+        impact: { becomeIndexable: urls.filter((u) => u.pagePolicy === "index").length, stayNoindex: urls.filter((u) => u.pagePolicy === "noindex").length, indexableNow: urls.filter((u) => u.policy === "index").length, pages: en.length },
+        lastValidation: lib.lastValidation() ? { ...lib.lastValidation(), by: person(lib.lastValidation().by) } : null,
+      };
+    };
+    app.get("/v2/admin/seo/indexing", need("seo:view"), (req, res) => ok(res, indexingOut()));
     app.patch("/v2/admin/seo/indexing", need("seo:view"), (req, res) => {
       if (!req.who.permissions.includes("site:visibility")) return fail(res, 403, "forbidden", "Changing search visibility needs site:visibility.", { required: "site:visibility" });
       const want = req.get("if-match");
       if (want != null && Number(want) !== lib.settings.version) return fail(res, 412, "stale", "Someone changed this since you opened it.", { current: lib.settings.version, by: person(lib.settings.history[0]?.by).name ?? "" });
-      const r = req.body?.canonicalHost !== undefined ? lib.setCanonicalHost(who(req), req.body.canonicalHost, req.body?.reason) : lib.setVisibility(who(req), req.body?.visibility, req.body?.reason);
+      const body = req.body ?? {};
+      const r = body.canonicalHost !== undefined ? lib.setCanonicalHost(who(req), body.canonicalHost, body.reason) : body.robots !== undefined ? lib.setRobots(who(req), body.robots, body.reason) : lib.setVisibility(who(req), body.visibility, body.reason);
       if (r.errors) return fail(res, 422, "invalid", "Some fields need attention.", { fieldErrors: r.errors });
-      ok(res, { settings: { ...lib.settings, history: lib.settings.history.map((h) => ({ ...h, by: person(h.by) })) }, urls: lib.indexingUrls(), sitemap: lib.sitemap(), robots: lib.robots() });
+      ok(res, indexingOut());
+    });
+    // robots.txt before saving: its warnings, and whether an address may be crawled under it.
+    app.post("/v2/admin/seo/indexing/robots/check", need("seo:view"), (req, res) => {
+      const text = typeof req.body?.text === "string" ? req.body.text : lib.robots();
+      const path = String(req.body?.path ?? "").trim();
+      const agent = String(req.body?.agent ?? "googlebot").trim() || "googlebot";
+      const test = path ? lib.robotsTools.testRobots(text, path.startsWith("/") ? path : `/${path}`, agent) : null;
+      ok(res, { warnings: lib.robotsWarnings(text), test, rules: lib.robotsTools.parseRobots(text) });
+    });
+    // Validate indexing settings: the site-wide policy, page policies, the sitemap and robots.txt
+    // (as set here and as live), canonicals, languages and the canonical host, each with a fix link.
+    app.post("/v2/admin/seo/indexing/validate", need("seo:view"), async (req, res) => {
+      const checks = [];
+      const add = (id, level, params = {}, fix = null) => checks.push({ id, level, params, fix });
+      const urls = lib.indexingUrls();
+      const hidden = lib.settings.visibility === "noindex";
+      add("visibility", hidden ? "info" : "pass", { pages: urls.filter((u) => u.locale === "en").length });
+      const noindexInSitemap = urls.filter((u) => u.warnings.includes("noindexInSitemap"));
+      add("noindexInSitemap", noindexInSitemap.length ? "warn" : "pass", { count: noindexInSitemap.length }, noindexInSitemap.length ? "/seo/indexing?warning=noindexInSitemap#sitemap" : null);
+      const canonicalElsewhere = urls.filter((u) => u.warnings.includes("canonicalElsewhere"));
+      add("canonicalInSitemap", canonicalElsewhere.length ? "warn" : "pass", { count: canonicalElsewhere.length }, canonicalElsewhere.length ? "/seo/indexing?warning=canonicalElsewhere#sitemap" : null);
+      const health = lib.health().rows;
+      const canonicalErrors = health.filter((r) => r.issues.some((i) => ["canonicalHost", "canonicalUnreachable", "canonicalSitemap"].includes(i)));
+      add("canonicals", canonicalErrors.length ? "fail" : "pass", { count: canonicalErrors.length }, canonicalErrors.length ? "/seo?issue=" + canonicalErrors[0].issues.find((i) => i.startsWith("canonical")) : null);
+      const robotsWarn = lib.robotsWarnings(lib.robots());
+      const blocking = robotsWarn.filter((w) => ["blocksHome", "blocksIndexable", "tooLong"].includes(w.kind));
+      add("robots", blocking.length ? "fail" : robotsWarn.length ? "warn" : "pass", { count: robotsWarn.length, kinds: robotsWarn.map((w) => w.kind).join(", ") }, robotsWarn.length ? "/seo/indexing#robots" : null);
+      add("languages", "pass", { languages: lib.sitePublicLocales().join(", ").toUpperCase() }, null);
+      // The live website.
+      const snap = await liveSite.snapshot({ fresh: true });
+      if (!snap.configured) add("live", "warn", {}, null);
+      else if (!snap.reachable) add("live", "fail", { url: snap.url }, null);
+      else {
+        add("live", "pass", { url: snap.url });
+        const read = readSitemap(snap.sitemap.xml, lib.settings.canonicalHost);
+        const expected = new Set(lib.sitemap().map((u) => u.loc));
+        const same = read.urls.length === expected.size && read.urls.every((u) => expected.has(u));
+        add("liveSitemapValid", read.problems.some((p) => p !== "no_lastmod") ? "fail" : read.problems.length ? "warn" : "pass", { problems: read.problems.join(", "), count: read.urls.length }, "#sitemap-file");
+        add("liveSitemapMatches", same ? "pass" : "warn", { live: read.urls.length, expected: expected.size }, same ? null : "#live");
+        const robotsSame = String(snap.robots.text ?? "").trim() === lib.robots().trim();
+        add("liveRobotsMatches", robotsSame ? "pass" : "warn", {}, robotsSame ? null : "#live");
+        const liveVisibility = snap.build?.site?.visibility;
+        add("liveVisibility", !liveVisibility ? "warn" : liveVisibility === lib.settings.visibility ? "pass" : "warn", { live: liveVisibility ?? "?", set: lib.settings.visibility }, liveVisibility === lib.settings.visibility ? null : "#live");
+        const servedFrom = new URL(snap.url).origin;
+        add("canonicalHost", servedFrom === lib.settings.canonicalHost ? "pass" : "warn", { host: lib.settings.canonicalHost, served: servedFrom }, servedFrom === lib.settings.canonicalHost ? null : "#canonical-host");
+      }
+      const summary = { pass: checks.filter((c) => c.level === "pass").length, info: checks.filter((c) => c.level === "info").length, warn: checks.filter((c) => c.level === "warn").length, fail: checks.filter((c) => c.level === "fail").length };
+      const record = lib.recordValidation({ at: new Date().toISOString(), by: req.who.user.key, summary, checks });
+      ok(res, { ...record, by: person(record.by) });
     });
     // What the website's head tags need from the settings (S3: prerender-heads). No people, no PII.
     // A file the website ships is its own /assets path; an upload lives in the Website Manager until the site has it.

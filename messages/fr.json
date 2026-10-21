@@ -2127,6 +2127,202 @@
         "redirect_auto": "Créée lors d’un changement d’adresse",
         "redirect_test": "Testée"
       }
+    },
+    "indexing": {
+      "validated": "Validation terminée : {fail} en échec, {warn} à vérifier.",
+      "validateFailed": "La validation n’a pas pu s’exécuter. Réessayez.",
+      "validateTitle": "Valider les réglages d’indexation",
+      "validateHelp": "Vérifie que le réglage du site, les réglages des pages, le sitemap, robots.txt, les canoniques et les langues concordent, ici et sur le site en ligne.",
+      "validate": "Valider les réglages d’indexation",
+      "lastValidated": "Dernière validation {time} par {name}",
+      "summary": {
+        "pass": "{count, plural, one {# réussi} other {# réussis}}",
+        "warn": "{count, plural, one {# à vérifier} other {# à vérifier}}",
+        "fail": "{count, plural, one {# en échec} other {# en échec}}"
+      },
+      "notValidated": "Pas encore validé.",
+      "fix": "Corriger",
+      "check": {
+        "visibility": {
+          "title": "Réglage du site",
+          "info": "Tout le site demande aux moteurs de ne pas l’indexer, jusqu’à l’approbation du contenu. Aucune page n’est indexable et le sitemap est vide à dessein ({pages} pages).",
+          "pass": "Le site peut être indexé. Le réglage de chaque page décide ({pages} pages)."
+        },
+        "noindexInSitemap": {
+          "title": "Pages noindex prévues dans le sitemap",
+          "warn": "{count} adresses sont prévues dans le sitemap mais en noindex. Elles sont exclues du sitemap publié ; décidez ce qu’il faut à chaque page.",
+          "pass": "Aucune page n’est à la fois noindex et prévue dans le sitemap."
+        },
+        "canonicalInSitemap": {
+          "title": "Sitemap et canoniques",
+          "warn": "{count} adresses prévues dans le sitemap désignent une autre adresse comme l’original. Elles sont exclues du sitemap publié.",
+          "pass": "Chaque adresse prévue dans le sitemap est son propre original."
+        },
+        "canonicals": {
+          "title": "Adresses canoniques",
+          "fail": "{count} pages ont un problème de canonique (autre site, adresse non servie par le site ou conflit avec le sitemap).",
+          "pass": "Aucun problème de canonique."
+        },
+        "robots": {
+          "title": "robots.txt",
+          "fail": "robots.txt bloque des pages qui doivent être trouvées ({kinds}).",
+          "warn": "robots.txt a {count} avertissements à vérifier ({kinds}).",
+          "pass": "robots.txt ne bloque rien qui doive être trouvé."
+        },
+        "languages": {
+          "title": "Langues",
+          "pass": "Langues publiques, depuis les réglages du site, utilisées par le tableau de bord et le site : {languages}."
+        },
+        "live": {
+          "title": "Site en ligne",
+          "pass": "{url} a répondu.",
+          "warn": "Aucune adresse de site n’est définie : les fichiers en ligne n’ont pas pu être vérifiés.",
+          "fail": "{url} est injoignable."
+        },
+        "liveSitemapValid": {
+          "title": "Fichier sitemap publié",
+          "pass": "Sitemap valide avec {count} adresses.",
+          "warn": "Le fichier sitemap a des avertissements : {problems}.",
+          "fail": "Le fichier sitemap a des problèmes : {problems}."
+        },
+        "liveSitemapMatches": {
+          "title": "Sitemap sur le site en ligne",
+          "pass": "Le sitemap en ligne correspond aux réglages ici.",
+          "warn": "Le sitemap en ligne liste {live} adresses ; les réglages ici en donnent {expected}. Publiez le site."
+        },
+        "liveRobotsMatches": {
+          "title": "robots.txt sur le site en ligne",
+          "pass": "Le robots.txt en ligne correspond à celui d’ici.",
+          "warn": "Le robots.txt en ligne diffère de celui d’ici. Publiez le site."
+        },
+        "liveVisibility": {
+          "title": "Réglage du site en ligne",
+          "pass": "Le site en ligne utilise le réglage d’ici.",
+          "warn": "Le site en ligne a été construit avec « {live} », le réglage ici est « {set} ». Publiez le site."
+        },
+        "canonicalHost": {
+          "title": "Hôte canonique",
+          "pass": "Les canoniques utilisent {host}, où le site est servi.",
+          "warn": "Les canoniques utilisent {host}, mais le site est servi depuis {served}. Normal avant un changement de domaine ; sinon modifiez l’hôte canonique."
+        }
+      },
+      "hiddenBody": "Chaque page demande aux moteurs de ne pas l’indexer, jusqu’à l’approbation du contenu. {own} pages sont réglées sur index et deviendraient indexables si ce réglage est activé ; actuellement {indexable} le sont.",
+      "visibleBody": "Les moteurs peuvent indexer le site. {indexable} adresses sont indexables ; les pages en noindex restent exclues.",
+      "overrideExplained": "Tant que le site est masqué, ce réglage prime sur chaque page : une page réglée sur index envoie quand même noindex. Une fois visible, le réglage de chaque page s’applique.",
+      "notIndexedYet": "Autoriser l’indexation ne veut pas dire que Google a indexé la page. Vérifiez-le dans Google Search Console.",
+      "notRemovedAtOnce": "Masquer le site ne retire pas les pages des résultats tout de suite : les moteurs les retirent en les explorant à nouveau.",
+      "makeVisibleImpact": "{indexable} adresses deviennent indexables. {noindex} restent en noindex à cause de leur propre réglage ; modifiez-le dans le SEO de chaque page. Tout contenu provisoire peut apparaître dans les résultats.",
+      "hideImpact": "{count} adresses indexables aujourd’hui disparaîtront des résultats dans les prochains jours.",
+      "nowVisible": "Le site peut maintenant être indexé. Publiez le site pour l’appliquer.",
+      "nowHidden": "Le site est masqué de la recherche. Publiez le site pour l’appliquer.",
+      "historyCanonical": "Hôte canonique",
+      "historyRobots": "robots.txt",
+      "google": {
+        "title": "État d’indexation chez Google",
+        "sample": "Données d’exemple, pas de Google",
+        "help": "Ce que Google rapporte lui-même, séparé des réglages ci-dessus. Tant que Search Console n’est pas connecté, les chiffres ci-dessous sont un exemple de ce qui s’affichera.",
+        "indexed": "Indexées",
+        "notIndexed": "Non indexées",
+        "redirects": "Page avec redirection",
+        "reason": {
+          "noindex": "Exclue par la balise ‘noindex’ : {count}",
+          "discovered": "Découverte, actuellement non indexée : {count}"
+        },
+        "lastCrawl": "Dernière exploration : {time}",
+        "connect": "Connecter Google Search Console",
+        "connectTitle": "Connecter Google Search Console",
+        "connectHelp": "Il faut le propriétaire du site et une configuration hors du Website Manager :",
+        "step1": "Validez le domaine (orgtik.ch, ou le domaine en ligne) dans Google Search Console avec un enregistrement DNS TXT.",
+        "step2": "Créez un projet Google Cloud, activez l’API Search Console et configurez le consentement OAuth ou un compte de service.",
+        "step3": "Donnez à ce compte l’accès à la propriété Search Console.",
+        "step4": "Ajoutez ses identifiants au serveur du Website Manager. Il lit alors la couverture de l’index et les inspections d’URL (Google autorise environ 2 000 inspections par jour).",
+        "close": "Fermer"
+      },
+      "sitemapTitle": "Sitemap et indexation des pages",
+      "colOwnPolicy": "Réglage de la page",
+      "colEffective": "Envoyé aux moteurs",
+      "canonicalSelf": "Cette adresse",
+      "listed": "Dans le sitemap",
+      "notListed": "Hors du sitemap",
+      "whyExcluded": "Exclue par le réglage de la page",
+      "whyNoindex": "Les pages noindex sont exclues",
+      "whyCanonical": "Désigne une autre adresse comme l’original",
+      "warning": {
+        "noindexInSitemap": "Prévue dans le sitemap, mais noindex",
+        "canonicalElsewhere": "Prévue dans le sitemap, canonique ailleurs"
+      },
+      "fileTitle": "Fichier sitemap publié",
+      "openFile": "Ouvrir le fichier",
+      "regenerate": "Régénérer : publier le site",
+      "fileChecking": "Lecture du fichier en ligne…",
+      "fileUnavailable": "Le sitemap en ligne n’a pas pu être lu.",
+      "fileUrl": "Adresse",
+      "fileCount": "Adresses incluses",
+      "fileCountValue": "{live} en ligne, {expected} d’après les réglages ici",
+      "fileUpdated": "Dernière mise à jour",
+      "unknown": "Inconnu",
+      "fileStatus": "Vérification",
+      "fileProblem": {
+        "missing": "absent",
+        "not_valid_xml": "XML non valide",
+        "other_host": "adresses sur un autre hôte",
+        "no_lastmod": "sans dates de modification"
+      },
+      "fileValid": "XML valide, chaque adresse sur l’hôte canonique",
+      "sitemapRules": "Le sitemap publié ne liste que les pages publiées indexables, à leur propre adresse. Panier, paiement et connexion sont exclus par le réglage de leur page.",
+      "sitemapRulesHidden": "Le sitemap publié ne liste que les pages publiées indexables, à leur propre adresse. Tant que le site est masqué, il n’y en a aucune : le sitemap vide est voulu.",
+      "searchLabel": "Rechercher par nom de page ou adresse",
+      "warningsFilter": "Avertissements",
+      "anyWarning": "Tout avertissement",
+      "noAddresses": "Aucune adresse ne correspond à ces filtres.",
+      "languagesNote": "Langues vérifiées : {languages} (publiques dans les réglages du site).",
+      "robotsCustom": "Écrit ici",
+      "robotsGenerated": "Généré depuis le réglage du site",
+      "robotsVsNoindex": "robots.txt contrôle l’exploration ; noindex garde une page hors des résultats. Une page bloquée ne peut pas être lue : les moteurs ne voient jamais son noindex, et elle peut encore être listée via des liens. Pour garder une page hors des résultats, utilisez noindex et laissez-la explorable.",
+      "robotsEditor": "Fichier",
+      "robotsEditorHelp": "Les avertissements et le testeur suivent la saisie, avant l’enregistrement. Ce qui est enregistré passe en ligne à la publication du site.",
+      "robotsReadOnly": "Modifier robots.txt nécessite le droit de visibilité du site.",
+      "robotsWarning": {
+        "tooLong": "Le fichier dépasse 10 000 octets. Gardez-le court.",
+        "unknownLines": "Les lignes {lines} ne sont pas des règles robots.txt et sont ignorées.",
+        "blocksHome": "Cela bloque la page d’accueil : tout le site devient inexplorable.",
+        "blocksIndexable": "Cela bloque {count} pages qui doivent être trouvées : {pages}.",
+        "blocksNoindex": "Cela bloque {count} pages noindex ({pages}) : les moteurs ne peuvent pas lire leur noindex.",
+        "noSitemapLine": "Le site est visible mais robots.txt n’a pas de ligne Sitemap.",
+        "sitemapOtherHost": "La ligne Sitemap pointe vers un autre hôte : {sitemaps}."
+      },
+      "robotsNoWarnings": "Aucun avertissement : rien de ce qui doit être trouvé n’est bloqué.",
+      "robotsSave": "Enregistrer robots.txt",
+      "robotsResetAction": "Revenir au fichier généré",
+      "robotsSaved": "robots.txt enregistré. Publiez le site pour l’appliquer.",
+      "robotsReset": "robots.txt revenu au fichier généré. Publiez le site pour l’appliquer.",
+      "robotsTooLong": "robots.txt est trop long.",
+      "testerTitle": "Tester une adresse",
+      "testerPath": "Adresse",
+      "testerAgent": "Robot",
+      "anyCrawler": "Tout robot (*)",
+      "testerAllowed": "Autorisée : peut être explorée",
+      "testerBlocked": "Bloquée : ne peut pas être explorée",
+      "testerRule": "Ligne {line} : {rule}",
+      "testerNoRule": "Aucune règle ne correspond : l’exploration est autorisée.",
+      "testerNote": "Utilise le texte ci-dessus, enregistré ou non : la règle correspondante la plus longue l’emporte, Allow en cas d’égalité, comme Google la lit.",
+      "guideTitle": "Comment fonctionnent les règles",
+      "guideAllow": "Allow : laisse les robots entrer dans un chemin, même dans un dossier bloqué (Allow: /checkout/help dans Disallow: /checkout).",
+      "guideDisallow": "Disallow : tient les robots hors d’un chemin et de tout ce qu’il contient. Un Disallow vide autorise tout.",
+      "guideWildcards": "* correspond à n’importe quels caractères et $ marque la fin : Disallow: /*.pdf$ bloque chaque PDF.",
+      "robotsResetTitle": "Revenir au robots.txt généré ?",
+      "robotsSaveTitle": "Enregistrer robots.txt ?",
+      "robotsResetImpact": "Le fichier écrit ici est remplacé par celui généré depuis le réglage du site.",
+      "robotsSaveImpactWarnings": "Il a {count} avertissements ci-dessus. Il passe en ligne à la publication du site.",
+      "robotsSaveImpact": "Il passe en ligne à la publication du site.",
+      "hostTitle": "Hôte canonique",
+      "hostHelp": "Toutes les adresses canoniques, hreflang et du sitemap reposent dessus. Changez-le quand le site passe sur son domaine (orgtik.ch) ; rien ne change tout seul.",
+      "hostLabel": "Hôte",
+      "hostSave": "Enregistrer l’hôte canonique",
+      "hostConfirmTitle": "Changer l’hôte canonique ?",
+      "hostConfirmImpact": "Toutes les adresses canoniques, hreflang et du sitemap utiliseront {host} une fois le site publié. Les moteurs considèrent cet hôte comme l’original.",
+      "hostSaved": "Hôte canonique enregistré. Publiez le site pour l’appliquer.",
+      "hostInvalid": "Utilisez une adresse https:// sans chemin, par ex. https://orgtik.ch."
     }
   },
   "Site": {

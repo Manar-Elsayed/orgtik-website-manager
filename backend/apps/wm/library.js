@@ -26,7 +26,7 @@ const ADDRESS = {
 };
 const plain = (s) => String(s ?? "").replace(/<[^>]+>/g, "").trim();
 
-function makeLibrary({ seed, store, now, uploads, demo = false, locales, site }) {
+function makeLibrary({ seed, store, now, uploads, demo = false, locales, site, publicLocales }) {
   const media = new Map((seed.media ?? []).map((m) => [m.id, clone(m)]));
   const redirects = new Map((seed.seo?.redirects ?? []).map((r) => [r.id, clone(r)]));
   const settings = clone(seed.seo?.settings ?? { visibility: "noindex", canonicalHost: "https://orgtik-site.vercel.app", publicLocales: ["en"], version: 1, history: [] });
@@ -485,6 +485,9 @@ function makeLibrary({ seed, store, now, uploads, demo = false, locales, site })
   const serverRedirects = () => servedRedirects().filter((r) => (r.handledBy ?? "host") === "host").map(({ id, from, to, code, query }) => ({ id, from, to, code, query: query ?? "keep" })).sort((a, b) => a.from.localeCompare(b.from));
   // Publishing the website: the last request to rebuild it, and by whom.
   let lastPublish = null;
+  // The last Validate indexing settings: when, by whom, and every check's result.
+  let lastValidation = null;
+  const recordValidation = (value) => (lastValidation = value);
   function recordPublish(who, result) {
     lastPublish = { at: now(), by: who.key, ok: result.ok, status: result.status ?? null, reason: String(result.reason ?? "").trim() || null };
     log(who.key, "site_publish", "site", "settings", { ok: result.ok });
@@ -548,40 +551,66 @@ function makeLibrary({ seed, store, now, uploads, demo = false, locales, site })
   }
 
   // ---- indexing ----
+  // The public languages: the Site settings toggles (one source with the website, which builds its
+  // pages and hreflang from them). Without Site settings (tests, tools), the saved list.
+  const sitePublicLocales = () => publicLocales?.() ?? settings.publicLocales;
+  const urlIn = (locale, path) => settings.canonicalHost + (locale === "en" ? "" : `/${locale}`) + (path === "/" && locale !== "en" ? "" : path);
+  // Every published address in every public language: its own policy, what search engines are
+  // told after the site-wide setting, its canonical, and whether the published sitemap lists it.
   function indexingUrls() {
     const urls = [];
-    const included = new Set(sitemap().map(row => row.loc));
+    const hidden = settings.visibility === "noindex";
     for (const entry of store.entries.values()) {
       if (!ADDRESS[entry.type] || entry.workflow.visibility !== "live" || !entry.live) continue;
-      for (const locale of settings.publicLocales) {
+      for (const locale of sitePublicLocales()) {
         const seo = entry.live.seo?.[locale] ?? entry.live.seo?.en ?? {};
         const path = ADDRESS[entry.type](entry, entry.live, liveOnly);
-        const loc = settings.canonicalHost + (locale === "en" ? "" : `/${locale}`) + (path === "/" && locale !== "en" ? "" : path);
-        const policy = settings.visibility === "noindex" || seo.robots === "noindex" ? "noindex" : "index";
-        urls.push({ id: entry.id, type: entry.type, locale, loc, canonical: seo.canonical || loc, policy, reason: settings.visibility === "noindex" ? "siteOverride" : seo.robots === "noindex" ? "pagePolicy" : "allowed", inSitemap: included.has(loc), lastmod: String(entry.workflow.publishedAt ?? entry.workflow.updatedAt).slice(0, 10) });
+        const loc = urlIn(locale, path);
+        const pagePolicy = seo.robots === "noindex" ? "noindex" : "index";
+        const policy = hidden || pagePolicy === "noindex" ? "noindex" : "index";
+        const canonical = seo.canonical || loc;
+        const sitemapSetting = seo.inSitemap !== false;
+        const canonicalSelf = canonical === loc;
+        // The website's rule (orgtik-site/scripts/prerender-heads.mjs): indexable, its own original, and wanted in the sitemap.
+        const inSitemap = sitemapSetting && policy === "index" && canonicalSelf;
+        const warnings = [];
+        if (sitemapSetting && pagePolicy === "noindex") warnings.push("noindexInSitemap");
+        if (sitemapSetting && !canonicalSelf) warnings.push("canonicalElsewhere");
+        const lastmod = entry.workflow.publishedAt ?? entry.workflow.updatedAt ?? null;
+        urls.push({
+          id: entry.id, type: entry.type, name: plain(entry.live.locales?.en?.name ?? entry.live.name ?? entry.id), locale, path, loc, canonical, canonicalSelf,
+          pagePolicy, policy, overridden: hidden && pagePolicy === "index",
+          reason: hidden ? "siteOverride" : pagePolicy === "noindex" ? "pagePolicy" : "allowed",
+          sitemapSetting, inSitemap, warnings, lastmod,
+        });
       }
     }
     return urls.sort((a, b) => a.loc.localeCompare(b.loc));
   }
-  function sitemap() {
-    const urls = [];
-    for (const e of store.entries.values()) {
-      if (!ADDRESS[e.type] || e.workflow.visibility !== "live" || !e.live) continue;
-      const at = ADDRESS[e.type](e, e.live, liveOnly);
-      for (const locale of settings.publicLocales) {
-        const seo = e.live.seo?.[locale] ?? e.live.seo?.en ?? {};
-        if (seo.inSitemap === false) continue;
-        const suffix = locale === "en" ? at : `/${locale}${at === "/" ? "" : at}`;
-        urls.push({ loc: settings.canonicalHost + suffix, lastmod: String(e.workflow.publishedAt ?? e.workflow.updatedAt).slice(0, 10), type: e.type, id: e.id });
-      }
-    }
-    urls.sort((a, b) => a.loc.localeCompare(b.loc));
-    return urls;
-  }
-  const robots = () =>
+  // The sitemap the website publishes: only what search engines may index, each at its own address.
+  const sitemap = () => indexingUrls().filter((u) => u.inSitemap).map(({ loc, lastmod, type, id }) => ({ loc, lastmod: String(lastmod ?? "").slice(0, 10), type, id }));
+  // robots.txt: as written here when someone has, otherwise generated from the site-wide setting.
+  const generatedRobots = () =>
     settings.visibility === "noindex"
       ? "# Page heads carry noindex. Crawling remains allowed so engines can read it.\nUser-agent: *\nAllow: /\n"
       : `User-agent: *\nAllow: /\n\nSitemap: ${settings.canonicalHost}/sitemap.xml\n`;
+  const robots = () => (typeof settings.robotsTxt === "string" ? settings.robotsTxt : generatedRobots());
+  const robotsTools = require("./robots");
+  // Every published address, for the robots.txt warnings: is it one search engines should find?
+  const robotsPages = () => indexingUrls().filter((u) => u.locale === "en").map((u) => ({ path: u.path, url: u.loc, name: u.name, indexable: u.policy === "index" || u.pagePolicy === "index" }));
+  const robotsWarnings = (text) => robotsTools.robotsWarnings(text, { pages: robotsPages(), canonicalHost: settings.canonicalHost, visible: settings.visibility === "index" });
+  function setRobots(who, text, reason) {
+    if (!String(reason ?? "").trim()) return { errors: { reason: "required" } };
+    if (text !== null && typeof text !== "string") return { errors: { robots: "required" } };
+    if (typeof text === "string" && Buffer.byteLength(text) > robotsTools.MAX_BYTES) return { errors: { robots: "too_long" } };
+    const next = text === null ? undefined : text.replace(/\r\n/g, "\n").replace(/\s*$/, "\n");
+    if (next === settings.robotsTxt) return { settings };
+    if (next === undefined) delete settings.robotsTxt; else settings.robotsTxt = next;
+    settings.version += 1;
+    settings.history.unshift({ at: now(), by: who.key, visibility: settings.visibility, robots: next === undefined ? "generated" : "custom", note: String(reason).trim() });
+    log(who.key, "robots_txt", "site", "settings", { custom: next !== undefined });
+    return { settings };
+  }
   function setVisibility(who, visibility, reason) {
     if (!["index", "noindex"].includes(visibility)) return { errors: { visibility: "required" } };
     if (!String(reason ?? "").trim()) return { errors: { reason: "required" } };
@@ -608,14 +637,14 @@ function makeLibrary({ seed, store, now, uploads, demo = false, locales, site })
     return { settings };
   }
 
-  const exportState = () => ({ data: clone({ media: [...media], redirects: [...redirects], settings, healthRun, lastPublish, demoVersion: 3 }), sequences: { nextMedia, nextRedirect } });
+  const exportState = () => ({ data: clone({ media: [...media], redirects: [...redirects], settings, healthRun, lastPublish, lastValidation, demoVersion: 3 }), sequences: { nextMedia, nextRedirect } });
   const validateState = value => {
     const incoming = codec.object(value), rows = codec.mapRows(incoming.data?.media), redirects_ = codec.mapRows(incoming.data?.redirects), settings_ = codec.object(incoming.data?.settings);
     if (!Number.isSafeInteger(settings_.version) || !Array.isArray(settings_.history) || !Array.isArray(settings_.publicLocales)) throw codec.fail("Website Manager SEO settings are incomplete.");
-    return { data: { media: rows, redirects: redirects_, settings: settings_, healthRun: incoming.data.healthRun ?? null, lastPublish: incoming.data.lastPublish ?? null, demoVersion: incoming.data.demoVersion ?? 0 }, sequences: { nextMedia: codec.sequence(incoming.sequences?.nextMedia, rows, "md"), nextRedirect: codec.sequence(incoming.sequences?.nextRedirect, redirects_, "rd") } };
+    return { data: { media: rows, redirects: redirects_, settings: settings_, healthRun: incoming.data.healthRun ?? null, lastPublish: incoming.data.lastPublish ?? null, lastValidation: incoming.data.lastValidation ?? null, demoVersion: incoming.data.demoVersion ?? 0 }, sequences: { nextMedia: codec.sequence(incoming.sequences?.nextMedia, rows, "md"), nextRedirect: codec.sequence(incoming.sequences?.nextRedirect, redirects_, "rd") } };
   };
-  const importState = value => { const incoming = validateState(value); codec.replaceMap(media, incoming.data.media); codec.replaceMap(redirects, incoming.data.redirects); codec.replaceObject(settings, incoming.data.settings); healthRun = incoming.data.healthRun; lastPublish = incoming.data.lastPublish; nextMedia = incoming.sequences.nextMedia; nextRedirect = incoming.sequences.nextRedirect; if (incoming.data.demoVersion < 1) ensureDemo(); else if (demo && incoming.data.demoVersion < 2) require("./seed/workflow-examples").mediaExamples(media); if (demo && incoming.data.demoVersion < 3) require("./seed/demo-states").redirectStatusExamples(redirects); };
-  return { media, redirects, settings, mediaOut, resolveMedia, updateMedia, addUpload, removeMedia, serverRedirects, redirectProblems, executionOf, expectedTest, recordTest, normPath, applyRedirect, QUERY_MODES, recordPublish, lastPublish: () => lastPublish, health, CHECKS, GUIDANCE, MAIN_CHECKS, hasOther, runHealth, healthRunState, missingSeo, SEO_GROUPS, checkedLocales, seoConflicts, saveRedirect, removeRedirect, REDIRECT_STATUSES, sitemap, indexingUrls, robots, setVisibility, setCanonicalHost, RIGHTS, keepAddresses, previewAddresses, exportState, importState, validateState };
+  const importState = value => { const incoming = validateState(value); codec.replaceMap(media, incoming.data.media); codec.replaceMap(redirects, incoming.data.redirects); codec.replaceObject(settings, incoming.data.settings); healthRun = incoming.data.healthRun; lastPublish = incoming.data.lastPublish; lastValidation = incoming.data.lastValidation; nextMedia = incoming.sequences.nextMedia; nextRedirect = incoming.sequences.nextRedirect; if (incoming.data.demoVersion < 1) ensureDemo(); else if (demo && incoming.data.demoVersion < 2) require("./seed/workflow-examples").mediaExamples(media); if (demo && incoming.data.demoVersion < 3) require("./seed/demo-states").redirectStatusExamples(redirects); };
+  return { media, redirects, settings, mediaOut, resolveMedia, updateMedia, addUpload, removeMedia, serverRedirects, redirectProblems, executionOf, expectedTest, recordTest, normPath, applyRedirect, QUERY_MODES, recordPublish, lastPublish: () => lastPublish, recordValidation, lastValidation: () => lastValidation, health, CHECKS, GUIDANCE, MAIN_CHECKS, hasOther, runHealth, healthRunState, missingSeo, SEO_GROUPS, checkedLocales, seoConflicts, saveRedirect, removeRedirect, REDIRECT_STATUSES, sitemap, indexingUrls, robots, generatedRobots, robotsWarnings, robotsTools, setRobots, sitePublicLocales, setVisibility, setCanonicalHost, RIGHTS, keepAddresses, previewAddresses, exportState, importState, validateState };
 }
 
 module.exports = { makeLibrary };

@@ -2127,6 +2127,202 @@
         "redirect_auto": "Created when an address changed",
         "redirect_test": "Tested"
       }
+    },
+    "indexing": {
+      "validated": "Validation finished: {fail} failing, {warn} to check.",
+      "validateFailed": "The validation couldn’t run. Try again.",
+      "validateTitle": "Validate indexing settings",
+      "validateHelp": "Checks that the site-wide setting, page settings, sitemap, robots.txt, canonicals and languages agree, here and on the live site.",
+      "validate": "Validate indexing settings",
+      "lastValidated": "Last validated {time} by {name}",
+      "summary": {
+        "pass": "{count, plural, one {# passed} other {# passed}}",
+        "warn": "{count, plural, one {# to check} other {# to check}}",
+        "fail": "{count, plural, one {# failing} other {# failing}}"
+      },
+      "notValidated": "Not validated yet.",
+      "fix": "Fix",
+      "check": {
+        "visibility": {
+          "title": "Site-wide setting",
+          "info": "The whole site asks search engines not to index it, until the content is approved. No page is indexable and the sitemap is empty by design ({pages} pages).",
+          "pass": "The site may be indexed. Each page’s own setting decides ({pages} pages)."
+        },
+        "noindexInSitemap": {
+          "title": "noindex pages set to be in the sitemap",
+          "warn": "{count} addresses are set to be in the sitemap but to noindex. They are left out of the published sitemap; decide which one each page needs.",
+          "pass": "No page is both noindex and set to be in the sitemap."
+        },
+        "canonicalInSitemap": {
+          "title": "Sitemap and canonicals",
+          "warn": "{count} addresses set to be in the sitemap name another address as the original. They are left out of the published sitemap.",
+          "pass": "Every address set to be in the sitemap is its own original."
+        },
+        "canonicals": {
+          "title": "Canonical addresses",
+          "fail": "{count} pages have a canonical problem (another website, an address the site doesn’t serve, or a sitemap conflict).",
+          "pass": "No canonical problems."
+        },
+        "robots": {
+          "title": "robots.txt",
+          "fail": "robots.txt blocks pages that should be found ({kinds}).",
+          "warn": "robots.txt has {count} warnings to check ({kinds}).",
+          "pass": "robots.txt blocks nothing that should be found."
+        },
+        "languages": {
+          "title": "Languages",
+          "pass": "Public languages, from Site settings, used by the dashboard and the website alike: {languages}."
+        },
+        "live": {
+          "title": "Live website",
+          "pass": "{url} answered.",
+          "warn": "No website address is set, so the live files couldn’t be checked.",
+          "fail": "{url} couldn’t be reached."
+        },
+        "liveSitemapValid": {
+          "title": "Published sitemap file",
+          "pass": "Valid sitemap with {count} addresses.",
+          "warn": "The sitemap file has warnings: {problems}.",
+          "fail": "The sitemap file has problems: {problems}."
+        },
+        "liveSitemapMatches": {
+          "title": "Sitemap on the live site",
+          "pass": "The live sitemap matches the settings here.",
+          "warn": "The live sitemap lists {live} addresses; the settings here give {expected}. Publish the website."
+        },
+        "liveRobotsMatches": {
+          "title": "robots.txt on the live site",
+          "pass": "The live robots.txt matches the one here.",
+          "warn": "The live robots.txt differs from the one here. Publish the website."
+        },
+        "liveVisibility": {
+          "title": "Site-wide setting on the live site",
+          "pass": "The live site uses the setting here.",
+          "warn": "The live site was built with “{live}”, the setting here is “{set}”. Publish the website."
+        },
+        "canonicalHost": {
+          "title": "Canonical host",
+          "pass": "Canonicals use {host}, where the site is served.",
+          "warn": "Canonicals use {host}, but the site is served from {served}. Fine before a domain move; otherwise change the canonical host."
+        }
+      },
+      "hiddenBody": "Every page asks search engines not to index it, until the content is approved. {own} pages are set to index on their own and would become indexable if this is switched on; right now {indexable} are.",
+      "visibleBody": "Search engines may index the site. {indexable} addresses are indexable; pages set to noindex stay out.",
+      "overrideExplained": "While the site is hidden, it overrides every page: a page set to index is still sent noindex. Once it’s visible, each page’s own setting applies.",
+      "notIndexedYet": "Allowing indexing doesn’t mean Google has indexed a page. Check that in Google Search Console.",
+      "notRemovedAtOnce": "Hiding the site doesn’t remove pages from results at once: search engines drop them as they crawl again.",
+      "makeVisibleImpact": "{indexable} addresses become indexable. {noindex} stay noindex because of their own page setting; change those in each page’s SEO. Anything still a placeholder can show up in results.",
+      "hideImpact": "{count} addresses that are indexable now drop out of search results over the next days.",
+      "nowVisible": "The site may now be indexed. Publish the website to apply it.",
+      "nowHidden": "The site is hidden from search. Publish the website to apply it.",
+      "historyCanonical": "Canonical host",
+      "historyRobots": "robots.txt",
+      "google": {
+        "title": "Google index status",
+        "sample": "Sample data, not from Google",
+        "help": "What Google itself reports, kept apart from the settings above. Until Search Console is connected, the figures below are a sample of what will show.",
+        "indexed": "Indexed",
+        "notIndexed": "Not indexed",
+        "redirects": "Page with redirect",
+        "reason": {
+          "noindex": "Excluded by ‘noindex’ tag: {count}",
+          "discovered": "Discovered, currently not indexed: {count}"
+        },
+        "lastCrawl": "Last crawl: {time}",
+        "connect": "Connect Google Search Console",
+        "connectTitle": "Connecting Google Search Console",
+        "connectHelp": "This needs the website’s owner and setup outside the Website Manager:",
+        "step1": "Verify the domain (orgtik.ch, or the live domain) in Google Search Console, with a DNS TXT record.",
+        "step2": "Create a Google Cloud project, enable the Search Console API, and set up OAuth consent or a service account.",
+        "step3": "Give that account access to the Search Console property.",
+        "step4": "Add its credentials to the Website Manager’s server. It then reads index coverage and URL inspection results (Google allows about 2,000 inspections a day).",
+        "close": "Close"
+      },
+      "sitemapTitle": "Sitemap and page indexing",
+      "colOwnPolicy": "Page setting",
+      "colEffective": "Sent to search engines",
+      "canonicalSelf": "This address",
+      "listed": "In the sitemap",
+      "notListed": "Not in the sitemap",
+      "whyExcluded": "Left out by the page’s setting",
+      "whyNoindex": "noindex pages are left out",
+      "whyCanonical": "Names another address as the original",
+      "warning": {
+        "noindexInSitemap": "Set to the sitemap, but noindex",
+        "canonicalElsewhere": "Set to the sitemap, canonical elsewhere"
+      },
+      "fileTitle": "Published sitemap file",
+      "openFile": "Open the file",
+      "regenerate": "Regenerate: publish the website",
+      "fileChecking": "Reading the live file…",
+      "fileUnavailable": "The live sitemap couldn’t be read.",
+      "fileUrl": "Address",
+      "fileCount": "Addresses in it",
+      "fileCountValue": "{live} live, {expected} from the settings here",
+      "fileUpdated": "Last updated",
+      "unknown": "Unknown",
+      "fileStatus": "Check",
+      "fileProblem": {
+        "missing": "missing",
+        "not_valid_xml": "not valid XML",
+        "other_host": "addresses on another host",
+        "no_lastmod": "no last-modified dates"
+      },
+      "fileValid": "Valid XML, every address on the canonical host",
+      "sitemapRules": "The published sitemap lists only published pages that may be indexed, at their own address. Cart, checkout and sign-in are left out by their page setting.",
+      "sitemapRulesHidden": "The published sitemap lists only published pages that may be indexed, at their own address. While the site is hidden that is none: the empty sitemap is intended.",
+      "searchLabel": "Search by page name or address",
+      "warningsFilter": "Warnings",
+      "anyWarning": "Any warning",
+      "noAddresses": "No address matches these filters.",
+      "languagesNote": "Languages checked: {languages} (public in Site settings).",
+      "robotsCustom": "Written here",
+      "robotsGenerated": "Generated from the site-wide setting",
+      "robotsVsNoindex": "robots.txt controls crawling; noindex keeps a page out of results. A blocked page can’t be read, so search engines never see its noindex, and it can still be listed from links. To keep a page out of results, use noindex and leave it crawlable.",
+      "robotsEditor": "File",
+      "robotsEditorHelp": "Warnings and the tester follow what you type, before you save. Saving reaches the live site when the website is published.",
+      "robotsReadOnly": "Changing robots.txt needs the site visibility permission.",
+      "robotsWarning": {
+        "tooLong": "The file is over 10,000 bytes. Keep it short.",
+        "unknownLines": "Lines {lines} aren’t robots.txt rules and are ignored.",
+        "blocksHome": "This blocks the home page, so the whole site can’t be crawled.",
+        "blocksIndexable": "This blocks {count} pages that should be found: {pages}.",
+        "blocksNoindex": "This blocks {count} noindex pages ({pages}): search engines can’t read their noindex.",
+        "noSitemapLine": "The site is visible but robots.txt has no Sitemap line.",
+        "sitemapOtherHost": "The Sitemap line points to another host: {sitemaps}."
+      },
+      "robotsNoWarnings": "No warnings: nothing that should be found is blocked.",
+      "robotsSave": "Save robots.txt",
+      "robotsResetAction": "Reset to generated",
+      "robotsSaved": "robots.txt saved. Publish the website to apply it.",
+      "robotsReset": "robots.txt reset to the generated file. Publish the website to apply it.",
+      "robotsTooLong": "robots.txt is too long.",
+      "testerTitle": "Test an address",
+      "testerPath": "Address",
+      "testerAgent": "Crawler",
+      "anyCrawler": "Any crawler (*)",
+      "testerAllowed": "Allowed: may be crawled",
+      "testerBlocked": "Blocked: may not be crawled",
+      "testerRule": "Line {line}: {rule}",
+      "testerNoRule": "No rule matches, so crawling is allowed.",
+      "testerNote": "Uses the text above, saved or not: the longest matching rule wins and Allow wins a tie, as Google reads it.",
+      "guideTitle": "How the rules work",
+      "guideAllow": "Allow: lets crawlers into a path, even inside a blocked folder (Allow: /checkout/help inside Disallow: /checkout).",
+      "guideDisallow": "Disallow: keeps crawlers out of a path and everything under it. An empty Disallow allows everything.",
+      "guideWildcards": "* matches any characters and $ marks the end: Disallow: /*.pdf$ blocks every PDF.",
+      "robotsResetTitle": "Reset robots.txt to the generated file?",
+      "robotsSaveTitle": "Save robots.txt?",
+      "robotsResetImpact": "The file written here is replaced by the one generated from the site-wide setting.",
+      "robotsSaveImpactWarnings": "It has {count} warnings above. It reaches the live site when the website is published.",
+      "robotsSaveImpact": "It reaches the live site when the website is published.",
+      "hostTitle": "Canonical host",
+      "hostHelp": "Every canonical, hreflang and sitemap address is built on this. Change it when the site moves to its own domain (orgtik.ch); nothing changes by itself.",
+      "hostLabel": "Host",
+      "hostSave": "Save canonical host",
+      "hostConfirmTitle": "Change the canonical host?",
+      "hostConfirmImpact": "Every canonical, hreflang and sitemap address will use {host} once the website is published. Search engines treat that host as the original.",
+      "hostSaved": "Canonical host saved. Publish the website to apply it.",
+      "hostInvalid": "Use an https:// address with no path, e.g. https://orgtik.ch."
     }
   },
   "Site": {

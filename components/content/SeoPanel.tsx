@@ -275,6 +275,7 @@ export function SeoPanel({
           <div className={fullWidthFields ? "grid min-w-0 gap-4" : "grid gap-4 sm:grid-cols-2"}>
             <Field label={t("robots")}>
               <Select
+                data-seo-field="robots"
                 readOnly={!can.edit}
                 value={seo.robots ?? "index"}
                 onValueChange={(v) => onChange({ robots: v as "index" | "noindex" })}

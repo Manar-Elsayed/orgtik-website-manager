@@ -598,6 +598,10 @@ test("SEO-only edits preserve content permissions; redirects and indexing includ
   );
   assert.ok(library.robots().includes("Allow: /"));
   library.settings.publicLocales = ["en", "ar", "de"];
+  // The published sitemap lists only indexable pages (client SEO requirements, 2026-10-21): with
+  // the site visible, the German home (English settings, index) is listed, the Arabic one isn't.
+  library.setVisibility(approver, "index", "Test public policy");
+  store.entries.get("pg_home").live.seo.de = { ...store.entries.get("pg_home").live.seo.de, robots: "index", inSitemap: true };
   store.entries.get("pg_home").live.seo.ar = {
     robots: "noindex",
     inSitemap: false,

@@ -741,22 +741,48 @@ export type RedirectList = Page<Redirect> & { liveKnown: boolean; liveUrl: strin
 export type Indexing = {
   /** What the site wraps titles in, and its default shared image (for previews). */
   site?: { titleTemplate: string; defaultOgImage: string | null };
-  urls: { id: string; type: EntryType; locale: string; loc: string; canonical: string; policy: "index" | "noindex"; reason: "siteOverride" | "pagePolicy" | "allowed"; inSitemap: boolean; lastmod: string }[];
+  urls: IndexingUrl[];
   settings: {
     canonicalHost: string;
     visibility: "index" | "noindex";
     publicLocales: Locale[];
+    /** robots.txt is written here (otherwise generated from the site-wide setting). */
+    robotsCustom: boolean;
     version: number;
     history: {
       at: string;
       by: Person;
       visibility: "index" | "noindex";
+      canonicalHost?: string;
+      robots?: "custom" | "generated";
       note: string;
     }[];
   };
+  /** The public languages, from Site settings: the same list the website builds from. */
+  publicLocales: Locale[];
   sitemap: { loc: string; lastmod: string; type: EntryType; id: string }[];
   robots: string;
+  robotsGenerated: string;
+  robotsWarnings: RobotsWarning[];
+  /** What switching the site-wide setting would really do. */
+  impact: { becomeIndexable: number; stayNoindex: number; indexableNow: number; pages: number };
+  lastValidation: IndexingValidation | null;
 };
+export type IndexingUrl = {
+  id: string; type: EntryType; name: string; locale: Locale; path: string; loc: string;
+  canonical: string; canonicalSelf: boolean;
+  /** The page's own setting, and what search engines are told after the site-wide one. */
+  pagePolicy: "index" | "noindex"; policy: "index" | "noindex"; overridden: boolean;
+  reason: "siteOverride" | "pagePolicy" | "allowed";
+  /** Wanted in the sitemap (the page's setting), and actually in the published sitemap. */
+  sitemapSetting: boolean; inSitemap: boolean;
+  warnings: ("noindexInSitemap" | "canonicalElsewhere")[];
+  lastmod: string | null;
+};
+export type RobotsWarning = { kind: "tooLong" | "unknownLines" | "blocksHome" | "blocksIndexable" | "blocksNoindex" | "noSitemapLine" | "sitemapOtherHost"; lines?: number[]; count?: number; pages?: string[]; sitemaps?: string[] };
+export type RobotsCheck = { warnings: RobotsWarning[]; test: { allowed: boolean; rule: { type: "allow" | "disallow"; path: string; line: number } | null; agent: string | null } | null };
+export type IndexingCheck = { id: string; level: "pass" | "info" | "warn" | "fail"; params: Record<string, string | number>; fix: string | null };
+export type IndexingValidation = { at: string; by: Person; summary: { pass: number; info: number; warn: number; fail: number }; checks: IndexingCheck[] };
 
 export type EntryPatch = {
   presentation?: EntryContent["presentation"];
@@ -1165,6 +1191,21 @@ export const api = createApi({
       }),
       invalidatesTags: ["Seo"],
     }),
+    setRobots: b.mutation<Indexing, { version: number; robots: string | null; reason: string }>({
+      query: ({ version, ...body }) => ({ url: "/admin/seo/indexing", method: "PATCH", body, headers: { "if-match": String(version) } }),
+      invalidatesTags: ["Seo"],
+    }),
+    setCanonicalHost: b.mutation<Indexing, { version: number; canonicalHost: string; reason: string }>({
+      query: ({ version, ...body }) => ({ url: "/admin/seo/indexing", method: "PATCH", body, headers: { "if-match": String(version) } }),
+      invalidatesTags: ["Seo"],
+    }),
+    checkRobots: b.mutation<RobotsCheck, { text: string; path?: string; agent?: string }>({
+      query: (body) => ({ url: "/admin/seo/indexing/robots/check", method: "POST", body }),
+    }),
+    validateIndexing: b.mutation<IndexingValidation, void>({
+      query: () => ({ url: "/admin/seo/indexing/validate", method: "POST" }),
+      invalidatesTags: ["Seo"],
+    }),
     translateEntry: b.mutation<
       Entry,
       EntryRef & {
@@ -1356,6 +1397,10 @@ export const {
   usePreviewAddressesQuery,
   usePreviewTokenMutation,
   useSetVisibilityMutation,
+  useSetRobotsMutation,
+  useSetCanonicalHostMutation,
+  useCheckRobotsMutation,
+  useValidateIndexingMutation,
   useTranslateEntryMutation,
   useEntryVersionQuery,
   useRestoreEntryMutation,

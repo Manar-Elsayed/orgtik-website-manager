@@ -2127,6 +2127,202 @@
         "redirect_auto": "Bei einer Adressänderung erstellt",
         "redirect_test": "Getestet"
       }
+    },
+    "indexing": {
+      "validated": "Prüfung fertig: {fail} fehlerhaft, {warn} zu prüfen.",
+      "validateFailed": "Die Prüfung konnte nicht laufen. Bitte erneut versuchen.",
+      "validateTitle": "Indexierungseinstellungen prüfen",
+      "validateHelp": "Prüft, ob Website-Einstellung, Seiteneinstellungen, Sitemap, robots.txt, Canonicals und Sprachen zusammenpassen, hier und auf der Live-Website.",
+      "validate": "Indexierungseinstellungen prüfen",
+      "lastValidated": "Zuletzt geprüft {time} von {name}",
+      "summary": {
+        "pass": "{count, plural, one {# bestanden} other {# bestanden}}",
+        "warn": "{count, plural, one {# zu prüfen} other {# zu prüfen}}",
+        "fail": "{count, plural, one {# fehlerhaft} other {# fehlerhaft}}"
+      },
+      "notValidated": "Noch nicht geprüft.",
+      "fix": "Beheben",
+      "check": {
+        "visibility": {
+          "title": "Website-Einstellung",
+          "info": "Die ganze Website bittet Suchmaschinen, sie nicht zu indexieren, bis die Inhalte freigegeben sind. Keine Seite ist indexierbar, die Sitemap ist bewusst leer ({pages} Seiten).",
+          "pass": "Die Website darf indexiert werden. Die Einstellung jeder Seite entscheidet ({pages} Seiten)."
+        },
+        "noindexInSitemap": {
+          "title": "noindex-Seiten für die Sitemap vorgesehen",
+          "warn": "{count} Adressen sind für die Sitemap vorgesehen, aber auf noindex gesetzt. Sie fehlen in der veröffentlichten Sitemap; entscheiden Sie pro Seite.",
+          "pass": "Keine Seite ist zugleich noindex und für die Sitemap vorgesehen."
+        },
+        "canonicalInSitemap": {
+          "title": "Sitemap und Canonicals",
+          "warn": "{count} für die Sitemap vorgesehene Adressen nennen eine andere Adresse als Original. Sie fehlen in der veröffentlichten Sitemap.",
+          "pass": "Jede für die Sitemap vorgesehene Adresse ist ihr eigenes Original."
+        },
+        "canonicals": {
+          "title": "Canonical-Adressen",
+          "fail": "{count} Seiten haben ein Canonical-Problem (andere Website, eine nicht ausgelieferte Adresse oder ein Sitemap-Konflikt).",
+          "pass": "Keine Canonical-Probleme."
+        },
+        "robots": {
+          "title": "robots.txt",
+          "fail": "robots.txt sperrt Seiten, die gefunden werden sollen ({kinds}).",
+          "warn": "robots.txt hat {count} Hinweise zu prüfen ({kinds}).",
+          "pass": "robots.txt sperrt nichts, was gefunden werden soll."
+        },
+        "languages": {
+          "title": "Sprachen",
+          "pass": "Öffentliche Sprachen aus den Website-Einstellungen, für Dashboard und Website gleich: {languages}."
+        },
+        "live": {
+          "title": "Live-Website",
+          "pass": "{url} hat geantwortet.",
+          "warn": "Keine Website-Adresse gesetzt, die Live-Dateien konnten nicht geprüft werden.",
+          "fail": "{url} war nicht erreichbar."
+        },
+        "liveSitemapValid": {
+          "title": "Veröffentlichte Sitemap-Datei",
+          "pass": "Gültige Sitemap mit {count} Adressen.",
+          "warn": "Die Sitemap-Datei hat Hinweise: {problems}.",
+          "fail": "Die Sitemap-Datei hat Probleme: {problems}."
+        },
+        "liveSitemapMatches": {
+          "title": "Sitemap auf der Live-Website",
+          "pass": "Die Live-Sitemap entspricht den Einstellungen hier.",
+          "warn": "Die Live-Sitemap führt {live} Adressen; laut Einstellungen hier sind es {expected}. Website veröffentlichen."
+        },
+        "liveRobotsMatches": {
+          "title": "robots.txt auf der Live-Website",
+          "pass": "Die Live-robots.txt entspricht der hier.",
+          "warn": "Die Live-robots.txt weicht von der hier ab. Website veröffentlichen."
+        },
+        "liveVisibility": {
+          "title": "Website-Einstellung auf der Live-Website",
+          "pass": "Die Live-Website nutzt die Einstellung hier.",
+          "warn": "Die Live-Website wurde mit „{live}“ gebaut, hier ist „{set}“ eingestellt. Website veröffentlichen."
+        },
+        "canonicalHost": {
+          "title": "Canonical-Host",
+          "pass": "Canonicals nutzen {host}, wo die Website ausgeliefert wird.",
+          "warn": "Canonicals nutzen {host}, die Website wird aber von {served} ausgeliefert. Vor einem Domainwechsel in Ordnung; sonst den Canonical-Host ändern."
+        }
+      },
+      "hiddenBody": "Jede Seite bittet Suchmaschinen, sie nicht zu indexieren, bis die Inhalte freigegeben sind. {own} Seiten sind selbst auf index gesetzt und würden beim Einschalten indexierbar; derzeit sind es {indexable}.",
+      "visibleBody": "Suchmaschinen dürfen die Website indexieren. {indexable} Adressen sind indexierbar; Seiten auf noindex bleiben draußen.",
+      "overrideExplained": "Solange die Website verborgen ist, gilt das für jede Seite: Auch eine Seite auf index sendet noindex. Ist sie sichtbar, gilt die Einstellung jeder Seite.",
+      "notIndexedYet": "Indexierung erlauben heißt nicht, dass Google eine Seite indexiert hat. Das zeigt die Google Search Console.",
+      "notRemovedAtOnce": "Verbergen entfernt Seiten nicht sofort aus den Ergebnissen: Suchmaschinen lassen sie beim nächsten Crawlen fallen.",
+      "makeVisibleImpact": "{indexable} Adressen werden indexierbar. {noindex} bleiben wegen ihrer eigenen Seiteneinstellung auf noindex; ändern Sie das im SEO jeder Seite. Platzhalter können in Ergebnissen erscheinen.",
+      "hideImpact": "{count} derzeit indexierbare Adressen verschwinden in den nächsten Tagen aus den Suchergebnissen.",
+      "nowVisible": "Die Website darf jetzt indexiert werden. Website veröffentlichen, um es zu übernehmen.",
+      "nowHidden": "Die Website ist für die Suche verborgen. Website veröffentlichen, um es zu übernehmen.",
+      "historyCanonical": "Canonical-Host",
+      "historyRobots": "robots.txt",
+      "google": {
+        "title": "Indexierungsstatus bei Google",
+        "sample": "Beispieldaten, nicht von Google",
+        "help": "Was Google selbst meldet, getrennt von den Einstellungen oben. Bis die Search Console verbunden ist, sind die Zahlen unten ein Beispiel dessen, was erscheinen wird.",
+        "indexed": "Indexiert",
+        "notIndexed": "Nicht indexiert",
+        "redirects": "Seite mit Weiterleitung",
+        "reason": {
+          "noindex": "Durch ‘noindex’-Tag ausgeschlossen: {count}",
+          "discovered": "Gefunden, derzeit nicht indexiert: {count}"
+        },
+        "lastCrawl": "Letztes Crawlen: {time}",
+        "connect": "Google Search Console verbinden",
+        "connectTitle": "Google Search Console verbinden",
+        "connectHelp": "Dafür braucht es den Website-Inhaber und eine Einrichtung außerhalb des Website Managers:",
+        "step1": "Die Domain (orgtik.ch oder die Live-Domain) in der Google Search Console per DNS-TXT-Eintrag bestätigen.",
+        "step2": "Ein Google-Cloud-Projekt anlegen, die Search Console API aktivieren und OAuth-Zustimmung oder ein Dienstkonto einrichten.",
+        "step3": "Diesem Konto Zugriff auf die Search-Console-Property geben.",
+        "step4": "Die Zugangsdaten auf dem Server des Website Managers hinterlegen. Dann liest er Indexabdeckung und URL-Prüfungen (Google erlaubt etwa 2.000 Prüfungen pro Tag).",
+        "close": "Schließen"
+      },
+      "sitemapTitle": "Sitemap und Seitenindexierung",
+      "colOwnPolicy": "Seiteneinstellung",
+      "colEffective": "An Suchmaschinen gesendet",
+      "canonicalSelf": "Diese Adresse",
+      "listed": "In der Sitemap",
+      "notListed": "Nicht in der Sitemap",
+      "whyExcluded": "Durch die Seiteneinstellung ausgelassen",
+      "whyNoindex": "noindex-Seiten werden ausgelassen",
+      "whyCanonical": "Nennt eine andere Adresse als Original",
+      "warning": {
+        "noindexInSitemap": "Für die Sitemap vorgesehen, aber noindex",
+        "canonicalElsewhere": "Für die Sitemap vorgesehen, Canonical woanders"
+      },
+      "fileTitle": "Veröffentlichte Sitemap-Datei",
+      "openFile": "Datei öffnen",
+      "regenerate": "Neu erzeugen: Website veröffentlichen",
+      "fileChecking": "Live-Datei wird gelesen…",
+      "fileUnavailable": "Die Live-Sitemap konnte nicht gelesen werden.",
+      "fileUrl": "Adresse",
+      "fileCount": "Enthaltene Adressen",
+      "fileCountValue": "{live} live, {expected} laut Einstellungen hier",
+      "fileUpdated": "Zuletzt aktualisiert",
+      "unknown": "Unbekannt",
+      "fileStatus": "Prüfung",
+      "fileProblem": {
+        "missing": "fehlt",
+        "not_valid_xml": "kein gültiges XML",
+        "other_host": "Adressen auf einem anderen Host",
+        "no_lastmod": "keine Änderungsdaten"
+      },
+      "fileValid": "Gültiges XML, jede Adresse auf dem Canonical-Host",
+      "sitemapRules": "Die veröffentlichte Sitemap führt nur veröffentlichte, indexierbare Seiten unter ihrer eigenen Adresse. Warenkorb, Checkout und Anmeldung bleiben per Seiteneinstellung draußen.",
+      "sitemapRulesHidden": "Die veröffentlichte Sitemap führt nur veröffentlichte, indexierbare Seiten unter ihrer eigenen Adresse. Solange die Website verborgen ist, sind das keine: Die leere Sitemap ist gewollt.",
+      "searchLabel": "Nach Seitenname oder Adresse suchen",
+      "warningsFilter": "Hinweise",
+      "anyWarning": "Jeder Hinweis",
+      "noAddresses": "Keine Adresse passt zu diesen Filtern.",
+      "languagesNote": "Geprüfte Sprachen: {languages} (öffentlich in den Website-Einstellungen).",
+      "robotsCustom": "Hier geschrieben",
+      "robotsGenerated": "Aus der Website-Einstellung erzeugt",
+      "robotsVsNoindex": "robots.txt steuert das Crawlen; noindex hält eine Seite aus den Ergebnissen. Eine gesperrte Seite kann nicht gelesen werden, ihr noindex bleibt also ungesehen und sie kann über Links trotzdem gelistet werden. Um eine Seite aus den Ergebnissen zu halten, noindex nutzen und sie crawlbar lassen.",
+      "robotsEditor": "Datei",
+      "robotsEditorHelp": "Hinweise und Tester folgen der Eingabe, schon vor dem Speichern. Gespeichertes geht mit der nächsten Veröffentlichung live.",
+      "robotsReadOnly": "Zum Ändern der robots.txt ist die Berechtigung für die Website-Sichtbarkeit nötig.",
+      "robotsWarning": {
+        "tooLong": "Die Datei ist größer als 10.000 Bytes. Kurz halten.",
+        "unknownLines": "Die Zeilen {lines} sind keine robots.txt-Regeln und werden ignoriert.",
+        "blocksHome": "Das sperrt die Startseite, die ganze Website kann nicht gecrawlt werden.",
+        "blocksIndexable": "Das sperrt {count} Seiten, die gefunden werden sollen: {pages}.",
+        "blocksNoindex": "Das sperrt {count} noindex-Seiten ({pages}): Suchmaschinen können ihr noindex nicht lesen.",
+        "noSitemapLine": "Die Website ist sichtbar, aber robots.txt hat keine Sitemap-Zeile.",
+        "sitemapOtherHost": "Die Sitemap-Zeile zeigt auf einen anderen Host: {sitemaps}."
+      },
+      "robotsNoWarnings": "Keine Hinweise: Nichts, was gefunden werden soll, ist gesperrt.",
+      "robotsSave": "robots.txt speichern",
+      "robotsResetAction": "Auf erzeugte Datei zurücksetzen",
+      "robotsSaved": "robots.txt gespeichert. Website veröffentlichen, um sie zu übernehmen.",
+      "robotsReset": "robots.txt auf die erzeugte Datei zurückgesetzt. Website veröffentlichen, um sie zu übernehmen.",
+      "robotsTooLong": "robots.txt ist zu lang.",
+      "testerTitle": "Adresse testen",
+      "testerPath": "Adresse",
+      "testerAgent": "Crawler",
+      "anyCrawler": "Jeder Crawler (*)",
+      "testerAllowed": "Erlaubt: darf gecrawlt werden",
+      "testerBlocked": "Gesperrt: darf nicht gecrawlt werden",
+      "testerRule": "Zeile {line}: {rule}",
+      "testerNoRule": "Keine Regel passt, Crawlen ist erlaubt.",
+      "testerNote": "Nutzt den Text oben, gespeichert oder nicht: Die längste passende Regel gewinnt, bei Gleichstand Allow, so wie Google liest.",
+      "guideTitle": "So wirken die Regeln",
+      "guideAllow": "Allow: lässt Crawler in einen Pfad, auch in einem gesperrten Ordner (Allow: /checkout/help in Disallow: /checkout).",
+      "guideDisallow": "Disallow: hält Crawler aus einem Pfad und allem darunter heraus. Ein leeres Disallow erlaubt alles.",
+      "guideWildcards": "* steht für beliebige Zeichen, $ für das Ende: Disallow: /*.pdf$ sperrt jedes PDF.",
+      "robotsResetTitle": "robots.txt auf die erzeugte Datei zurücksetzen?",
+      "robotsSaveTitle": "robots.txt speichern?",
+      "robotsResetImpact": "Die hier geschriebene Datei wird durch die aus der Website-Einstellung erzeugte ersetzt.",
+      "robotsSaveImpactWarnings": "Sie hat {count} Hinweise (oben). Live ist sie, sobald die Website veröffentlicht wird.",
+      "robotsSaveImpact": "Live ist sie, sobald die Website veröffentlicht wird.",
+      "hostTitle": "Canonical-Host",
+      "hostHelp": "Darauf bauen alle Canonical-, hreflang- und Sitemap-Adressen auf. Ändern, wenn die Website auf ihre eigene Domain (orgtik.ch) zieht; nichts ändert sich von selbst.",
+      "hostLabel": "Host",
+      "hostSave": "Canonical-Host speichern",
+      "hostConfirmTitle": "Canonical-Host ändern?",
+      "hostConfirmImpact": "Alle Canonical-, hreflang- und Sitemap-Adressen nutzen {host}, sobald die Website veröffentlicht ist. Suchmaschinen sehen diesen Host als Original.",
+      "hostSaved": "Canonical-Host gespeichert. Website veröffentlichen, um ihn zu übernehmen.",
+      "hostInvalid": "Eine https://-Adresse ohne Pfad verwenden, z. B. https://orgtik.ch."
     }
   },
   "Site": {
