@@ -570,6 +570,7 @@ export type SeoCheck =
   | "descriptionMissing"
   | "descriptionShort"
   | "descriptionLong"
+  | "descriptionDuplicate"
   | "addressDuplicate"
   | "focusDuplicate"
   | "noSocialImage"
@@ -598,7 +599,8 @@ export type SeoHealthRow = SeoRow & {
 };
 /** Another page, named in a duplicate warning. */
 export type SeoPageRef = { id: string; type: EntryType; name: string; path: string };
-export type SeoDuplicates = Partial<Record<"title" | "address" | "focus", SeoPageRef[]>>;
+export type SeoDuplicateKind = "title" | "description" | "address" | "focus";
+export type SeoDuplicates = Partial<Record<SeoDuplicateKind, SeoPageRef[]>>;
 export type SeoHealth = Page<SeoHealthRow> & {
   counts: Record<SeoCheck, number>;
   healthy: number;
@@ -623,6 +625,8 @@ export type SeoMissingRow = Pick<SeoRow, "id" | "type" | "name" | "path" | "titl
   issues: SeoIssue[];
   /** Per language, the pages each duplicate clashes with. */
   duplicates?: Partial<Record<Locale, SeoDuplicates>>;
+  /** Per language, the title, description, address or keyphrase each duplicate shares. */
+  duplicateText?: Partial<Record<Locale, Partial<Record<SeoDuplicateKind, string>>>>;
 };
 export type SeoMissing = Page<SeoMissingRow> & {
   counts: Record<SeoGroup, number>;

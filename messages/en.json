@@ -1754,6 +1754,7 @@
       "descriptionMissing": "No search description",
       "descriptionShort": "Description under 50 characters",
       "descriptionLong": "Description over 160 characters",
+      "descriptionDuplicate": "Same description as another page",
       "addressDuplicate": "Same address as another page",
       "focusDuplicate": "Same focus keyphrase as another page",
       "noSocialImage": "No image for shared links",
@@ -1933,7 +1934,14 @@
       "issueFilter": "Issues",
       "moreIssues": "+{count}",
       "moreIssuesLabel": "Show {count} more issues for {page}",
-      "fewerIssues": "Show less"
+      "fewerIssues": "Show less",
+      "duplicateNote": {
+        "title": "This title is also used on:",
+        "description": "This description is also used on:",
+        "address": "This address is also used by:",
+        "focus": "This focus keyphrase is also the focus of:"
+      },
+      "duplicateMore": "and {count, plural, one {# more page} other {# more pages}}"
     },
     "languageNotPublic": "{language} isn’t switched on for the site",
     "languageNotPublicHelp": "Only the languages switched on in Site settings are checked. Turn this one on there to check its pages.",

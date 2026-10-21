@@ -110,3 +110,20 @@ test('SEO health shows a page once for every set of languages with exactly the s
     assert.deepEqual(g.descriptionLengths, own.map(r => r.descriptionLength));
   }
 });
+
+test('two pages with the same description are both flagged, with the page and the text for the note', () => {
+  const { store, library } = setup();
+  const [a, b] = library.health().rows.filter((r) => r.locale === 'en').slice(0, 2);
+  const text = 'One description shared by two pages, long enough to pass the length checks.';
+  for (const id of [a.id, b.id]) { const e = store.entries.get(id); (e.draft ?? e.live).seo.en.description = text; }
+  const rows = library.health().rows.filter((r) => r.locale === 'en' && [a.id, b.id].includes(r.id));
+  for (const r of rows) {
+    assert.ok(r.issues.includes('descriptionDuplicate'), `${r.id} flagged`);
+    assert.deepEqual(r.duplicates.description.map((o) => o.id), [r.id === a.id ? b.id : a.id]);
+    assert.equal(r.duplicateText.description, text);
+  }
+  const row = library.missingSeo().rows.find((r) => r.id === a.id);
+  assert.ok(row.issues.includes('descriptionDuplicate'));
+  assert.equal(row.duplicates.en.description[0].id, b.id);
+  assert.equal(row.duplicateText.en.description, text);
+});
