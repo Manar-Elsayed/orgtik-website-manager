@@ -18,18 +18,27 @@ function Handoff() {
   const landing = useRef((() => { const value = (params.get("redirect") || "").replace(/\s/g, ""); return value.startsWith("/") && !value.startsWith("//") && !value.startsWith("/\\") ? value : "/"; })());
   const { session, error, retry } = useHandoffSession(SOS_API, "staff:wm", code.current);
   const [result, setResult] = useState<Result>("checking"), [attempt, setAttempt] = useState(0);
+  const retryAttempt = () => { setResult("checking"); retry(); setAttempt(value => value + 1); };
+  // A brief outage (a busy shared store answers 503) gets one quiet retry before the error shows.
+  const autoRetried = useRef(false);
+  const offline = () => {
+    if (autoRetried.current) return setResult("offline");
+    autoRetried.current = true;
+    setTimeout(retryAttempt, 1000);
+  };
   useEffect(() => {
     if (!code.current) { if (!rejectedTokenUrl.current && getToken()) router.replace("/"); else if (!rejectedTokenUrl.current) router.replace("/signed-out"); else setResult("expired"); return; }
-    if (error) { setResult(error.status >= 500 ? "offline" : error.status === 403 ? "forbidden" : "expired"); return; }
+    if (error) { if (error.status >= 500) offline(); else setResult(error.status === 403 ? "forbidden" : "expired"); return; }
     if (!session) return;
     if (session.workspaceContext || !session.staffAccess?.apps.includes("wm")) { setResult("forbidden"); return; }
     let live = true;
     fetch(WM_API + "/admin/me", { headers: { Authorization: "Bearer " + session.tokens.accessToken } })
-      .then(response => { if (!live) return; if (response.ok) { setStaffSession(session); confirm(() => router.replace(landing.current)); } else setResult(response.status >= 500 ? "offline" : response.status === 403 ? "forbidden" : "expired"); })
-      .catch(reason => { if (live) setResult(reason instanceof SessionRequestError && reason.status === 403 ? "forbidden" : "offline"); });
+      .then(response => { if (!live) return; if (response.ok) { setStaffSession(session); confirm(() => router.replace(landing.current)); } else if (response.status >= 500) offline(); else setResult(response.status === 403 ? "forbidden" : "expired"); })
+      .catch(reason => { if (!live) return; if (reason instanceof SessionRequestError && reason.status === 403) setResult("forbidden"); else offline(); });
     return () => { live = false; };
+    // offline() reads refs and stable setters only.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session, error, attempt, router, confirm]);
-  const retryAttempt = () => { setResult("checking"); retry(); setAttempt(value => value + 1); };
   if (success) return success;
   if (result === "checking") {
     return (
