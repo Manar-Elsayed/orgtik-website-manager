@@ -45,7 +45,7 @@ function AuditLog() {
           );
         },
       },
-      { id: "version", header: t("colVersion"), meta: { numeric: true }, cell: ({ row }) => <span className="tabular-nums text-fg-subtle">{row.original.version ? `v${row.original.version}` : ""}</span> },
+      { id: "version", header: t("colVersion"), meta: { numeric: true }, cell: ({ row }) => <span className="tabular-nums text-fg-subtle">{row.original.version ? `v${row.original.version}` : "–"}</span> },
     ],
     [t, f],
   );

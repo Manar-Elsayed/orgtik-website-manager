@@ -126,7 +126,19 @@
       "role_update": "Ruolo modificato",
       "role_delete": "Ruolo eliminato",
       "user_role_pause": "Accesso del ruolo sospeso",
-      "user_role_resume": "Accesso del ruolo ripristinato"
+      "user_role_resume": "Accesso del ruolo ripristinato",
+      "idea_edit": "Ha modificato un’idea",
+      "rollback_published": "Ha ripristinato la versione pubblicata precedente",
+      "redirect_test": "Ha testato un reindirizzamento",
+      "site_publish": "Ha pubblicato il sito",
+      "redirect_auto": "Ha aggiunto un reindirizzamento per un indirizzo cambiato",
+      "robots_txt": "Ha modificato robots.txt",
+      "canonical_host": "Ha modificato l’host canonico",
+      "create": "Creato",
+      "delete": "Eliminato",
+      "schedule_failed": "Pubblicazione programmata non riuscita",
+      "user_delete": "Ha eliminato un utente",
+      "seo_check": "Ha eseguito un controllo SEO"
     }
   },
   "Auth": {

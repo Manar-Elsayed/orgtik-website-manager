@@ -126,7 +126,19 @@
       "role_update": "Changed a role",
       "role_delete": "Deleted a role",
       "user_role_pause": "Paused role access",
-      "user_role_resume": "Resumed role access"
+      "user_role_resume": "Resumed role access",
+      "idea_edit": "Edited an idea",
+      "rollback_published": "Rolled back the published version",
+      "redirect_test": "Tested a redirect",
+      "site_publish": "Published the website",
+      "redirect_auto": "Added a redirect for a changed address",
+      "robots_txt": "Changed robots.txt",
+      "canonical_host": "Changed the canonical host",
+      "create": "Created",
+      "delete": "Deleted",
+      "schedule_failed": "Scheduled publish failed",
+      "user_delete": "Deleted a user",
+      "seo_check": "Ran an SEO check"
     }
   },
   "Auth": {

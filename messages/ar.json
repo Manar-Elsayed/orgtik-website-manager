@@ -126,7 +126,19 @@
       "role_update": "عدّل دورًا",
       "role_delete": "حذف دورًا",
       "user_role_pause": "إيقاف صلاحيات الدور مؤقتًا",
-      "user_role_resume": "استئناف صلاحيات الدور"
+      "user_role_resume": "استئناف صلاحيات الدور",
+      "idea_edit": "عدّل فكرة",
+      "rollback_published": "أعاد النسخة المنشورة السابقة",
+      "redirect_test": "اختبر إعادة توجيه",
+      "site_publish": "نشر الموقع",
+      "redirect_auto": "أضاف إعادة توجيه لعنوان تغيّر",
+      "robots_txt": "غيّر robots.txt",
+      "canonical_host": "غيّر النطاق الأساسي",
+      "create": "أنشأ",
+      "delete": "حذف",
+      "schedule_failed": "تعذّر النشر المجدول",
+      "user_delete": "حذف مستخدمًا",
+      "seo_check": "أجرى فحص SEO"
     }
   },
   "Auth": {

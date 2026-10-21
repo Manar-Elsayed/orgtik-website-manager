@@ -126,7 +126,19 @@
       "role_update": "Rolle geändert",
       "role_delete": "Rolle gelöscht",
       "user_role_pause": "Rollenzugriff pausiert",
-      "user_role_resume": "Rollenzugriff fortgesetzt"
+      "user_role_resume": "Rollenzugriff fortgesetzt",
+      "idea_edit": "Idee bearbeitet",
+      "rollback_published": "Veröffentlichte Version zurückgesetzt",
+      "redirect_test": "Weiterleitung getestet",
+      "site_publish": "Website veröffentlicht",
+      "redirect_auto": "Weiterleitung für geänderte Adresse hinzugefügt",
+      "robots_txt": "robots.txt geändert",
+      "canonical_host": "Kanonischen Host geändert",
+      "create": "Erstellt",
+      "delete": "Gelöscht",
+      "schedule_failed": "Geplante Veröffentlichung fehlgeschlagen",
+      "user_delete": "Benutzer gelöscht",
+      "seo_check": "SEO-Prüfung ausgeführt"
     }
   },
   "Auth": {

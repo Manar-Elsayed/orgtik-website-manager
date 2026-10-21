@@ -35,7 +35,10 @@ function makeLibrary({ seed, store, now, uploads, demo = false, locales, site, p
   const ensureDemo = () => { if (demo) { require("./seed/demo-states").redirectExamples(redirects, now); require("./seed/workflow-examples").mediaExamples(media); } };
   ensureDemo();
   const current = (e) => e.draft ?? e.live;
-  const log = (who, action, id, type, extra = {}) => store.audit.unshift({ at: now(), by: who, action, entry: id, type, ...extra });
+  // Every event carries the version it left behind: the redirect's, the file's or the site settings'
+  // (a deletion passes the version it removed).
+  const versionOf = (id, type) => (type === "redirect" ? redirects.get(id)?.version : type === "media" ? media.get(id)?.version : type === "settings" ? settings.version : undefined);
+  const log = (who, action, id, type, extra = {}) => store.audit.unshift({ at: now(), by: who, action, entry: id, type, version: versionOf(id, type), ...extra });
 
   // ---- media ----
   // Every place an entry names the file: { entry, type, name, field, ownAlt } (live and draft).
@@ -144,7 +147,7 @@ function makeLibrary({ seed, store, now, uploads, demo = false, locales, site, p
     media.delete(m.id);
     // Bytes are retained until storage garbage collection: a failed journal commit can
     // restore this record. The public media route serves only registered library files.
-    log(who.key, "media_delete", m.id, "media");
+    log(who.key, "media_delete", m.id, "media", { version: m.version });
     return { ok: true };
   }
 
@@ -449,7 +452,7 @@ function makeLibrary({ seed, store, now, uploads, demo = false, locales, site, p
   }
   function removeRedirect(r, who) {
     redirects.delete(r.id);
-    log(who.key, "redirect_delete", r.id, "redirect");
+    log(who.key, "redirect_delete", r.id, "redirect", { version: r.version });
   }
 
   // ---- a published address that changes keeps working (plan: "a change after publishing creates 301s") ----
