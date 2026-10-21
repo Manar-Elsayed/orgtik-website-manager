@@ -241,12 +241,13 @@ export function SeoPanel({
       {/* A link preview as social networks draw it: image, site, title, description. */}
       <div role="img" aria-label={t("socialPreview")} className="overflow-hidden rounded-field border border-line bg-raised">
         {ogImage ? <img src={mediaUrl(ogImage)} alt="" className="aspect-[1.91/1] w-full object-cover" /> : <div className="grid aspect-[1.91/1] place-items-center bg-sunken text-body-sm text-fg-subtle">{t("noImage")}</div>}
-        <div className="flex flex-col gap-0.5 p-3" dir={lang === "ar" ? "rtl" : "ltr"} lang={lang}>
-          <span dir="ltr" className="text-start text-caption uppercase text-fg-subtle">
+        {/* Always left-aligned; each line reads in its own text's direction (an English fallback keeps its full stop at the end). */}
+        <div className="flex flex-col gap-0.5 p-3 text-left" dir="ltr" lang={lang}>
+          <span className="text-caption uppercase text-fg-subtle">
             orgtik.ch
           </span>
-          <span className="line-clamp-2 text-body font-medium text-fg">{ogTitle || t("noTitle")}</span>
-          <span className="line-clamp-2 text-body-sm text-fg-muted">{ogDescription}</span>
+          <span dir="auto" className="line-clamp-2 text-left text-body font-medium text-fg">{ogTitle || t("noTitle")}</span>
+          <span dir="auto" className="line-clamp-2 text-left text-body-sm text-fg-muted">{ogDescription}</span>
         </div>
       </div>
     </Section>
@@ -269,14 +270,15 @@ export function SeoPanel({
         <Section icon={<MagnifyingGlass />} title={t("search")}>
           {/* The result as a search engine shows it: address, title and description, cut where they'd be cut.
               Its colours are the search engine's own, on purpose and in both themes: it shows what people see there. */}
-          <div aria-label={t("searchPreview")} role="img" className="rounded-field border border-line bg-white p-4 text-start" dir={lang === "ar" ? "rtl" : "ltr"} lang={lang}>
-            <div dir="ltr" className="truncate text-start text-[12px] text-[#4D5156]">
+          {/* Always left-aligned; each line reads in its own text's direction (an English fallback keeps its full stop at the end). */}
+          <div aria-label={t("searchPreview")} role="img" className="rounded-field border border-line bg-white p-4 text-left" dir="ltr" lang={lang}>
+            <div className="truncate text-left text-[12px] text-[#4D5156]">
               {address}
             </div>
-            <div className="mt-1 truncate text-[20px] leading-7 text-[#1A0DAB]" style={{ fontFamily: "Arial, sans-serif" }}>
+            <div dir="auto" className="mt-1 truncate text-left text-[20px] leading-7 text-[#1A0DAB]" style={{ fontFamily: "Arial, sans-serif" }}>
               {shownTitle ? cut(shownTitle, "20px Arial", TITLE_PX) : <span className="text-[#70757A]">{t("noTitle")}</span>}
             </div>
-            <p className="mt-1 line-clamp-2 text-[14px] leading-[22px] text-[#4D5156]" style={{ fontFamily: "Arial, sans-serif" }}>
+            <p dir="auto" className="mt-1 line-clamp-2 text-left text-[14px] leading-[22px] text-[#4D5156]" style={{ fontFamily: "Arial, sans-serif" }}>
               {shownDescription ? cut(shownDescription, "14px Arial", DESCRIPTION_PX) : <span className="text-[#70757A]">{t("noDescription")}</span>}
             </p>
           </div>
