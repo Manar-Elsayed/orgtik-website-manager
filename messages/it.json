@@ -1862,9 +1862,7 @@
       "robotsNoindex": "Non elencare questa pagina",
       "inSitemap": "Includi nella sitemap",
       "canonical": "Indirizzo canonico",
-      "canonicalHelp": "Lascia vuoto: si usa l’indirizzo della pagina ({address}). Impostalo solo se un altro indirizzo ha lo stesso contenuto.",
-      "canonicalSeoOnly": "Lo imposta il team SEO; vuoto significa l’indirizzo della pagina.",
-      "canonicalInvalid": "Usa un indirizzo completo https://.",
+      "canonicalHelp": "Impostato automaticamente dall’indirizzo della pagina e dall’host canonico (SEO › Indicizzazione) e aggiornato quando l’indirizzo cambia. Non è modificabile, quindi nessuno può farlo puntare a un altro indirizzo.",
       "structured": "Dati strutturati",
       "structuredGenerated": "Il sito scrive {type} per questa pagina dal suo contenuto. Niente da compilare.",
       "structuredNone": "Il sito non scrive dati strutturati per questo tipo di pagina.",
@@ -1932,11 +1930,6 @@
       "emptyFiltered": "Nessuna pagina corrisponde a questi filtri.",
       "clearFilters": "Cancella filtri",
       "issueFilter": "Problemi",
-      "duplicateHint": {
-        "title": "Stesso titolo di {pages}",
-        "address": "Stesso indirizzo di {pages}",
-        "focus": "Parola chiave duplicata: è anche la frase chiave di {pages}. Cambiala."
-      },
       "moreIssues": "+{count}",
       "moreIssuesLabel": "Mostra altri {count} problemi per {page}",
       "fewerIssues": "Mostra meno"

@@ -91,6 +91,7 @@ import {
 import { useEntryName } from "@/lib/entryName";
 import { useCan } from "@/lib/permissions";
 import { safeReturn } from "@/lib/useListState";
+import { WEBSITE_URL } from "@/lib/env";
 import {
   api,
   statusOf,
@@ -115,6 +116,9 @@ import {
 } from "@/store/api";
 
 const LOCALES: Locale[] = ["en", "ar", "de", "fr", "it"];
+// The canonical URL the site prints for a page: the canonical host, the language prefix (none for
+// English) and the page's address, as the sitemap builds it.
+const canonicalUrl = (host: string, lang: Locale, path: string) => host.replace(/\/+$/, "") + (lang === "en" ? "" : `/${lang}`) + (path === "/" && lang !== "en" ? "" : path);
 const NATIVE: Record<Locale, string> = {
   en: "English",
   ar: "العربية",
@@ -1135,6 +1139,7 @@ function Editor({ entry, type, seoOnly = false }: { entry: Entry; type: ContentT
                   seo={seo as SeoBlock}
                   english={(entry.content.seo.en ?? {}) as SeoBlock}
                   address={`orgtik.ch${previewPath === "/" ? "" : previewPath}`}
+                  canonical={canonicalUrl(indexing.data?.settings.canonicalHost ?? WEBSITE_URL, lang, previewPath)}
                   slug={
                     type.fixedAddress
                       ? (previewPath.split("/").pop() ?? "")
@@ -1153,7 +1158,6 @@ function Editor({ entry, type, seoOnly = false }: { entry: Entry; type: ContentT
                   errors={errors}
                   can={{
                     edit: seoEditable,
-                    canonical: can("seo:edit"),
                     jsonLd: can("seo:custom-jsonld"),
                   }}
                   onChange={(patch) =>

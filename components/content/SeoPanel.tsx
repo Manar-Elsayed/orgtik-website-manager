@@ -89,6 +89,7 @@ export function SeoPanel({
   seo,
   english,
   address,
+  canonical,
   slug,
   siteHidden,
   entryImage,
@@ -106,6 +107,8 @@ export function SeoPanel({
   english: SeoBlock;
   /** The page's full address, for the previews ("orgtik.ch/work/…"). */
   address: string;
+  /** The canonical URL the site prints for this page and language, built from its address. */
+  canonical: string;
   slug: string;
   /** The whole site is hidden from search (Indexing): a page's own setting waits for it. */
   siteHidden: boolean;
@@ -114,7 +117,7 @@ export function SeoPanel({
   /** What the site generates for this page ("Service", "BlogPosting"…), or null. */
   structuredType: string | null;
   errors: Record<string, string>;
-  can: { edit: boolean; canonical: boolean; jsonLd: boolean };
+  can: { edit: boolean; jsonLd: boolean };
   onChange: (patch: Partial<SeoBlock>) => void;
   fullWidthFields?: boolean;
   /** This page, so duplicate warnings can leave it out. */
@@ -302,8 +305,9 @@ export function SeoPanel({
               <Checkbox disabled={!can.edit} checked={seo.inSitemap !== false} onCheckedChange={(v: boolean) => onChange({ inSitemap: v })} label={t("inSitemap")} />
             </div>
           </div>
-          <Field label={t("canonical")} description={can.canonical ? t("canonicalHelp", { address }) : t("canonicalSeoOnly")} error={err("canonical") ? t("canonicalInvalid") : undefined}>
-            <Input dir="ltr" readOnly={!can.canonical} value={seo.canonical ?? ""} placeholder={address.startsWith("http") ? address : `https://${address}`} onChange={(e) => onChange({ canonical: e.target.value.trim() })} />
+          {/* Always the page's own address: set automatically, never typed in. */}
+          <Field label={t("canonical")} description={t("canonicalHelp")}>
+            <Input dir="ltr" readOnly value={canonical} />
           </Field>
         </Section>
 

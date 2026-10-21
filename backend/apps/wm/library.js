@@ -488,7 +488,8 @@ function makeLibrary({ seed, store, now, uploads, demo = false, locales, site, p
         const loc = urlIn(locale, path);
         const pagePolicy = seo.robots === "noindex" ? "noindex" : "index";
         const policy = hidden || pagePolicy === "noindex" ? "noindex" : "index";
-        const canonical = seo.canonical || loc;
+        // Always the page's own address; an override saved before it became automatic is ignored.
+        const canonical = loc;
         const sitemapSetting = seo.inSitemap !== false;
         const canonicalSelf = canonical === loc;
         // The website's rule (orgtik-site/scripts/prerender-heads.mjs): indexable, its own original, and wanted in the sitemap.

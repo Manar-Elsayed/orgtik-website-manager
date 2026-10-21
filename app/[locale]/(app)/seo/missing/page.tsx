@@ -15,8 +15,8 @@ import { statusOf, useSeoMissingQuery, type Locale, type SeoIssue, type SeoMissi
 // In the SEO editor's order, then the image (fixed in the content editor).
 const SEARCH_ISSUES: SeoIssue[] = ["titleMissing", "titleLong", "titleDuplicate", "descriptionMissing", "descriptionShort", "descriptionLong", "addressDuplicate"];
 const ALL_ISSUES: SeoIssue[] = [...SEARCH_ISSUES, "focusMissing", "focusDuplicate", "keywordsMissing", "noSocialImage", "imageNoAlt"];
-// Which duplicate each issue is, so its hint can name the other pages.
-const DUPLICATE_OF: Partial<Record<SeoIssue, "title" | "address" | "focus">> = { titleDuplicate: "title", addressDuplicate: "address", focusDuplicate: "focus" };
+// Issues shown in the warning tone: the search result ones and every duplicate.
+const WARNING_ISSUES: SeoIssue[] = [...SEARCH_ISSUES, "focusDuplicate"];
 const LOCALES: Locale[] = ["en", "ar", "de", "fr", "it"];
 const NATIVE: Record<Locale, string> = { en: "English", ar: "العربية", de: "Deutsch", fr: "Français", it: "Italiano" };
 // Issues shown per row before the rest fold behind "+N".
@@ -83,7 +83,7 @@ function Missing() {
           <span className="flex min-w-56 flex-wrap items-center gap-1">
             {visible.map((issue) => (
               <Link key={issue} href={fixHref(row.original, issue)} aria-label={tm("fixIn", { issue: t(`checks.${issue}`), page: entryName(row.original) })} className="rounded-pill focus-visible:outline-2 focus-visible:outline-focus">
-                <Badge size="sm" tone={SEARCH_ISSUES.includes(issue) || DUPLICATE_OF[issue] ? "warning" : "neutral"} className="hover:underline">{t(`checks.${issue}`)}</Badge>
+                <Badge size="sm" tone={WARNING_ISSUES.includes(issue) ? "warning" : "neutral"} className="hover:underline">{t(`checks.${issue}`)}</Badge>
               </Link>
             ))}
             {more > 0 ? (
@@ -91,11 +91,6 @@ function Missing() {
                 <Badge size="sm" tone="neutral" className="hover:underline">{open ? tm("fewerIssues") : tm("moreIssues", { count: more })}</Badge>
               </button>
             ) : null}
-            {/* A duplicate says which page already uses the title, address or keyphrase. */}
-            {visible.map((issue) => {
-              const kind = DUPLICATE_OF[issue], others = kind ? row.original.duplicates?.[openIn(row.original, issue) as Locale]?.[kind] : undefined;
-              return kind && others?.length ? <span key={`${issue}-hint`} className="w-full text-caption text-warning">{tm(`duplicateHint.${kind}`, { pages: others.map((o) => entryName(o)).join(", ") })}</span> : null;
-            })}
           </span>
           );
         },
