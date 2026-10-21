@@ -30,6 +30,7 @@ import { DataTable, type ColumnDef } from "@orgtik/ui/table";
 import { SitePublishCard } from "@/components/seo/SitePublishCard";
 import { RequirePermission } from "@/components/frame/RequirePermission";
 import { useListState } from "@/lib/useListState";
+import { TABLE_ROWS } from "@/lib/tableRows";
 import { useCan } from "@/lib/permissions";
 import { WEBSITE_URL } from "@/lib/env";
 import { statusOf, useDeleteRedirectMutation, useRedirectsQuery, useSaveRedirectMutation, useTestRedirectMutation, type ApiError, type Redirect, type RedirectProblem, type RedirectStatus, type RedirectTest } from "@/store/api";
@@ -306,6 +307,7 @@ function Redirects() {
         <Select label={tr("colExecution")} value={url.get("execution", "all")} onValueChange={(execution) => url.set({ execution })} options={[{ value: "all", label: ti("all") }, ...EXECUTIONS.map((value) => ({ value, label: tr(`execution.${value}`) }))]} />
       </div>
       <DataTable
+        className={TABLE_ROWS}
         mode="server"
         rowCount={data?.total ?? 0}
         pagination={{ pageIndex: url.page - 1, pageSize: size }}

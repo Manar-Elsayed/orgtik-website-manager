@@ -2,12 +2,13 @@
 
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
-import { Badge, Button, Input, Select, PageHeader, buttonVariants, useFormatter } from "@orgtik/ui";
+import { Badge, Button, Input, Select, PageHeader, buttonVariants, cn, useFormatter } from "@orgtik/ui";
 import { DataTable, type ColumnDef } from "@orgtik/ui/table";
 import { RequirePermission } from "@/components/frame/RequirePermission";
 import { SeoCountCard, revealList } from "@/components/seo/SeoCountCard";
 import { Link } from "@/i18n/routing";
 import { useListState } from "@/lib/useListState";
+import { TABLE_ROWS } from "@/lib/tableRows";
 import { TYPES } from "@/lib/contentTypes";
 import { useEntryName } from "@/lib/entryName";
 import { statusOf, useSeoHealthQuery, type Locale, type SeoCheck, type SeoHealthRow } from "@/store/api";
@@ -114,7 +115,7 @@ function Health() {
           status={status}
           paginate
           onRetry={refetch}
-          className={isFetching && !isLoading ? "opacity-70" : undefined}
+          className={cn(TABLE_ROWS, isFetching && !isLoading && "opacity-70")}
           empty={unpublished ? { title: t("languageNotPublic", { language: NATIVE[lang as Locale] ?? lang }), description: t("languageNotPublicHelp"), action: <Link href="/settings/site" className={buttonVariants({ variant: "secondary", size: "sm" })}>{t("openSiteSettings")}</Link> } : { title: t("allGood"), action: check !== "all" || url.get("search") || url.get("kind") || url.get("lang") ? <Button size="sm" variant="secondary" onClick={() => url.set({ issue: "all", search: "", kind: "all", lang: "all" })}>{t("showAllPages")}</Button> : undefined }}
         />
       </div>

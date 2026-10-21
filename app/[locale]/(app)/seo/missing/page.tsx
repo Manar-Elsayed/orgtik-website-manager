@@ -8,6 +8,7 @@ import { DataTable, type ColumnDef } from "@orgtik/ui/table";
 import { RequirePermission } from "@/components/frame/RequirePermission";
 import { Link } from "@/i18n/routing";
 import { useListState } from "@/lib/useListState";
+import { TABLE_ROWS } from "@/lib/tableRows";
 import { TYPES } from "@/lib/contentTypes";
 import { useEntryName } from "@/lib/entryName";
 import { statusOf, useSeoMissingQuery, type Locale, type SeoDuplicateKind, type SeoIssue, type SeoMissingRow } from "@/store/api";
@@ -201,7 +202,7 @@ function Missing() {
             status={status}
             paginate
             onRetry={refetch}
-            className={isFetching && !isLoading ? "opacity-70" : undefined}
+            className={cn(TABLE_ROWS, isFetching && !isLoading && "opacity-70")}
             empty={unpublished ? { title: t("languageNotPublic", { language: NATIVE[lang as Locale] ?? lang }), description: t("languageNotPublicHelp"), action: <Link href="/settings/site" className={buttonVariants({ variant: "secondary", size: "sm" })}>{t("openSiteSettings")}</Link> } : { title: tm("empty"), description: filtered ? tm("emptyFiltered") : undefined, action: filtered ? <Button size="sm" variant="secondary" onClick={clear}>{tm("clearFilters")}</Button> : undefined }}
           />
         </section>
