@@ -389,7 +389,8 @@
     "platformPricingBody": "Il checkout usa i prezzi regionali attuali. Modifica qui i testi del sito e in Admin i prezzi e le regole delle offerte.",
     "historicalPricingBody": "Questi esempi di sola lettura provengono da un catalogo precedente. Sono valori di riferimento, non i prezzi attuali del checkout.",
     "platformPricingSource": "Prezzi Admin",
-    "catalogReferenceBody": "Nomi e funzionalità dei pacchetti sono condivisi con il sito. Modifica i testi in Pagine e i prezzi attuali in Admin."
+    "catalogReferenceBody": "Nomi e funzionalità dei pacchetti sono condivisi con il sito. Modifica i testi in Pagine e i prezzi attuali in Admin.",
+    "slugOtherLanguage": "Comune a tutte le lingue; modificalo in inglese. Indirizzo di questa lingua: orgtik.ch{path}"
   },
   "EntryNames": {
     "pg_home": "Home",

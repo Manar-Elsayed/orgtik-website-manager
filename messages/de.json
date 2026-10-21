@@ -389,7 +389,8 @@
     "platformPricingBody": "Die Kasse verwendet aktuelle regionale Preise. Website-Texte bearbeiten Sie hier, Preise und Angebotsregeln in Admin.",
     "historicalPricingBody": "Diese schreibgeschützten Beispiele stammen aus einem früheren Website-Katalog. Es sind Referenzwerte, keine aktuellen Kassenpreise.",
     "platformPricingSource": "Admin-Preise",
-    "catalogReferenceBody": "Paketnamen und Funktionen werden mit der Website geteilt. Seitentexte bearbeiten Sie unter Seiten, aktuelle Preise in Admin."
+    "catalogReferenceBody": "Paketnamen und Funktionen werden mit der Website geteilt. Seitentexte bearbeiten Sie unter Seiten, aktuelle Preise in Admin.",
+    "slugOtherLanguage": "Für alle Sprachen gleich; auf Englisch ändern. Adresse dieser Sprache: orgtik.ch{path}"
   },
   "EntryNames": {
     "pg_home": "Startseite",

@@ -389,7 +389,8 @@
     "platformPricingBody": "Checkout uses current regional prices. Manage website wording here; manage prices and offer rules in Admin.",
     "historicalPricingBody": "These read-only examples come from an earlier website catalog. They are reference values, not current checkout prices.",
     "platformPricingSource": "Admin pricing",
-    "catalogReferenceBody": "Package names and capabilities are shared with the website. Edit its page wording in Pages; current prices are managed in Admin."
+    "catalogReferenceBody": "Package names and capabilities are shared with the website. Edit its page wording in Pages; current prices are managed in Admin.",
+    "slugOtherLanguage": "Shared by every language; change it in English. This language's address: orgtik.ch{path}"
   },
   "EntryNames": {
     "pg_home": "Home",

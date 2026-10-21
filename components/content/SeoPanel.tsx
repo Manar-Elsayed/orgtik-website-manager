@@ -89,6 +89,7 @@ export function SeoPanel({
   seo,
   english,
   address,
+  addressCard,
   canonical,
   slug,
   siteHidden,
@@ -107,6 +108,8 @@ export function SeoPanel({
   english: SeoBlock;
   /** The page's full address, for the previews ("orgtik.ch/work/…"). */
   address: string;
+  /** The page's address field, shown first so the side column's checks start level with it. */
+  addressCard?: ReactNode;
   /** The canonical URL the site prints for this page and language, built from its address. */
   canonical: string;
   slug: string;
@@ -202,6 +205,7 @@ export function SeoPanel({
   return (
     <div className={fullWidthFields ? "grid min-w-0 gap-4" : "grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)]"}>
       <div className="flex min-w-0 flex-col gap-4">
+        {addressCard}
         <Section icon={<MagnifyingGlass />} title={t("search")}>
           {/* The result as a search engine shows it: address, title and description, cut where they'd be cut.
               Its colours are the search engine's own, on purpose and in both themes: it shows what people see there. */}
