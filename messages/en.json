@@ -1936,7 +1936,10 @@
         "title": "Same title as {pages}",
         "address": "Same address as {pages}",
         "focus": "Duplicated keyword: also the focus of {pages}. Change it."
-      }
+      },
+      "moreIssues": "+{count}",
+      "moreIssuesLabel": "Show {count} more issues for {page}",
+      "fewerIssues": "Show less"
     },
     "languageNotPublic": "{language} isn’t switched on for the site",
     "languageNotPublicHelp": "Only the languages switched on in Site settings are checked. Turn this one on there to check its pages.",

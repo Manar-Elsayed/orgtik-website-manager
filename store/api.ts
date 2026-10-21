@@ -589,10 +589,17 @@ export type SeoRow = {
   duplicates?: SeoDuplicates;
   state: WorkflowState;
 };
+/** One SEO health table row: a page with every language that has exactly the same issues. */
+export type SeoHealthRow = SeoRow & {
+  locales: Locale[];
+  /** Per language, in the order of `locales`. */
+  titleLengths: number[];
+  descriptionLengths: number[];
+};
 /** Another page, named in a duplicate warning. */
 export type SeoPageRef = { id: string; type: EntryType; name: string; path: string };
 export type SeoDuplicates = Partial<Record<"title" | "address" | "focus", SeoPageRef[]>>;
-export type SeoHealth = Page<SeoRow> & {
+export type SeoHealth = Page<SeoHealthRow> & {
   counts: Record<SeoCheck, number>;
   healthy: number;
   checked: number;

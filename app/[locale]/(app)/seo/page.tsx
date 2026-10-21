@@ -10,13 +10,18 @@ import { Link } from "@/i18n/routing";
 import { useListState } from "@/lib/useListState";
 import { TYPES } from "@/lib/contentTypes";
 import { useEntryName } from "@/lib/entryName";
-import { statusOf, useSeoHealthQuery, type Locale, type SeoCheck, type SeoRow } from "@/store/api";
+import { statusOf, useSeoHealthQuery, type Locale, type SeoCheck, type SeoHealthRow } from "@/store/api";
 
 type Filter = "all" | "none" | "any" | SeoCheck;
 // Every language the site can publish in, whether or not it is public yet.
 const LOCALES: Locale[] = ["en", "ar", "de", "fr", "it"];
 const NATIVE: Record<Locale, string> = { en: "English", ar: "العربية", de: "Deutsch", fr: "Français", it: "Italiano" };
 const LIST = "seo-health-list";
+// One length, or the shortest to longest when the grouped languages differ.
+const span = (values: number[], n: (v: number) => string) => {
+  const lo = Math.min(...values), hi = Math.max(...values);
+  return lo === hi ? n(lo) : `${n(lo)}–${n(hi)}`;
+};
 
 // What a search result and a shared link need, page by page: a checklist, not a score.
 function Health() {
@@ -35,9 +40,9 @@ function Health() {
   };
   const { data, isLoading, error, refetch, isFetching } = useSeoHealthQuery({ issue: check === "all" ? undefined : check, search: url.get("search"), kind: url.get("kind"), lang: url.get("lang"), page: url.page, pageSize: 10 });
 
-  const columns = useMemo<ColumnDef<SeoRow, any>[]>(() => {
+  const columns = useMemo<ColumnDef<SeoHealthRow, any>[]>(() => {
     const returnTo = encodeURIComponent(url.href);
-    const fixHref = (r: SeoRow) => `/seo/content/${r.id}?lang=${r.locale}&returnTo=${returnTo}`;
+    const fixHref = (r: SeoHealthRow) => `/seo/content/${r.id}?lang=${r.locale}&returnTo=${returnTo}`;
     return [
       {
         id: "page",
@@ -56,10 +61,10 @@ function Health() {
         },
       },
       { id: "type", header: t("colType"), meta: { width: "1%" }, cell: ({ row }) => <span className="whitespace-nowrap text-fg-muted">{tt(`${row.original.type}.one`)}</span> },
-      // Each page is checked once per language.
-      { id: "lang", header: t("missing.colLanguage"), meta: { width: "1%" }, cell: ({ row }) => <span dir="ltr" title={NATIVE[row.original.locale]} className="font-mono text-caption text-fg-muted">{row.original.locale.toUpperCase()}</span> },
-      { id: "title", header: t("colTitle"), meta: { numeric: true }, cell: ({ row }) => <span className="tabular-nums text-fg-muted">{f.number(row.original.titleLength)}</span> },
-      { id: "description", header: t("colDescription"), meta: { numeric: true }, cell: ({ row }) => <span className="tabular-nums text-fg-muted">{f.number(row.original.descriptionLength)}</span> },
+      // Each page is checked once per language; languages with the same issues share a row.
+      { id: "lang", header: t("missing.colLanguage"), meta: { width: "1%" }, cell: ({ row }) => <span dir="ltr" title={row.original.locales.map((l) => NATIVE[l]).join(", ")} className="whitespace-nowrap font-mono text-caption text-fg-muted">{row.original.locales.map((l) => l.toUpperCase()).join(" · ")}</span> },
+      { id: "title", header: t("colTitle"), meta: { numeric: true }, cell: ({ row }) => <span className="tabular-nums text-fg-muted">{span(row.original.titleLengths, (v) => f.number(v))}</span> },
+      { id: "description", header: t("colDescription"), meta: { numeric: true }, cell: ({ row }) => <span className="tabular-nums text-fg-muted">{span(row.original.descriptionLengths, (v) => f.number(v))}</span> },
       {
         id: "status",
         header: t("colStatus"),
@@ -105,7 +110,7 @@ function Health() {
           pagination={{ pageIndex: url.page - 1, pageSize: 10 }}
           onPaginationChange={update => url.set({ page: (typeof update === "function" ? update({ pageIndex: url.page - 1, pageSize: 10 }) : update).pageIndex + 1 })}
           data={data?.items ?? []}
-          getRowId={(r) => `${r.id}-${r.locale}`}
+          getRowId={(r) => `${r.id}-${r.locales.join("-")}`}
           status={status}
           paginate
           onRetry={refetch}

@@ -1936,7 +1936,10 @@
         "title": "Stesso titolo di {pages}",
         "address": "Stesso indirizzo di {pages}",
         "focus": "Parola chiave duplicata: è anche la frase chiave di {pages}. Cambiala."
-      }
+      },
+      "moreIssues": "+{count}",
+      "moreIssuesLabel": "Mostra altri {count} problemi per {page}",
+      "fewerIssues": "Mostra meno"
     },
     "languageNotPublic": "{language} non è attivata per il sito",
     "languageNotPublicHelp": "Vengono controllate solo le lingue attivate nelle impostazioni del sito. Attiva questa lingua per controllarne le pagine.",

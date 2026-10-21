@@ -92,3 +92,21 @@ test('duplicate titles, addresses and focus keyphrases name the other page, and 
   assert.deepEqual(live.address, []);
   assert.deepEqual(library.seoConflicts({ entry: 'pg_home', lang: 'en', title: '', focus: '' }), { title: [], focus: [], address: [] });
 });
+
+test('SEO health shows a page once for every set of languages with exactly the same issues', () => {
+  const store = makeStore(now, { demo: true });
+  store.ensureDemo();
+  const library = makeLibrary({ store, seed: store.seed, now, uploads: 'unused', locales: () => ['en', 'ar', 'de', 'fr', 'it'] });
+  const rows = library.health().rows, grouped = library.groupHealthRows(rows);
+  assert.ok(grouped.length < rows.length, 'some languages share a row');
+  assert.equal(grouped.reduce((n, g) => n + g.locales.length, 0), rows.length, 'every language is still listed once');
+  const keys = grouped.map(g => `${g.id}|${g.issues.join(',')}`);
+  assert.equal(new Set(keys).size, keys.length, 'one row per page and set of issues');
+  for (const g of grouped) {
+    const own = rows.filter(r => r.id === g.id && g.locales.includes(r.locale));
+    assert.deepEqual(own.map(r => r.locale), g.locales);
+    for (const r of own) assert.deepEqual(r.issues, g.issues);
+    assert.deepEqual(g.titleLengths, own.map(r => r.titleLength));
+    assert.deepEqual(g.descriptionLengths, own.map(r => r.descriptionLength));
+  }
+});

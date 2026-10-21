@@ -1936,7 +1936,10 @@
         "title": "Même titre que {pages}",
         "address": "Même adresse que {pages}",
         "focus": "Mot-clé en double : c’est aussi l’expression clé de {pages}. Changez-le."
-      }
+      },
+      "moreIssues": "+{count}",
+      "moreIssuesLabel": "Afficher {count} autres problèmes pour {page}",
+      "fewerIssues": "Afficher moins"
     },
     "languageNotPublic": "{language} n’est pas activé pour le site",
     "languageNotPublicHelp": "Seules les langues activées dans les paramètres du site sont vérifiées. Activez celle-ci pour vérifier ses pages.",

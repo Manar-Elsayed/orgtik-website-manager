@@ -1936,7 +1936,10 @@
         "title": "العنوان نفسه في {pages}",
         "address": "العنوان الإلكتروني نفسه في {pages}",
         "focus": "كلمة مفتاحية مكررة: هي أيضًا العبارة الرئيسية في {pages}. غيّرها."
-      }
+      },
+      "moreIssues": "+{count}",
+      "moreIssuesLabel": "عرض {count} مشكلات أخرى في {page}",
+      "fewerIssues": "عرض أقل"
     },
     "languageNotPublic": "{language} غير مفعّلة للموقع",
     "languageNotPublicHelp": "يتم فحص اللغات المفعّلة في إعدادات الموقع فقط. فعّل هذه اللغة هناك لفحص صفحاتها.",
