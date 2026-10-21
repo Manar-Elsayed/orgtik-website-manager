@@ -90,7 +90,10 @@ test('duplicate titles, addresses and focus keyphrases name the other page, and 
   assert.deepEqual(live.title.map(p => p.id).sort(), ['pg_about', 'pg_home']);
   assert.deepEqual(live.focus.map(p => p.id).sort(), ['pg_plans', 'pg_software']);
   assert.deepEqual(live.address, []);
-  assert.deepEqual(library.seoConflicts({ entry: 'pg_home', lang: 'en', title: '', focus: '' }), { title: [], description: [], focus: [], address: [] });
+  const { text, ...fields } = library.seoConflicts({ entry: 'pg_home', lang: 'en', title: '', focus: '' });
+  assert.deepEqual(fields, { title: [], description: [], focus: [], address: [] });
+  // The home page's tagline is also on Services: page text comes from the saved copy, not what is typed.
+  assert.deepEqual(text.map(p => p.id), ['pg_services']);
 });
 
 test('SEO health shows a page once for every set of languages with exactly the same issues', () => {
@@ -125,4 +128,24 @@ test('two pages with the same description are both flagged, and the editor names
   assert.ok(row.issues.includes('descriptionDuplicate'));
   assert.equal(row.duplicates.en.description[0].id, b.id);
   assert.deepEqual(library.seoConflicts({ entry: a.id, lang: 'en', description: text }).description.map((o) => o.id), [b.id]);
+});
+
+test('pages repeating a passage of their own copy are flagged, and the editor names the other page with the passage', () => {
+  const { store, library } = setup();
+  const [a, b] = library.health().rows.filter((r) => r.locale === 'en').slice(0, 2);
+  const passage = 'A passage of page copy written once and pasted onto a second page by mistake.';
+  for (const id of [a.id, b.id]) { const e = store.entries.get(id); const c = e.draft ?? e.live; c.locales.en = { ...c.locales.en, extraCopy: passage }; }
+  const rows = library.health().rows.filter((r) => r.locale === 'en' && [a.id, b.id].includes(r.id));
+  for (const r of rows) {
+    assert.ok(r.issues.includes('textDuplicate'), `${r.id} flagged`);
+    assert.deepEqual(r.duplicates.text.map((o) => o.id), [r.id === a.id ? b.id : a.id]);
+  }
+  const named = library.seoConflicts({ entry: a.id, lang: 'en' }).text;
+  assert.deepEqual(named.map((o) => o.id), [b.id]);
+  assert.equal(named[0].excerpt, passage);
+  // Short labels repeating (buttons, headings) are not page text.
+  for (const id of [a.id, b.id]) { const e = store.entries.get(id); const c = e.draft ?? e.live; c.locales.en = { ...c.locales.en, extraCopy: 'Read more' }; }
+  const after = library.health().rows.find((r) => r.id === a.id && r.locale === 'en');
+  assert.ok((after.duplicates.text ?? []).every((o) => o.id !== b.id || o.excerpt !== 'Read more'));
+  assert.ok(library.SEO_GROUPS.search.includes('textDuplicate'));
 });

@@ -1757,6 +1757,7 @@
       "descriptionDuplicate": "Même description qu’une autre page",
       "addressDuplicate": "Même adresse qu’une autre page",
       "focusDuplicate": "Même expression clé qu’une autre page",
+      "textDuplicate": "Même texte de page qu’une autre page",
       "noSocialImage": "Pas d’image pour les liens partagés",
       "imageNoAlt": "Image principale sans description",
       "focusMissing": "Aucune expression clé principale",
@@ -1906,7 +1907,8 @@
         "title": "Même titre que :",
         "description": "Même description que :",
         "focus": "Même expression clé que :",
-        "address": "Même adresse que :"
+        "address": "Même adresse que :",
+        "text": "Même texte de page que :"
       }
     },
     "fromArchive": "Contenu archivé",

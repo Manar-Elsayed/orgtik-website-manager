@@ -14,7 +14,7 @@ import { useEntryName } from "@/lib/entryName";
 import { statusOf, useSeoMissingQuery, type Locale, type SeoIssue, type SeoMissingRow } from "@/store/api";
 
 // In the SEO editor's order, then the image (fixed in the content editor).
-const SEARCH_ISSUES: SeoIssue[] = ["titleMissing", "titleLong", "titleDuplicate", "descriptionMissing", "descriptionShort", "descriptionLong", "descriptionDuplicate", "addressDuplicate"];
+const SEARCH_ISSUES: SeoIssue[] = ["titleMissing", "titleLong", "titleDuplicate", "descriptionMissing", "descriptionShort", "descriptionLong", "descriptionDuplicate", "addressDuplicate", "textDuplicate"];
 const ALL_ISSUES: SeoIssue[] = [...SEARCH_ISSUES, "focusMissing", "focusDuplicate", "keywordsMissing", "noSocialImage", "imageNoAlt"];
 const LOCALES: Locale[] = ["en", "ar", "de", "fr", "it"];
 const NATIVE: Record<Locale, string> = { en: "English", ar: "العربية", de: "Deutsch", fr: "Français", it: "Italiano" };

@@ -152,13 +152,28 @@ function makeLibrary({ seed, store, now, uploads, demo = false, locales, site, p
   // Every language the site has switched on, published or not, so gaps are fixed before a language
   // goes live. Without a site list (tests, packaged tools), the public languages.
   const checkedLocales = () => locales?.() ?? settings.publicLocales;
-  const CHECKS = ["titleMissing", "titleLong", "titleDuplicate", "descriptionMissing", "descriptionShort", "descriptionLong", "descriptionDuplicate", "addressDuplicate", "focusDuplicate", "noSocialImage", "imageNoAlt"];
+  const CHECKS = ["titleMissing", "titleLong", "titleDuplicate", "descriptionMissing", "descriptionShort", "descriptionLong", "descriptionDuplicate", "addressDuplicate", "focusDuplicate", "textDuplicate", "noSocialImage", "imageNoAlt"];
+  // A page's own copy, as passages long enough to matter (a heading or button label repeating is
+  // normal): every string under its language, without addresses, images or its SEO block.
+  const TEXT_MIN = 60;
+  const NOT_TEXT = new Set(["slug", "href", "url", "src", "icon", "id", "image", "alt", "seo", "path", "link", "cta"]);
+  function passages(node, out = new Map()) {
+    if (node == null) return out;
+    if (typeof node === "string") {
+      const text = plain(node).replace(/\s+/g, " ");
+      if (text.length >= TEXT_MIN && !/^(https?:|\/)/.test(text)) out.set(text.toLowerCase(), text);
+    } else if (Array.isArray(node)) for (const n of node) passages(n, out);
+    else if (typeof node === "object") for (const [k, v] of Object.entries(node)) if (!NOT_TEXT.has(k)) passages(v, out);
+    return out;
+  }
   // Two pages competing for one search result: the same title, description, address or focus keyphrase in one language.
   const DUPLICATES = { title: "titleDuplicate", description: "descriptionDuplicate", address: "addressDuplicate", focus: "focusDuplicate" };
   function health() {
     const rows = [];
     const seen = { title: new Map(), description: new Map(), address: new Map(), focus: new Map() };
     const note = (kind, value, index) => { if (value) seen[kind].set(value, [...(seen[kind].get(value) ?? []), index]); };
+    // Page text: each passage, per language, with the rows that carry it and how it reads.
+    const text = new Map(), excerptOf = new Map();
     for (const e of store.entries.values()) {
       if (!ADDRESS[e.type]) continue;
       const c = current(e);
@@ -182,6 +197,11 @@ function makeLibrary({ seed, store, now, uploads, demo = false, locales, site, p
         note("description", description && `${l}:${description.toLowerCase()}`, rows.length);
         note("address", `${l}:${path}`, rows.length);
         note("focus", focus && `${l}:${focus}`, rows.length);
+        for (const [key, shown] of passages(c.locales?.[l])) {
+          const k = `${l}:${key}`;
+          text.set(k, [...(text.get(k) ?? []), rows.length]);
+          excerptOf.set(k, shown);
+        }
         rows.push({ id: e.id, type: e.type, name: plain(c.locales.en?.name ?? c.name ?? e.id), path, locale: l, title, description, titleLength: title.length, descriptionLength: description.length, keywords, focus: String(seo.focus ?? "").trim(), issues, duplicates: {}, state: e.draft ? e.workflow.state : "published" });
       }
     }
@@ -192,6 +212,16 @@ function makeLibrary({ seed, store, now, uploads, demo = false, locales, site, p
       for (const i of idx) {
         rows[i].issues.push(issue);
         rows[i].duplicates[kind] = idx.filter((j) => rows[j].id !== rows[i].id).map((j) => ({ id: rows[j].id, type: rows[j].type, name: rows[j].name, path: rows[j].path }));
+      }
+    }
+    // A page names each other page once, with the first passage they share.
+    for (const [k, idx] of text) {
+      if (new Set(idx.map((i) => rows[i].id)).size < 2) continue;
+      for (const i of idx) {
+        const others = new Map((rows[i].duplicates.text ?? []).map((o) => [o.id, o]));
+        for (const j of idx) if (rows[j].id !== rows[i].id && !others.has(rows[j].id)) others.set(rows[j].id, { id: rows[j].id, type: rows[j].type, name: rows[j].name, path: rows[j].path, excerpt: excerptOf.get(k) });
+        rows[i].duplicates.text = [...others.values()];
+        rows[i].issues.push("textDuplicate");
       }
     }
     for (const row of rows) row.issues = CHECKS.filter((k) => row.issues.includes(k));
@@ -222,13 +252,14 @@ function makeLibrary({ seed, store, now, uploads, demo = false, locales, site, p
       description: others.filter((r) => same(r.description, description)).map(pick),
       focus: others.filter((r) => same(r.focus, focus)).map(pick),
       address: own ? others.filter((r) => r.path === own.path).map(pick) : [],
+      text: own?.duplicates.text ?? [],
     };
   }
   // SEO missing: SEO health's checks plus the keyword fields, grouped like the SEO editor's
   // sections (search results, keywords, shared links) and the content editor's image, one row per
   // page with the languages that have something to fix.
   const SEO_GROUPS = {
-    search: ["titleMissing", "titleLong", "titleDuplicate", "descriptionMissing", "descriptionShort", "descriptionLong", "descriptionDuplicate", "addressDuplicate"],
+    search: ["titleMissing", "titleLong", "titleDuplicate", "descriptionMissing", "descriptionShort", "descriptionLong", "descriptionDuplicate", "addressDuplicate", "textDuplicate"],
     keywords: ["focusMissing", "focusDuplicate", "keywordsMissing"],
     sharing: ["noSocialImage"],
     images: ["imageNoAlt"],
