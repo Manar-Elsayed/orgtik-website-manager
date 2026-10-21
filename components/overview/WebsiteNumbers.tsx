@@ -158,7 +158,7 @@ export function WebsiteNumbers() {
             previousLabel={t("previousPeriod")}
           />
 
-          <div className="grid items-start gap-4 xl:grid-cols-2">
+          <div className="grid gap-4 xl:grid-cols-2">
             <RankingChart
               loading={isLoading}
               title={t("topPages")}
