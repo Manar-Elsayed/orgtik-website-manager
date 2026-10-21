@@ -1757,7 +1757,7 @@
       "descriptionDuplicate": "Stessa descrizione di un’altra pagina",
       "addressDuplicate": "Stesso indirizzo di un’altra pagina",
       "focusDuplicate": "Stessa frase chiave di un’altra pagina",
-      "textDuplicate": "Stesso testo di un’altra pagina",
+      "textDuplicate": "Testo duplicato",
       "noSocialImage": "Nessuna immagine per i link condivisi",
       "imageNoAlt": "Immagine principale senza descrizione",
       "focusMissing": "Nessuna frase chiave principale",
@@ -1908,7 +1908,7 @@
         "description": "Stessa descrizione di:",
         "focus": "Stessa frase chiave di:",
         "address": "Stesso indirizzo di:",
-        "text": "Stesso testo della pagina di:"
+        "text": "Testo duplicato, anche su:"
       }
     },
     "fromArchive": "Contenuto archiviato",

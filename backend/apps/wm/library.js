@@ -152,7 +152,8 @@ function makeLibrary({ seed, store, now, uploads, demo = false, locales, site, p
   // Every language the site has switched on, published or not, so gaps are fixed before a language
   // goes live. Without a site list (tests, packaged tools), the public languages.
   const checkedLocales = () => locales?.() ?? settings.publicLocales;
-  const CHECKS = ["titleMissing", "titleLong", "titleDuplicate", "descriptionMissing", "descriptionShort", "descriptionLong", "descriptionDuplicate", "addressDuplicate", "focusDuplicate", "textDuplicate", "noSocialImage", "imageNoAlt"];
+  // Duplicated text leads: it is the issue the SEO team looks for first.
+  const CHECKS = ["textDuplicate", "titleMissing", "titleLong", "titleDuplicate", "descriptionMissing", "descriptionShort", "descriptionLong", "descriptionDuplicate", "addressDuplicate", "focusDuplicate", "noSocialImage", "imageNoAlt"];
   // A page's own copy, as passages long enough to matter (a heading or button label repeating is
   // normal): every string under its language, without addresses, images or its SEO block.
   const TEXT_MIN = 60;
@@ -259,7 +260,7 @@ function makeLibrary({ seed, store, now, uploads, demo = false, locales, site, p
   // sections (search results, keywords, shared links) and the content editor's image, one row per
   // page with the languages that have something to fix.
   const SEO_GROUPS = {
-    search: ["titleMissing", "titleLong", "titleDuplicate", "descriptionMissing", "descriptionShort", "descriptionLong", "descriptionDuplicate", "addressDuplicate", "textDuplicate"],
+    search: ["textDuplicate", "titleMissing", "titleLong", "titleDuplicate", "descriptionMissing", "descriptionShort", "descriptionLong", "descriptionDuplicate", "addressDuplicate"],
     keywords: ["focusMissing", "focusDuplicate", "keywordsMissing"],
     sharing: ["noSocialImage"],
     images: ["imageNoAlt"],
