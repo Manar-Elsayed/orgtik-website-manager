@@ -9,7 +9,8 @@ import { ArrowClockwise, CheckCircle, Circle, Code, Globe, Info, MagnifyingGlass
 import { Badge, Button, Card, Checkbox, Field, Input, Select, Tag, Textarea, cn, toast, useFormatter } from "@orgtik/ui";
 import { mediaUrl } from "@/lib/env";
 import { useEntryName } from "@/lib/entryName";
-import { useSeoConflictsQuery, type Locale, type SeoPageRef } from "@/store/api";
+import { Link } from "@/i18n/routing";
+import { useSeoConflictsQuery, type Locale, type SeoDuplicateKind, type SeoDuplicates, type SeoPageRef } from "@/store/api";
 
 export type SeoBlock = {
   title?: string;
@@ -59,6 +60,32 @@ function DuplicateHint({ pages, message }: { pages: SeoPageRef[] | undefined; me
   const entryName = useEntryName();
   if (!pages?.length) return null;
   return <WarningNote>{message(pages.map((page) => entryName(page)).join(", "))}</WarningNote>;
+}
+
+// Every duplicate in this language at the top of the editor, each naming the pages to compare with.
+function DuplicatesNote({ conflicts, lang }: { conflicts: Partial<SeoDuplicates> | undefined; lang: Locale }) {
+  const t = useTranslations("Seo.block");
+  const entryName = useEntryName();
+  const kinds = (["title", "description", "focus", "address"] as SeoDuplicateKind[]).filter((k) => conflicts?.[k]?.length);
+  if (!kinds.length) return null;
+  return (
+    <div role="status" className="flex flex-col gap-2 rounded-field bg-info-subtle px-3 py-2 text-body-sm text-info">
+      <p className="font-semibold">{t("duplicatesTitle")}</p>
+      <ul className="flex flex-col gap-1">
+        {kinds.map((k) => (
+          <li key={k} className="flex flex-wrap gap-x-1">
+            <span>{t(`duplicateOf.${k}`)}</span>
+            {conflicts![k]!.map((page, i) => (
+              <span key={page.id}>
+                <Link href={`/seo/content/${page.id}?lang=${lang}`} className="underline hover:no-underline focus-visible:outline-2 focus-visible:outline-focus">{entryName(page)}</Link>
+                {i < conflicts![k]!.length - 1 ? "," : null}
+              </span>
+            ))}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }
 
 // A focus keyphrase is a short search (2 words); each other keyword stays at 4 words or fewer.
@@ -149,7 +176,7 @@ export function SeoPanel({
     () => [
       { key: "titleSet", ok: Boolean(title.trim()) },
       { key: "titleFits", ok: Boolean(shownTitle) && titlePx <= TITLE_PX },
-      { key: "descriptionSet", ok: description.trim().length >= 50 },
+      { key: "descriptionSet", ok: description.trim().length >= 60 },
       { key: "descriptionFits", ok: Boolean(shownDescription) && descriptionPx <= DESCRIPTION_PX },
       { key: "focusInTitle", ok: has(shownTitle, focus), needs: "focus" },
       { key: "focusInDescription", ok: has(shownDescription, focus), needs: "focus" },
@@ -168,12 +195,19 @@ export function SeoPanel({
   const stale = Boolean(run) && checks.some((c, i) => c.ok !== run!.results[i]);
   const done = shown.filter((c) => c.ok).length;
   // Duplicate warnings follow what is typed, checked against the other pages after a short pause.
-  const [probe, setProbe] = useState({ title: title.trim(), focus: focus.trim() });
+  const [probe, setProbe] = useState({ title: title.trim(), description: description.trim(), focus: focus.trim() });
   useEffect(() => {
-    const id = setTimeout(() => setProbe({ title: title.trim(), focus: focus.trim() }), 400);
+    const id = setTimeout(() => setProbe({ title: title.trim(), description: description.trim(), focus: focus.trim() }), 400);
     return () => clearTimeout(id);
-  }, [title, focus]);
-  const { data: conflicts } = useSeoConflictsQuery({ entry: entryId ?? "", lang, title: probe.title, focus: probe.focus }, { skip: !entryId });
+  }, [title, description, focus]);
+  const { data: conflicts } = useSeoConflictsQuery({ entry: entryId ?? "", lang, title: probe.title, description: probe.description, focus: probe.focus }, { skip: !entryId });
+  // Only what still matches the fields: a warning goes as soon as the value changes.
+  const current: Partial<SeoDuplicates> | undefined = conflicts && {
+    title: probe.title === title.trim() ? conflicts.title : [],
+    description: probe.description === description.trim() ? conflicts.description : [],
+    focus: probe.focus === focus.trim() ? conflicts.focus : [],
+    address: conflicts.address,
+  };
   const runChecks = () => {
     setRuns((all) => ({ ...all, [lang]: { at: Date.now(), results: checks.map((c) => c.ok) } }));
     toast.success(t("checksRan", { done: checks.filter((c) => c.ok).length, total: checks.length }));
@@ -205,6 +239,7 @@ export function SeoPanel({
   return (
     <div className={fullWidthFields ? "grid min-w-0 gap-4" : "grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)]"}>
       <div className="flex min-w-0 flex-col gap-4">
+        <DuplicatesNote conflicts={current} lang={lang} />
         {addressCard}
         <Section icon={<MagnifyingGlass />} title={t("search")}>
           {/* The result as a search engine shows it: address, title and description, cut where they'd be cut.
@@ -220,14 +255,15 @@ export function SeoPanel({
               {shownDescription ? cut(shownDescription, "14px Arial", DESCRIPTION_PX) : <span className="text-[#70757A]">{t("noDescription")}</span>}
             </p>
           </div>
-          <DuplicateHint pages={conflicts?.address} message={(pages) => t("addressUsedOn", { pages })} />
+          <DuplicateHint pages={current?.address} message={(pages) => t("addressUsedOn", { pages })} />
           <Field label={t("title")} description={t("pixels", { used: titlePx, max: TITLE_PX })} error={tooLong("title")}>
             <Input dir="auto" lang={lang} readOnly={!can.edit} value={title} placeholder={lang === "en" ? undefined : english.title} onChange={(e) => onChange({ title: e.target.value })} />
           </Field>
-          <DuplicateHint pages={probe.title === title.trim() ? conflicts?.title : undefined} message={(pages) => t("titleUsedOn", { pages })} />
+          <DuplicateHint pages={current?.title} message={(pages) => t("titleUsedOn", { pages })} />
           <Field label={t("description")} description={t("descriptionHelp", { count: description.length, used: descriptionPx, max: DESCRIPTION_PX })} error={tooLong("description")}>
             <Textarea dir="auto" lang={lang} rows={3} readOnly={!can.edit} value={description} placeholder={lang === "en" ? undefined : english.description} onChange={(e) => onChange({ description: e.target.value })} />
           </Field>
+          <DuplicateHint pages={current?.description} message={(pages) => t("descriptionUsedOn", { pages })} />
         </Section>
 
         <Section icon={<Info />} title={t("keywords")}>
@@ -235,7 +271,7 @@ export function SeoPanel({
             <Input dir="auto" lang={lang} readOnly={!can.edit} value={focus} onChange={(e) => onChange({ focus: e.target.value })} />
           </Field>
           {wordsIn(focus) > FOCUS_WORDS ? <WarningNote>{t("focusTooManyWords", { count: wordsIn(focus), max: FOCUS_WORDS })}</WarningNote> : null}
-          <DuplicateHint pages={probe.focus === focus.trim() ? conflicts?.focus : undefined} message={(pages) => t("focusUsedOn", { pages })} />
+          <DuplicateHint pages={current?.focus} message={(pages) => t("focusUsedOn", { pages })} />
           <Field label={t("keywordList")} description={t.rich("keywordListHelp", { b: strong, max: KEYWORD_WORDS })} error={err("keywords") ? t("keywordsInvalid") : undefined}>
             <div className="flex flex-col gap-2">
               {keywords.length ? (

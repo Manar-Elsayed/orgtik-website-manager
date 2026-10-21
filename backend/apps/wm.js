@@ -718,7 +718,7 @@ module.exports = {
     app.get("/v2/admin/seo/conflicts", need("seo:view"), (req, res) => {
       const lang = String(req.query.lang ?? "");
       if (!lib.checkedLocales().includes(lang) || !req.query.entry) return fail(res, 422, "invalid", "Choose a page and language.");
-      ok(res, lib.seoConflicts({ entry: String(req.query.entry), lang, title: req.query.title, focus: req.query.focus }));
+      ok(res, lib.seoConflicts({ entry: String(req.query.entry), lang, title: req.query.title, description: req.query.description, focus: req.query.focus }));
     });
     // Addresses the site has, for "destination missing": every page and entry on the site or coming.
     const siteAddresses = () => new Set(lib.previewAddresses().map((a) => lib.normPath(a.path)));

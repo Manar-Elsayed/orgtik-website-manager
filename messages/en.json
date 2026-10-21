@@ -1752,7 +1752,7 @@
       "titleLong": "Title over 60 characters",
       "titleDuplicate": "Same title as another page",
       "descriptionMissing": "No search description",
-      "descriptionShort": "Description under 50 characters",
+      "descriptionShort": "Description under 60 characters",
       "descriptionLong": "Description over 160 characters",
       "descriptionDuplicate": "Same description as another page",
       "addressDuplicate": "Same address as another page",
@@ -1880,7 +1880,7 @@
       "check": {
         "titleSet": "Has its own search title",
         "titleFits": "The title fits in a search result",
-        "descriptionSet": "Has a description of 50 characters or more",
+        "descriptionSet": "Has a description of 60 characters or more",
         "descriptionFits": "The description fits in a search result",
         "focusInTitle": "The focus keyphrase is in the title",
         "focusInDescription": "The focus keyphrase is in the description",
@@ -1899,7 +1899,15 @@
       "addressUsedOn": "{pages} already uses this address. Change one of them so each page can be found.",
       "focusTooManyWords": "This keyphrase has {count} words. Keep it to {max}.",
       "keywordTooManyWords": "{count} words. Keep each keyword to {max} words or fewer.",
-      "keywordsTooLong": "Longer than {max} words: {keywords}. Shorten them."
+      "keywordsTooLong": "Longer than {max} words: {keywords}. Shorten them.",
+      "descriptionUsedOn": "This description is already used on {pages}. Change it so each page has its own description.",
+      "duplicatesTitle": "This page shares text with other pages",
+      "duplicateOf": {
+        "title": "Same title as:",
+        "description": "Same description as:",
+        "focus": "Same focus keyphrase as:",
+        "address": "Same address as:"
+      }
     },
     "fromArchive": "Archived content",
     "showAllPages": "Show all pages",
@@ -1934,14 +1942,7 @@
       "issueFilter": "Issues",
       "moreIssues": "+{count}",
       "moreIssuesLabel": "Show {count} more issues for {page}",
-      "fewerIssues": "Show less",
-      "duplicateNote": {
-        "title": "This title is also used on:",
-        "description": "This description is also used on:",
-        "address": "This address is also used by:",
-        "focus": "This focus keyphrase is also the focus of:"
-      },
-      "duplicateMore": "and {count, plural, one {# more page} other {# more pages}}"
+      "fewerIssues": "Show less"
     },
     "languageNotPublic": "{language} isn’t switched on for the site",
     "languageNotPublicHelp": "Only the languages switched on in Site settings are checked. Turn this one on there to check its pages.",

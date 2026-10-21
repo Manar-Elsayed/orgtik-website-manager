@@ -1752,7 +1752,7 @@
       "titleLong": "العنوان أطول من 60 حرفًا",
       "titleDuplicate": "العنوان مكرر في صفحة أخرى",
       "descriptionMissing": "بلا وصف بحث",
-      "descriptionShort": "الوصف أقصر من 50 حرفًا",
+      "descriptionShort": "الوصف أقصر من 60 حرفًا",
       "descriptionLong": "الوصف أطول من 160 حرفًا",
       "descriptionDuplicate": "الوصف نفسه مستخدم في صفحة أخرى",
       "addressDuplicate": "العنوان الإلكتروني نفسه لصفحة أخرى",
@@ -1880,7 +1880,7 @@
       "check": {
         "titleSet": "له عنوان بحث خاص",
         "titleFits": "العنوان يتسع في نتيجة البحث",
-        "descriptionSet": "له وصف من 50 حرفًا أو أكثر",
+        "descriptionSet": "له وصف من 60 حرفًا أو أكثر",
         "descriptionFits": "الوصف يتسع في نتيجة البحث",
         "focusInTitle": "العبارة الأساسية في العنوان",
         "focusInDescription": "العبارة الأساسية في الوصف",
@@ -1899,7 +1899,15 @@
       "addressUsedOn": "{pages} تستخدم هذا العنوان الإلكتروني بالفعل. غيّر أحدهما ليمكن الوصول إلى كل صفحة.",
       "focusTooManyWords": "تحتوي هذه العبارة على {count} كلمات. اجعلها {max} كلمتين.",
       "keywordTooManyWords": "{count} كلمات. اجعل كل كلمة مفتاحية {max} كلمات أو أقل.",
-      "keywordsTooLong": "أطول من {max} كلمات: {keywords}. اختصرها."
+      "keywordsTooLong": "أطول من {max} كلمات: {keywords}. اختصرها.",
+      "descriptionUsedOn": "هذا الوصف مستخدم بالفعل في {pages}. غيّره ليكون لكل صفحة وصفها الخاص.",
+      "duplicatesTitle": "هذه الصفحة تشترك في نص مع صفحات أخرى",
+      "duplicateOf": {
+        "title": "العنوان نفسه في:",
+        "description": "الوصف نفسه في:",
+        "focus": "العبارة المفتاحية نفسها في:",
+        "address": "العنوان (الرابط) نفسه في:"
+      }
     },
     "fromArchive": "محتوى مؤرشف",
     "showAllPages": "عرض كل الصفحات",
@@ -1934,14 +1942,7 @@
       "issueFilter": "المشكلات",
       "moreIssues": "+{count}",
       "moreIssuesLabel": "عرض {count} مشكلات أخرى في {page}",
-      "fewerIssues": "عرض أقل",
-      "duplicateNote": {
-        "title": "هذا العنوان مستخدم أيضًا في:",
-        "description": "هذا الوصف مستخدم أيضًا في:",
-        "address": "هذا العنوان (الرابط) مستخدم أيضًا في:",
-        "focus": "هذه العبارة المفتاحية هي أيضًا تركيز:"
-      },
-      "duplicateMore": "و{count} صفحات أخرى"
+      "fewerIssues": "عرض أقل"
     },
     "languageNotPublic": "{language} غير مفعّلة للموقع",
     "languageNotPublicHelp": "يتم فحص اللغات المفعّلة في إعدادات الموقع فقط. فعّل هذه اللغة هناك لفحص صفحاتها.",

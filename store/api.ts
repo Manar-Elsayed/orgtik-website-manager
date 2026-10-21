@@ -625,8 +625,6 @@ export type SeoMissingRow = Pick<SeoRow, "id" | "type" | "name" | "path" | "titl
   issues: SeoIssue[];
   /** Per language, the pages each duplicate clashes with. */
   duplicates?: Partial<Record<Locale, SeoDuplicates>>;
-  /** Per language, the title, description, address or keyphrase each duplicate shares. */
-  duplicateText?: Partial<Record<Locale, Partial<Record<SeoDuplicateKind, string>>>>;
 };
 export type SeoMissing = Page<SeoMissingRow> & {
   counts: Record<SeoGroup, number>;
@@ -1096,7 +1094,7 @@ export const api = createApi({
       query: (params) => ({ url: "/admin/seo/health", params }),
       providesTags: ["Seo", "EntryList"],
     }),
-    seoConflicts: b.query<Required<SeoDuplicates>, { entry: string; lang: string; title?: string; focus?: string }>({
+    seoConflicts: b.query<Required<SeoDuplicates>, { entry: string; lang: string; title?: string; description?: string; focus?: string }>({
       query: (params) => ({ url: "/admin/seo/conflicts", params }),
       providesTags: ["Seo"],
     }),
