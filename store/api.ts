@@ -720,10 +720,24 @@ export type Redirect = {
   source: "website" | "manager" | "address_change" | "archived";
   history?: { at: string; action: string; by: Person }[];
   handledBy: "browser" | "host";
+  /** Whether the query string travels on to the destination. */
+  query: "keep" | "drop";
+  /** How it runs on the website: its server (in the live build), the browser, not deployed yet, or only configured. */
+  execution: "server" | "browser" | "notDeployed" | "configured";
+  /** Problems the scan found that concern this redirect. */
+  problems: RedirectProblem[];
+  /** Set to Needs attention by hand, or a problem was found. */
+  needsAttention: boolean;
+  lastTest: RedirectTest | null;
   createdAt: string;
   createdBy: Person;
   version: number;
 };
+export type RedirectProblemKind = "duplicate" | "self" | "loop" | "chain" | "destinationMissing" | "notDeployed" | "deployedDiffers" | "disabledStillLive" | "deletedStillLive";
+export type RedirectProblem = { kind: RedirectProblemKind; ids: string[]; from?: string; to?: string; path?: string[]; suggestion?: string; related?: string[]; live?: { to: string; code: number; query: string }; redirects?: { id: string; from: string | null }[] };
+/** A request to the live website for the redirect's address, without following it. */
+export type RedirectTest = { at: string; by: Person; path: string; pass: boolean; disabled: boolean; handledBy: "host" | "browser"; expected: { status: number; location: string | null }; actual: { status: number; location: string | null } };
+export type RedirectList = Page<Redirect> & { liveKnown: boolean; liveUrl: string | null; problems: RedirectProblem[] };
 export type Indexing = {
   /** What the site wraps titles in, and its default shared image (for previews). */
   site?: { titleTemplate: string; defaultOgImage: string | null };
@@ -1085,7 +1099,7 @@ export const api = createApi({
       query: (params) => ({ url: "/admin/seo/missing", params }),
       providesTags: ["Seo", "EntryList"],
     }),
-    redirects: b.query<Page<Redirect>, { page?: number; pageSize?: number; search?: string; kind?: string; status?: string }>({
+    redirects: b.query<RedirectList, { page?: number; pageSize?: number; search?: string; kind?: string; status?: string; source?: string; execution?: string }>({
       query: (params) => ({ url: "/admin/seo/redirects", params }),
       providesTags: ["Seo"],
     }),
@@ -1098,6 +1112,7 @@ export const api = createApi({
         to: string;
         code: number;
         status: RedirectStatus;
+        query?: "keep" | "drop";
       }
     >({
       query: ({ id, version, ...body }) =>
@@ -1109,6 +1124,10 @@ export const api = createApi({
               headers: { "if-match": String(version) },
             }
           : { url: "/admin/seo/redirects", method: "POST", body },
+      invalidatesTags: ["Seo"],
+    }),
+    testRedirect: b.mutation<RedirectTest, string>({
+      query: (id) => ({ url: `/admin/seo/redirects/${id}/test`, method: "POST" }),
       invalidatesTags: ["Seo"],
     }),
     deleteRedirect: b.mutation<void, string>({
@@ -1331,6 +1350,7 @@ export const {
   useDeleteRedirectMutation,
   useIndexingQuery,
   useSiteLiveQuery,
+  useTestRedirectMutation,
   useLazySiteLiveQuery,
   usePublishSiteMutation,
   usePreviewAddressesQuery,

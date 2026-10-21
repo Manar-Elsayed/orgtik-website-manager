@@ -338,26 +338,134 @@ function makeLibrary({ seed, store, now, uploads, demo = false, locales, site })
   const livePaths = () => new Set([...store.entries.values()].filter((e) => ADDRESS[e.type] && e.live && e.workflow.visibility === "live").map((e) => ADDRESS[e.type](e, e.live, store.entries)));
   // Active redirects run; disabled ones are kept but not served; "attention" still runs and is flagged for review.
   const REDIRECT_STATUSES = ["active", "disabled", "attention"];
+  const QUERY_MODES = ["keep", "drop"];
+  // Two addresses are the same redirect source when they differ only by a trailing slash or letter
+  // case (/About/ and /about); fragments and query strings never take part in matching.
+  const normPath = (p) => { let x = String(p ?? "").trim().split("#")[0].split("?")[0]; if (x.length > 1) x = x.replace(/\/+$/, ""); return x.toLowerCase(); };
+  // Where one redirect sends a path, exactly as the website's server applies it (orgtik-site/middleware.js).
+  function applyRedirect(r, path) {
+    const p = normPath(path);
+    if (r.from.endsWith("/*")) {
+      const prefix = normPath(r.from.slice(0, -2));
+      if (p !== prefix && !p.startsWith(prefix + "/")) return null;
+      const rest = p.slice(prefix.length + 1);
+      return r.to.includes("*") ? r.to.replace("*", rest).replace(/\/(?=#|$)/, (m) => (rest ? m : "")) : r.to;
+    }
+    return normPath(r.from) === p ? r.to : null;
+  }
+  // Exact sources before wildcards, longer wildcards first: the order the server tries them.
+  const byPrecedence = (list) => [...list].sort((a, b) => Number(a.from.endsWith("/*")) - Number(b.from.endsWith("/*")) || b.from.length - a.from.length);
+  const firstMatch = (list, path) => { for (const r of byPrecedence(list)) { const to = applyRedirect(r, path); if (to != null) return { r, to }; } return null; };
+  // The path a redirect is checked from: its own address, or a sample under a wildcard.
+  const samplePath = (r) => (r.from.endsWith("/*") ? r.from.replace("*", "sample") : r.from);
   function validateRedirect(r, selfId) {
     const errors = {};
     const status = r.status ?? "active";
     if (!REDIRECT_STATUSES.includes(status)) errors.status = "required";
+    const query = r.query ?? "keep";
+    if (!QUERY_MODES.includes(query)) errors.query = "required";
     const from = String(r.from ?? "").trim();
     const to = String(r.to ?? "").trim();
     if (!/^\/[^\s?#]*$/.test(from)) errors.from = "path_format";
     else if (from.includes("*") && !from.endsWith("/*")) errors.from = "wildcard_end";
     if (!/^(\/|https:\/\/)\S*$/.test(to)) errors.to = "path_format";
     else if (to.includes("*") && !from.includes("*")) errors.to = "wildcard_unmatched";
-    if (from && from === to) errors.to = "same_as_from";
+    if (from && normPath(from) === normPath(to)) errors.to = "same_as_from";
     if (![301, 302].includes(Number(r.code))) errors.code = "required";
     const others = [...redirects.values()].filter((x) => x.id !== selfId);
-    if (others.some((x) => x.from === from)) errors.from = "duplicate";
+    if (others.some((x) => normPath(x.from) === normPath(from))) errors.from = "duplicate";
     if (livePaths().has(from)) errors.from = "shadows_page";
-    // A redirect to an address that itself redirects is a chain (and may be a loop): point at the end.
-    const target = to.split("#")[0];
+    // A redirect to an address another redirect catches (exactly or by wildcard) is a chain, or a
+    // loop when it comes back: point straight at the end instead.
     const serving = others.filter((x) => x.status !== "disabled");
-    if (!errors.to && serving.some((x) => x.from === target)) errors.to = serving.some((x) => x.from === target && x.to.split("#")[0] === from) ? "loop" : "chain";
-    return { errors, clean: { from, to, code: Number(r.code), status, note: String(r.note ?? "").trim() || undefined } };
+    if (!errors.to && !errors.from && to.startsWith("/") && !to.includes("*")) {
+      const next = firstMatch(serving, to);
+      if (next) {
+        const seen = new Set([normPath(from)]);
+        let at = next.to, hops = 0, loop = false;
+        while (at && hops < 10) {
+          if (seen.has(normPath(at))) { loop = true; break; }
+          seen.add(normPath(at));
+          const step = at.startsWith("/") ? firstMatch(serving, at) : null;
+          if (!step) break;
+          at = step.to; hops += 1;
+        }
+        errors.to = loop || normPath(next.to) === normPath(from) ? "loop" : "chain";
+      }
+    }
+    return { errors, clean: { from, to, code: Number(r.code), status, query, note: String(r.note ?? "").trim() || undefined } };
+  }
+  // Every problem in the saved redirects, with its reason and the redirects it concerns. With the
+  // live build's redirect list (`deployed`), also where the website's server differs from here.
+  function redirectProblems({ deployed = null, addresses = null } = {}) {
+    const all = [...redirects.values()];
+    const serving = all.filter((r) => r.status !== "disabled");
+    const host = serving.filter((r) => (r.handledBy ?? "host") === "host");
+    const problems = [];
+    const add = (kind, ids, detail = {}) => problems.push({ kind, ids, ...detail });
+    // Duplicate sources (after normalising), and redirects to themselves.
+    const bySource = new Map();
+    for (const r of all) bySource.set(normPath(r.from), [...(bySource.get(normPath(r.from)) ?? []), r]);
+    for (const group of bySource.values()) if (group.length > 1) add("duplicate", group.map((r) => r.id), { from: group[0].from });
+    for (const r of all) if (normPath(r.from) === normPath(r.to)) add("self", [r.id], { from: r.from });
+    // Loops and chains: follow each serving redirect the way the server would, up to 10 steps.
+    for (const r of serving) {
+      const path = [samplePath(r)];
+      const ids = [r.id];
+      let at = applyRedirect(r, path[0]);
+      let loop = false;
+      for (let hop = 0; at && at.startsWith("/") && hop < 10; hop++) {
+        const seen = path.some((p) => normPath(p) === normPath(at));
+        path.push(at);
+        if (seen) { loop = true; break; }
+        const step = firstMatch(serving, at);
+        if (!step) break;
+        ids.push(step.r.id);
+        at = step.to;
+      }
+      if (loop) add("loop", [...new Set(ids)], { path });
+      else if (ids.length > 1) add("chain", [r.id], { path, related: ids.slice(1), suggestion: path[path.length - 1] });
+    }
+    // Destinations the site doesn't have: an internal address that is neither a page nor caught by
+    // another redirect. Full https:// destinations are outside the site and checked by Test.
+    if (addresses) for (const r of serving) {
+      if (!r.to.startsWith("/") || r.to.includes("*")) continue;
+      const path = normPath(r.to);
+      if (!addresses.has(path) && !firstMatch(serving.filter((x) => x.id !== r.id), path)) add("destinationMissing", [r.id], { to: r.to });
+    }
+    // The website's server against the settings here (from the live build's record).
+    if (deployed) {
+      const live = new Map(deployed.map((d) => [normPath(d.from), d]));
+      for (const r of all.filter((x) => (x.handledBy ?? "host") === "host")) {
+        const d = live.get(normPath(r.from));
+        if (r.status === "disabled") { if (d) add("disabledStillLive", [r.id], { from: r.from }); continue; }
+        if (!d) add("notDeployed", [r.id], { from: r.from });
+        else if (d.to !== r.to || Number(d.code) !== Number(r.code) || (d.query ?? "keep") !== (r.query ?? "keep")) add("deployedDiffers", [r.id], { from: r.from, live: { to: d.to, code: d.code, query: d.query ?? "keep" } });
+      }
+      const known = new Set(all.map((r) => normPath(r.from)));
+      for (const d of deployed) if (!known.has(normPath(d.from))) add("deletedStillLive", [], { from: d.from });
+    }
+    return problems;
+  }
+  // How a redirect runs on the website: on its server (in the live build), in the browser, saved
+  // here but not on the site yet, or only configured (no build to compare with, or disabled).
+  function executionOf(r, deployed) {
+    if ((r.handledBy ?? "host") === "browser") return "browser";
+    if (!deployed) return "configured";
+    const d = deployed.find((x) => normPath(x.from) === normPath(r.from));
+    if (r.status === "disabled") return d ? "server" : "configured";
+    return d && d.to === r.to && Number(d.code) === Number(r.code) && (d.query ?? "keep") === (r.query ?? "keep") ? "server" : "notDeployed";
+  }
+  // What a test of the redirect expects from the website's server.
+  function expectedTest(r) {
+    const path = samplePath(r);
+    const probe = `${path}?redirect-test=1`;
+    return { path, probe, status: Number(r.code), to: applyRedirect(r, path), query: (r.query ?? "keep") === "keep" };
+  }
+  function recordTest(r, who, result) {
+    r.lastTest = { at: now(), by: who.key, ...result };
+    log(who.key, "redirect_test", r.id, "redirect", { pass: result.pass });
+    return r.lastTest;
   }
   function saveRedirect(who, input, existing) {
     const { errors, clean } = validateRedirect(input, existing?.id);
@@ -507,7 +615,7 @@ function makeLibrary({ seed, store, now, uploads, demo = false, locales, site })
     return { data: { media: rows, redirects: redirects_, settings: settings_, healthRun: incoming.data.healthRun ?? null, lastPublish: incoming.data.lastPublish ?? null, demoVersion: incoming.data.demoVersion ?? 0 }, sequences: { nextMedia: codec.sequence(incoming.sequences?.nextMedia, rows, "md"), nextRedirect: codec.sequence(incoming.sequences?.nextRedirect, redirects_, "rd") } };
   };
   const importState = value => { const incoming = validateState(value); codec.replaceMap(media, incoming.data.media); codec.replaceMap(redirects, incoming.data.redirects); codec.replaceObject(settings, incoming.data.settings); healthRun = incoming.data.healthRun; lastPublish = incoming.data.lastPublish; nextMedia = incoming.sequences.nextMedia; nextRedirect = incoming.sequences.nextRedirect; if (incoming.data.demoVersion < 1) ensureDemo(); else if (demo && incoming.data.demoVersion < 2) require("./seed/workflow-examples").mediaExamples(media); if (demo && incoming.data.demoVersion < 3) require("./seed/demo-states").redirectStatusExamples(redirects); };
-  return { media, redirects, settings, mediaOut, resolveMedia, updateMedia, addUpload, removeMedia, serverRedirects, recordPublish, lastPublish: () => lastPublish, health, CHECKS, GUIDANCE, MAIN_CHECKS, hasOther, runHealth, healthRunState, missingSeo, SEO_GROUPS, checkedLocales, seoConflicts, saveRedirect, removeRedirect, REDIRECT_STATUSES, sitemap, indexingUrls, robots, setVisibility, setCanonicalHost, RIGHTS, keepAddresses, previewAddresses, exportState, importState, validateState };
+  return { media, redirects, settings, mediaOut, resolveMedia, updateMedia, addUpload, removeMedia, serverRedirects, redirectProblems, executionOf, expectedTest, recordTest, normPath, applyRedirect, QUERY_MODES, recordPublish, lastPublish: () => lastPublish, health, CHECKS, GUIDANCE, MAIN_CHECKS, hasOther, runHealth, healthRunState, missingSeo, SEO_GROUPS, checkedLocales, seoConflicts, saveRedirect, removeRedirect, REDIRECT_STATUSES, sitemap, indexingUrls, robots, setVisibility, setCanonicalHost, RIGHTS, keepAddresses, previewAddresses, exportState, importState, validateState };
 }
 
 module.exports = { makeLibrary };

@@ -731,18 +731,57 @@ module.exports = {
       if (!lib.checkedLocales().includes(lang) || !req.query.entry) return fail(res, 422, "invalid", "Choose a page and language.");
       ok(res, lib.seoConflicts({ entry: String(req.query.entry), lang, title: req.query.title, focus: req.query.focus }));
     });
-    app.get("/v2/admin/seo/redirects", need("seo:view"), (req, res) => {
+    // Addresses the site has, for "destination missing": every page and entry on the site or coming.
+    const siteAddresses = () => new Set(lib.previewAddresses().map((a) => lib.normPath(a.path)));
+    app.get("/v2/admin/seo/redirects", need("seo:view"), async (req, res) => {
+      // The website's server, from its last build: what each redirect really does there.
+      const snap = await liveSite.snapshot();
+      const deployed = snap.reachable && Array.isArray(snap.build?.redirects) ? snap.build.redirects : null;
+      const problems = lib.redirectProblems({ deployed, addresses: siteAddresses() });
       let rows = [...lib.redirects.values()].sort((a, b) => a.from.localeCompare(b.from)).map((r) => {
         const history = store.audit.filter(event => event.entry === r.id && event.type === "redirect" || event.action === "redirect_auto" && event.from === r.from);
         if (!history.some(event => ["redirect_create", "redirect_auto"].includes(event.action))) history.push({ at: r.createdAt, by: r.createdBy, action: "redirect_create" });
-        return { ...r, status: r.status ?? "active", createdBy: person(r.createdBy), history: history.map(event => ({ ...event, by: person(event.by) })) };
+        const own = problems.filter((p) => p.ids.includes(r.id));
+        return { ...r, status: r.status ?? "active", query: r.query ?? "keep", handledBy: r.handledBy ?? "host", execution: lib.executionOf(r, deployed), problems: own, needsAttention: (r.status ?? "active") === "attention" || own.length > 0, lastTest: r.lastTest ? { ...r.lastTest, by: person(r.lastTest.by) } : null, createdBy: person(r.createdBy), history: history.map(event => ({ ...event, by: person(event.by) })) };
       });
       const search = String(req.query.search ?? "").trim().toLowerCase();
       if (search) rows = rows.filter(row => `${row.from} ${row.to} ${row.note ?? ""}`.toLowerCase().includes(search));
       if (req.query.kind) rows = rows.filter(row => String(row.code) === req.query.kind);
-      if (req.query.status) rows = rows.filter(row => row.status === req.query.status);
+      // Needs attention: set by hand, or a problem found in the scan.
+      if (req.query.status === "attention") rows = rows.filter(row => row.needsAttention);
+      else if (req.query.status) rows = rows.filter(row => row.status === req.query.status);
+      if (req.query.source) rows = rows.filter(row => row.source === req.query.source);
+      if (req.query.execution) rows = rows.filter(row => row.execution === req.query.execution);
       const { rows: out, meta } = page(req, rows);
-      ok(res, out, meta);
+      const byId = (id) => lib.redirects.get(id);
+      ok(res, out, { ...meta, liveKnown: Boolean(deployed), liveUrl: snap.url ?? null, problems: problems.map((p) => ({ ...p, redirects: p.ids.map((id) => ({ id, from: byId(id)?.from ?? null })) })) });
+    });
+    // Test: ask the website's server for the redirect's address (a wildcard's sample path) without
+    // following it, and compare the status and destination with what is set here.
+    app.post("/v2/admin/seo/redirects/:id/test", need("seo:view"), async (req, res) => {
+      const x = lib.redirects.get(req.params.id);
+      if (!x) return fail(res, 404, "not_found", "This redirect doesn't exist (any more).");
+      const want = lib.expectedTest(x);
+      const got = await liveSite.probe(want.probe);
+      if (!got.configured) return fail(res, 503, "site_not_configured", "No website address is set (NEXT_PUBLIC_WEBSITE_URL).");
+      if (!got.status) return fail(res, 503, "site_unreachable", "The website couldn't be reached.");
+      const base = new URL(got.url).origin;
+      const expectedUrl = new URL(want.to, base);
+      if (want.query) expectedUrl.searchParams.set("redirect-test", "1");
+      const browser = (x.handledBy ?? "host") === "browser";
+      const sameTarget = got.location != null && new URL(got.location).toString() === expectedUrl.toString();
+      const result = {
+        path: want.probe,
+        expected: browser ? { status: 200, location: null } : { status: want.status, location: expectedUrl.toString() },
+        actual: { status: got.status, location: got.location },
+        handledBy: browser ? "browser" : "host",
+        pass: browser ? got.status === 200 : got.status === want.status && sameTarget,
+        disabled: x.status === "disabled",
+      };
+      // A disabled redirect passes when the server no longer redirects.
+      if (x.status === "disabled") result.pass = !(got.status >= 300 && got.status < 400);
+      const record = lib.recordTest(x, who(req), result);
+      ok(res, { ...record, by: person(record.by) });
     });
     app.post("/v2/admin/seo/redirects", need("seo:create"), (req, res) => {
       const r = lib.saveRedirect(who(req), req.body ?? {});
