@@ -2768,7 +2768,7 @@
     "definitionStale": "This role changed. Close this dialog and reopen it to load the latest version.",
     "invalidRoleName": "Enter a unique role name with 1–100 characters.",
     "assignedRoleHelp": "{count, plural, one {Assigned to one user.} other {Assigned to # users.}} Deleting this role removes only this role assignment.",
-    "deleteProtected": "The Super admin role cannot be deleted.",
+    "deleteProtected": "The {role} role can’t be deleted: it keeps someone in charge of the Website Manager. You can still change its name and permissions.",
     "roleFailed": "The role could not be saved or deleted. Try again.",
     "roleSaved": "Role saved",
     "roleDeleted": "Role deleted",

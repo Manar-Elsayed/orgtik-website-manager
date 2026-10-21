@@ -239,7 +239,7 @@ test("Custom roles validate edits and delete assigned roles while preserving oth
   assert.deepEqual(audit.filter(row=>row.type==="role").map(row=>row.action),["role_delete","role_update","role_create"]);
 });
 
-test("Every assigned built-in except Super admin is deletable, with current impact and persistent permission tombstones", async t => {
+test("Every assigned built-in except Super admin and Owner is deletable, with current impact and persistent permission tombstones", async t => {
   const definitions={},overrides={},deletions={},audit=[];
   const users=[{id:1,key:'actor',isActive:true},...Object.keys(ROLES).filter(key=>key!=='wm_super_admin').map((key,index)=>({id:index+2,key:'person_'+key,isActive:true}))];
   const grants={actor:{roles:['wm_super_admin','wm_owner'],permissions:[]}};
@@ -255,10 +255,13 @@ test("Every assigned built-in except Super admin is deletable, with current impa
   let roles=(await call('GET')).data;
   assert.equal(roles.find(role=>role.key==='wm_super_admin').deletable,false);
   assert.equal((await call('DELETE','wm_super_admin',roles.find(role=>role.key==='wm_super_admin').version)).code,'protected_role');
-  const owner=roles.find(role=>role.key==='wm_owner');assert.equal(owner.deletable,true);assert.deepEqual(owner.deleteImpact,{assignedCount:2,usersLosingAccess:0,includesCurrentUser:true});
+  // Owner, like Super admin, keeps someone in charge.
+  const owner=roles.find(role=>role.key==='wm_owner');assert.equal(owner.deletable,false);
+  assert.equal((await call('DELETE','wm_owner',owner.version)).code,'protected_role');
+  const seo=roles.find(role=>role.key==='wm_seo');
   grants.person_wm_owner.roles.push('wm_seo');
-  assert.equal((await call('DELETE','wm_owner',owner.version)).status,412,'changed remaining assignments invalidate confirmation');
-  for(const key of Object.keys(ROLES).filter(key=>key!=='wm_super_admin')){
+  assert.equal((await call('DELETE','wm_seo',seo.version)).status,412,'changed remaining assignments invalidate confirmation');
+  for(const key of Object.keys(ROLES).filter(key=>!['wm_super_admin','wm_owner'].includes(key))){
     const before=(await call('GET')).data.find(role=>role.key===key);assert.equal(before.deletable,true);
     const impacted=Object.entries(grants).filter(([,grant])=>grant.roles.includes(key)),prior=new Map(impacted.map(([person])=>[person,S.db.staffAccessEpochs?.[person]??0]));
     assert.equal((await call('DELETE',key,before.version)).status,204,key);
@@ -267,7 +270,7 @@ test("Every assigned built-in except Super admin is deletable, with current impa
     assert.deepEqual(permissionsFor([key],overrides,deletions),[]);
     assert.deepEqual(availableRoleKeys([key],definitions,deletions),[]);
   }
-  assert.deepEqual(users,originalAccounts);assert.deepEqual(identity.grants.global,originalGlobal);assert.deepEqual(grants.actor.roles,['wm_super_admin']);
+  assert.deepEqual(users,originalAccounts);assert.deepEqual(identity.grants.global,originalGlobal);assert.deepEqual(grants.actor.roles,['wm_super_admin','wm_owner']);
   const saved=JSON.parse(JSON.stringify(deletions));assert.deepEqual(validateRoleDeletions(saved),deletions);
   assert.deepEqual(validateRoleDefinitions({},saved),{});assert.deepEqual(validateRoleOverrides({}, {},saved),{});
   for(const bad of [{wm_super_admin:true},{wm_viewer:false},{unknown:true},{wm_custom_bad:true}])assert.throws(()=>validateRoleDeletions(bad),{code:'wm_state_unavailable'});

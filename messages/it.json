@@ -2768,7 +2768,7 @@
     "definitionStale": "Questo ruolo è cambiato. Chiudi e riapri la finestra per caricare la versione più recente.",
     "invalidRoleName": "Inserisci un nome di ruolo univoco da 1 a 100 caratteri.",
     "assignedRoleHelp": "{count, plural, one {Assegnato a un utente.} other {Assegnato a # utenti.}} L’eliminazione rimuove solo questa assegnazione del ruolo.",
-    "deleteProtected": "Il ruolo Super admin non può essere eliminato.",
+    "deleteProtected": "Il ruolo {role} non può essere eliminato: garantisce che qualcuno resti responsabile del Website Manager. Puoi comunque cambiarne nome e permessi.",
     "roleFailed": "Impossibile salvare o eliminare il ruolo. Riprova.",
     "roleSaved": "Ruolo salvato",
     "roleDeleted": "Ruolo eliminato",

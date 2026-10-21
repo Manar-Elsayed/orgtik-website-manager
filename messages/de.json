@@ -2768,7 +2768,7 @@
     "definitionStale": "Diese Rolle wurde geändert. Schließen Sie den Dialog und öffnen Sie ihn erneut, um die aktuelle Version zu laden.",
     "invalidRoleName": "Geben Sie einen eindeutigen Rollennamen mit 1–100 Zeichen ein.",
     "assignedRoleHelp": "{count, plural, one {Einem Benutzer zugewiesen.} other {# Benutzern zugewiesen.}} Beim Löschen wird nur diese Rollenzuweisung entfernt.",
-    "deleteProtected": "Die Rolle Super admin kann nicht gelöscht werden.",
+    "deleteProtected": "Die Rolle {role} kann nicht gelöscht werden: Sie stellt sicher, dass jemand den Website Manager verantwortet. Name und Berechtigungen lassen sich weiterhin ändern.",
     "roleFailed": "Die Rolle konnte nicht gespeichert oder gelöscht werden. Versuchen Sie es erneut.",
     "roleSaved": "Rolle gespeichert",
     "roleDeleted": "Rolle gelöscht",
