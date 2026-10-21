@@ -32,7 +32,13 @@ export function IssueSpot({ active, label, children }: { active: boolean; label:
   }, [active]);
   if (!active) return <>{children}</>;
   return (
-    <div ref={ref} data-issue-spot className="flex min-w-0 flex-col gap-2 rounded-field outline-2 outline-offset-4 outline-danger">
+    // The red stroke goes on the input itself (every control is .ot-control); a spot without one,
+    // such as a note, is outlined as a whole.
+    <div
+      ref={ref}
+      data-issue-spot
+      className="flex min-w-0 flex-col gap-2 rounded-field [&_.ot-control]:border-danger [&_.ot-control]:ring-1 [&_.ot-control]:ring-danger [&:not(:has(.ot-control))]:outline-2 [&:not(:has(.ot-control))]:outline-offset-4 [&:not(:has(.ot-control))]:outline-danger"
+    >
       <p role="alert" className="flex items-center gap-1.5 text-body-sm font-semibold text-danger">
         <WarningCircle aria-hidden="true" weight="fill" className="size-4 shrink-0" />
         {label}
