@@ -1847,7 +1847,7 @@
       "focus": "Fokus-Keyphrase",
       "focusHelp": "Die Phrase, unter der diese Seite gefunden werden soll, <b>max. {max} Wörter</b>. Die Prüfungen nutzen sie; sie erscheint nicht auf der Seite.",
       "keywordList": "Weitere Keywords",
-      "keywordListHelp": "<b>Jedes Keyword max. {max} Wörter</b>, für Planung und Berichte. Mit Enter hinzufügen. Sie werden nicht in die Seite geschrieben (Suchmaschinen ignorieren dieses Tag).",
+      "keywordListHelp": "<b>Keyword max. {max} Wörter</b>, für Planung und Berichte. Mit Enter hinzufügen. Sie werden nicht in die Seite geschrieben (Suchmaschinen ignorieren dieses Tag).",
       "keywordPlaceholder": "Keyword hinzufügen",
       "keywordsInvalid": "Höchstens 20 Keywords mit je bis zu 60 Zeichen.",
       "social": "Wenn der Link geteilt wird",

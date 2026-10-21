@@ -1847,7 +1847,7 @@
       "focus": "Expression clé principale",
       "focusHelp": "L’expression pour laquelle cette page doit être trouvée, <b>{max} mots max.</b> Les vérifications l’utilisent ; elle n’apparaît pas sur la page.",
       "keywordList": "Autres mots-clés",
-      "keywordListHelp": "<b>Chaque mot-clé {max} mots max.</b>, pour la planification et les rapports. Appuyez sur Entrée pour en ajouter un. Ils ne sont pas écrits dans la page (les moteurs de recherche ignorent cette balise).",
+      "keywordListHelp": "<b>Mot-clé {max} mots max.</b>, pour la planification et les rapports. Appuyez sur Entrée pour en ajouter un. Ils ne sont pas écrits dans la page (les moteurs de recherche ignorent cette balise).",
       "keywordPlaceholder": "Ajouter un mot-clé",
       "keywordsInvalid": "20 mots-clés au plus, de 60 caractères chacun au maximum.",
       "social": "Quand le lien est partagé",

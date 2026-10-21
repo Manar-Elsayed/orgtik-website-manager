@@ -1847,7 +1847,7 @@
       "focus": "Frase chiave principale",
       "focusHelp": "La frase per cui questa pagina deve essere trovata, <b>max {max} parole</b>. I controlli la usano; non compare sulla pagina.",
       "keywordList": "Altre parole chiave",
-      "keywordListHelp": "<b>Ogni parola chiave max {max} parole</b>, per pianificazione e report. Premi Invio per aggiungerne una. Non vengono scritte nella pagina (i motori di ricerca ignorano quel tag).",
+      "keywordListHelp": "<b>Parola chiave max {max} parole</b>, per pianificazione e report. Premi Invio per aggiungerne una. Non vengono scritte nella pagina (i motori di ricerca ignorano quel tag).",
       "keywordPlaceholder": "Aggiungi una parola chiave",
       "keywordsInvalid": "Al massimo 20 parole chiave di 60 caratteri ciascuna.",
       "social": "Quando il link viene condiviso",
