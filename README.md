@@ -43,17 +43,18 @@ Import the repository. The framework is Next.js and the defaults work. Set these
 
 Redeploy after you change them, because `NEXT_PUBLIC_*` values are built in.
 
-### Data: demo mode
+### Data: Supabase
 
-No database is configured, so the backend keeps its data on the server instance (`/tmp`):
+Vercel runs several copies of this app at once, so they need one shared store for data and sign-in sessions. Without one (demo mode), each copy keeps its own, and sign-in loops back to the sign-in page. Demo mode only works locally or on a single server.
 
-- Edits last while an instance stays warm. After a cold start (inactivity, a redeploy) everything goes back to the seed content, and you have to sign in again.
-- If Vercel runs several instances at once, they don't share data.
+1. **Create the Supabase project.** In Vercel, go to orgtik-website-manager → Storage → Create Database → Supabase and connect it to this project. That sets `SUPABASE_URL` and the service key. Alternatively, create a project at supabase.com and add `SUPABASE_URL` and `SUPABASE_SECRET_KEY` (Project Settings → API keys → secret key) to Vercel yourself.
+2. **Create the schema.** In Supabase, open the SQL Editor and run `supabase/migrations/20261015225906_orgtik_persistence.sql`. It creates a private `orgtik` schema, one server-only function (`public.orgtik_persistence`) and a private `orgtik-media` storage bucket. Nothing is exposed to anonymous clients.
+3. **Set the session secret.** `MOCK_SESSION_SECRET` must be a random string of 32 or more characters. Every copy signs sessions with it.
+4. **Redeploy.** Once `SUPABASE_URL` and a key are present, the backend uses Supabase on its own.
 
-To keep data, add a store. The backend supports both of these without code changes:
+The data starts from the seed content. The first request after a cold start replays the saved changes on top of it.
 
-- **Upstash Redis.** In Vercel, go to Storage → Upstash → Redis and connect it to this project. That sets `KV_REST_API_URL` and `KV_REST_API_TOKEN`. Also set `MOCK_SESSION_SECRET` to a random string of 32 or more characters.
-- **Supabase.** Set `MOCK_PERSISTENCE=supabase`, `SUPABASE_URL`, `SUPABASE_SECRET_KEY` and `MOCK_SESSION_SECRET`. You also need the schema from the monorepo's `supabase/migrations`.
+Upstash Redis also works: set `KV_REST_API_URL`, `KV_REST_API_TOKEN` and `MOCK_SESSION_SECRET`.
 
 ## What isn't included
 

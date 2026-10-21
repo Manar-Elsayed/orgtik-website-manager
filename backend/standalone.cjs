@@ -21,6 +21,8 @@ env.MOCK_PUBLIC_URL ||= `${wmUrl}/api/backend`;
 env.SUITE_WEB_URLS ||= JSON.stringify({ wm: wmUrl, website: websiteUrl });
 env.MOCK_SANDBOX ||= "wm-standalone";
 
+// A connected Supabase project (the Vercel integration sets these) is used without further setup.
+if (!env.MOCK_PERSISTENCE && env.SUPABASE_URL && (env.SUPABASE_SECRET_KEY || env.SUPABASE_SERVICE_ROLE_KEY)) env.MOCK_PERSISTENCE = "supabase";
 const durable = env.MOCK_PERSISTENCE === "supabase" || ((env.KV_REST_API_URL || env.UPSTASH_REDIS_REST_URL) && (env.KV_REST_API_TOKEN || env.UPSTASH_REDIS_REST_TOKEN));
 if (!durable) {
   env.MOCK_PERSISTENCE ||= "file";
@@ -29,12 +31,15 @@ if (!durable) {
   if (!env.VERCEL) env.MOCK_DATA_DIR ||= path.join(__dirname, ".data");
 }
 // Sessions are signed with this secret. Without one, each server instance makes its own, so
-// signing in again is needed after a restart (which demo mode needs anyway).
-if (Buffer.byteLength(env.MOCK_SESSION_SECRET || "") < 32) env.MOCK_SESSION_SECRET = crypto.randomBytes(32).toString("hex");
+// signing in again is needed after a restart (which demo mode needs anyway). A shared store is
+// read by many instances, which must all sign with the same secret.
+const secretMissing = Buffer.byteLength(env.MOCK_SESSION_SECRET || "") < 32;
+if (secretMissing && !durable) env.MOCK_SESSION_SECRET = crypto.randomBytes(32).toString("hex");
 
 let listening;
 /** The loopback origin of the in-process mock API, e.g. http://127.0.0.1:53121/. */
 function backendOrigin() {
+  if (secretMissing && durable) return Promise.reject(new Error("MOCK_SESSION_SECRET (32+ characters) is required with a shared data store."));
   if (!listening) {
     listening = new Promise((resolve, reject) => {
       const handler = require("./api/index.js");
