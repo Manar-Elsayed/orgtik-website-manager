@@ -9,6 +9,7 @@ import { SitePublishCard } from "@/components/seo/SitePublishCard";
 import { RequirePermission } from "@/components/frame/RequirePermission";
 import { Link } from "@/i18n/routing";
 import { useListState } from "@/lib/useListState";
+import { TABLE_ROWS } from "@/lib/tableRows";
 import { useCan } from "@/lib/permissions";
 import { statusOf, useCheckRobotsMutation, useIndexingQuery, useSetCanonicalHostMutation, useSetRobotsMutation, useSetVisibilityMutation, useSiteLiveQuery, useValidateIndexingMutation, type ApiError, type Indexing, type IndexingCheck, type IndexingUrl, type RobotsCheck, type RobotsWarning } from "@/store/api";
 
@@ -282,7 +283,7 @@ function SitemapSection({ data }: { data: Indexing }) {
         <Select size="sm" label={tx("warningsFilter")} value={url.get("warning", "all")} onValueChange={(warning) => url.set({ warning })} options={[{ value: "all", label: ti("all") }, { value: "any", label: tx("anyWarning") }, { value: "noindexInSitemap", label: tx("warning.noindexInSitemap") }, { value: "canonicalElsewhere", label: tx("warning.canonicalElsewhere") }]} />
       </div>
       <DataTable
-        className="[&_tbody_td]:py-2"
+        className={TABLE_ROWS}
         label={tx("sitemapTitle")}
         columns={columns.map((column) => ({ ...column, enableSorting: false }))}
         data={rows}
