@@ -33,3 +33,19 @@ test('demo redirects show each status, and saved demo data gets them once', () =
   assert.equal(status('rd_demo_archived'), 'disabled');
   assert.equal(status('rd_demo_manager'), 'active');
 });
+
+test('the Activity Log records the version each redirect and settings change left behind', () => {
+  const store = makeStore(now), library = makeLibrary({ store, seed: store.seed, now, uploads: 'unused' });
+  const made = library.saveRedirect(who, { from: '/old-offer', to: '/services', code: 301 }).redirect;
+  assert.equal(store.audit[0].action, 'redirect_create');
+  assert.equal(store.audit[0].version, made.version);
+  const first = made.version;
+  const changed = library.saveRedirect(who, { ...made, status: 'disabled' }, made).redirect;
+  assert.equal(store.audit[0].version, changed.version);
+  assert.equal(changed.version, first + 1);
+  library.removeRedirect(changed, who);
+  assert.equal(store.audit[0].action, 'redirect_delete');
+  assert.equal(store.audit[0].version, changed.version, 'a deletion keeps the version it removed');
+  library.setVisibility(who, 'index', 'Launch');
+  assert.equal(store.audit[0].version, library.settings.version);
+});

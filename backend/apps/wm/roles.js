@@ -72,7 +72,8 @@ function registerRoles(app, { identity, store, overrides, definitions = {}, dele
       builtin: Object.hasOwn(ROLES, key),
       labelOverridden: Boolean(definitions[key]),
       assignedCount: people.length,
-      deletable: key !== "wm_super_admin",
+      // Owner and Super admin keep someone in charge: they can be edited, never deleted.
+      deletable: !PROTECTED.has(key),
       deleteImpact: {
         assignedCount: people.length,
         usersLosingAccess: people.filter(([, roles]) => !availableRoleKeys(roles.filter(role => role !== key), definitions, deletions).length).length,
@@ -151,7 +152,7 @@ function registerRoles(app, { identity, store, overrides, definitions = {}, dele
   app.delete("/v2/admin/roles/:key", need("roles:manage"), (req, res) => {
     const key = req.params.key;
     if (!keys().includes(key)) return fail(res, 404, "not_found", "Role not found.");
-    if (key === "wm_super_admin") return fail(res, 409, "protected_role", "The Super admin role cannot be deleted.");
+    if (PROTECTED.has(key)) return fail(res, 409, "protected_role", `The ${role(key).label} role cannot be deleted.`);
     if (req.get("if-match") !== role(key).version) return fail(res, 412, "stale", "This role changed. Reload it before deleting.");
     const people = assignments(key), S = people.length ? platform() : null;
     if (people.length && !S?.db) return fail(res, 503, "staff_authority_unavailable", "Current staff authority is unavailable. Try again.");

@@ -28,7 +28,8 @@ export function RoleDefinitionDialog({ role: initialRole, initialPermissions, in
   const [update, updating] = useUpdateRoleMutation();
   const [remove, removing] = useDeleteRoleMutation();
   const busy = creating.isLoading || updating.isLoading || removing.isLoading;
-  const deleteProtected = role?.key === "wm_super_admin";
+  // Owner and Super admin keep someone in charge: the server marks them protected.
+  const deleteProtected = Boolean(role?.protected);
   const assignedCount = role?.deleteImpact?.assignedCount ?? role?.assignedCount ?? 0;
   const usersLosingAccess = role?.deleteImpact?.usersLosingAccess ?? 0;
   const includesCurrentUser = role?.deleteImpact?.includesCurrentUser ?? assignedToMe;
@@ -37,7 +38,7 @@ export function RoleDefinitionDialog({ role: initialRole, initialPermissions, in
   const changed = !role || name.trim() !== role.label || [...permissions].sort().join() !== [...role.permissions].sort().join();
   const report = (error: unknown) => {
     const e = error as ApiError;
-    setProblem(e.status === 412 ? t("definitionStale") : e.code === "self_lockout" ? ti("selfLockout") : e.code === "invalid_label" ? t("invalidRoleName") : e.code === "protected_role" ? t("deleteProtected") : e.code === "role_limit" ? t("roleLimit") : t("roleFailed"));
+    setProblem(e.status === 412 ? t("definitionStale") : e.code === "self_lockout" ? ti("selfLockout") : e.code === "invalid_label" ? t("invalidRoleName") : e.code === "protected_role" ? t("deleteProtected", { role: role?.label ?? "" }) : e.code === "role_limit" ? t("roleLimit") : t("roleFailed"));
   };
   const save = async () => {
     setProblem("");
@@ -79,7 +80,7 @@ export function RoleDefinitionDialog({ role: initialRole, initialPermissions, in
           </fieldset>)}
           {!groups.length ? <p role="status" className="text-body-sm text-fg-muted">{ti("noResults")}</p> : null}
         </div>
-        {deleteProtected ? <p className="text-body-sm text-fg-muted">{t("deleteProtected")}</p> : assignedCount > 0 ? <p className="text-body-sm text-fg-muted">{t("assignedRoleHelp", {count: assignedCount})}</p> : null}
+        {deleteProtected ? <p className="text-body-sm text-fg-muted">{t("deleteProtected", { role: role?.label ?? "" })}</p> : assignedCount > 0 ? <p className="text-body-sm text-fg-muted">{t("assignedRoleHelp", {count: assignedCount})}</p> : null}
       </DialogBody>
       <DialogFooter>
         {role ? <ConfirmDialog title={t("deleteRoleTitle", {role: role.label})} impact={<span className="flex flex-col gap-3"><span>{t("deleteRoleImpact")}</span>{assignedCount > 0 ? <span>{t("assignedRoleHelp", {count: assignedCount})}</span> : null}{usersLosingAccess > 0 ? <span>{t("deleteRoleAccessImpact", {count: usersLosingAccess})}</span> : null}{includesCurrentUser ? <span>{t("deleteOwnRoleImpact")}</span> : null}</span>} confirmLabel={t("deleteRole")} onConfirm={deleteRole} trigger={<Button className="me-auto" variant="danger" startIcon={<Trash />} disabled={busy || deleteProtected}>{t("deleteRole")}</Button>} /> : null}

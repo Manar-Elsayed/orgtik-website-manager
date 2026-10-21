@@ -126,7 +126,19 @@
       "role_update": "Rôle modifié",
       "role_delete": "Rôle supprimé",
       "user_role_pause": "Accès du rôle suspendu",
-      "user_role_resume": "Accès du rôle rétabli"
+      "user_role_resume": "Accès du rôle rétabli",
+      "idea_edit": "A modifié une idée",
+      "rollback_published": "A rétabli la version publiée précédente",
+      "redirect_test": "A testé une redirection",
+      "site_publish": "A publié le site",
+      "redirect_auto": "A ajouté une redirection pour une adresse modifiée",
+      "robots_txt": "A modifié robots.txt",
+      "canonical_host": "A modifié l’hôte canonique",
+      "create": "Créé",
+      "delete": "Supprimé",
+      "schedule_failed": "Publication programmée échouée",
+      "user_delete": "A supprimé un utilisateur",
+      "seo_check": "A lancé une vérification SEO"
     }
   },
   "Auth": {
@@ -2768,7 +2780,7 @@
     "definitionStale": "Ce rôle a changé. Fermez cette fenêtre et rouvrez-la pour charger la dernière version.",
     "invalidRoleName": "Saisissez un nom de rôle unique de 1 à 100 caractères.",
     "assignedRoleHelp": "{count, plural, one {Attribué à un utilisateur.} other {Attribué à # utilisateurs.}} La suppression retire uniquement cette attribution de rôle.",
-    "deleteProtected": "Le rôle Super admin ne peut pas être supprimé.",
+    "deleteProtected": "Le rôle {role} ne peut pas être supprimé : il garantit qu’une personne reste responsable du Website Manager. Vous pouvez toujours modifier son nom et ses autorisations.",
     "roleFailed": "Le rôle n’a pas pu être enregistré ou supprimé. Réessayez.",
     "roleSaved": "Rôle enregistré",
     "roleDeleted": "Rôle supprimé",
