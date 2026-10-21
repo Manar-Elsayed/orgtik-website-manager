@@ -66,7 +66,7 @@ function DuplicateHint({ pages, message }: { pages: SeoPageRef[] | undefined; me
 function DuplicatesNote({ conflicts, lang }: { conflicts: Partial<SeoDuplicates> | undefined; lang: Locale }) {
   const t = useTranslations("Seo.block");
   const entryName = useEntryName();
-  const kinds = (["title", "description", "focus", "address"] as SeoDuplicateKind[]).filter((k) => conflicts?.[k]?.length);
+  const kinds = (["title", "description", "focus", "address", "text"] as SeoDuplicateKind[]).filter((k) => conflicts?.[k]?.length);
   if (!kinds.length) return null;
   return (
     <div role="status" className="flex flex-col gap-2 rounded-field bg-info-subtle px-3 py-2 text-body-sm text-info">
@@ -81,6 +81,8 @@ function DuplicatesNote({ conflicts, lang }: { conflicts: Partial<SeoDuplicates>
                 {i < conflicts![k]!.length - 1 ? "," : null}
               </span>
             ))}
+            {/* Page text names the passage, so it can be found on the page. */}
+            {k === "text" && conflicts![k]![0]?.excerpt ? <span dir="auto" lang={lang} className="w-full italic">“{conflicts![k]![0].excerpt}”</span> : null}
           </li>
         ))}
       </ul>
@@ -207,6 +209,7 @@ export function SeoPanel({
     description: probe.description === description.trim() ? conflicts.description : [],
     focus: probe.focus === focus.trim() ? conflicts.focus : [],
     address: conflicts.address,
+    text: conflicts.text,
   };
   const runChecks = () => {
     setRuns((all) => ({ ...all, [lang]: { at: Date.now(), results: checks.map((c) => c.ok) } }));

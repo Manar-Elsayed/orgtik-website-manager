@@ -573,6 +573,7 @@ export type SeoCheck =
   | "descriptionDuplicate"
   | "addressDuplicate"
   | "focusDuplicate"
+  | "textDuplicate"
   | "noSocialImage"
   | "imageNoAlt";
 export type SeoRow = {
@@ -598,8 +599,8 @@ export type SeoHealthRow = SeoRow & {
   descriptionLengths: number[];
 };
 /** Another page, named in a duplicate warning. */
-export type SeoPageRef = { id: string; type: EntryType; name: string; path: string };
-export type SeoDuplicateKind = "title" | "description" | "address" | "focus";
+export type SeoPageRef = { id: string; type: EntryType; name: string; path: string; /** For page text: the passage both pages carry. */ excerpt?: string };
+export type SeoDuplicateKind = "title" | "description" | "address" | "focus" | "text";
 export type SeoDuplicates = Partial<Record<SeoDuplicateKind, SeoPageRef[]>>;
 export type SeoHealth = Page<SeoHealthRow> & {
   counts: Record<SeoCheck, number>;
