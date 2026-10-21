@@ -1757,7 +1757,7 @@
       "descriptionDuplicate": "Gleiche Beschreibung wie eine andere Seite",
       "addressDuplicate": "Gleiche Adresse wie eine andere Seite",
       "focusDuplicate": "Gleiche Fokus-Keyphrase wie eine andere Seite",
-      "textDuplicate": "Gleicher Seitentext wie eine andere Seite",
+      "textDuplicate": "Doppelter Text",
       "noSocialImage": "Kein Bild für geteilte Links",
       "imageNoAlt": "Hauptbild ohne Beschreibung",
       "focusMissing": "Keine Fokus-Keyphrase",
@@ -1908,7 +1908,7 @@
         "description": "Gleiche Beschreibung wie:",
         "focus": "Gleiche Fokus-Keyphrase wie:",
         "address": "Gleiche Adresse wie:",
-        "text": "Gleicher Seitentext wie:"
+        "text": "Doppelter Text, auch auf:"
       }
     },
     "fromArchive": "Archivierter Inhalt",

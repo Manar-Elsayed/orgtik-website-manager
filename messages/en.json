@@ -1757,7 +1757,7 @@
       "descriptionDuplicate": "Same description as another page",
       "addressDuplicate": "Same address as another page",
       "focusDuplicate": "Same focus keyphrase as another page",
-      "textDuplicate": "Same page text as another page",
+      "textDuplicate": "Duplicated text",
       "noSocialImage": "No image for shared links",
       "imageNoAlt": "Main image without a description",
       "focusMissing": "No focus keyphrase",
@@ -1908,7 +1908,7 @@
         "description": "Same description as:",
         "focus": "Same focus keyphrase as:",
         "address": "Same address as:",
-        "text": "Same page text as:"
+        "text": "Duplicated text, also on:"
       }
     },
     "fromArchive": "Archived content",

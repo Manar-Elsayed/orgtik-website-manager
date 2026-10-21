@@ -14,7 +14,8 @@ import { useEntryName } from "@/lib/entryName";
 import { statusOf, useSeoMissingQuery, type Locale, type SeoIssue, type SeoMissingRow } from "@/store/api";
 
 // In the SEO editor's order, then the image (fixed in the content editor).
-const SEARCH_ISSUES: SeoIssue[] = ["titleMissing", "titleLong", "titleDuplicate", "descriptionMissing", "descriptionShort", "descriptionLong", "descriptionDuplicate", "addressDuplicate", "textDuplicate"];
+// Duplicated text first, so it is never folded behind "+N" and leads the filter chips.
+const SEARCH_ISSUES: SeoIssue[] = ["textDuplicate", "titleMissing", "titleLong", "titleDuplicate", "descriptionMissing", "descriptionShort", "descriptionLong", "descriptionDuplicate", "addressDuplicate"];
 const ALL_ISSUES: SeoIssue[] = [...SEARCH_ISSUES, "focusMissing", "focusDuplicate", "keywordsMissing", "noSocialImage", "imageNoAlt"];
 const LOCALES: Locale[] = ["en", "ar", "de", "fr", "it"];
 const NATIVE: Record<Locale, string> = { en: "English", ar: "العربية", de: "Deutsch", fr: "Français", it: "Italiano" };
@@ -133,7 +134,8 @@ function Missing() {
   }, [t, tm, tt, f, entryName, url.href, lang, locales, pickedKey, expanded]);
 
   // One chip per issue that some listed page has (with how many), plus any already chosen.
-  const chips = ALL_ISSUES.filter((i) => (data?.issueCounts?.[i] ?? 0) > 0 || picked.includes(i)).map((i) => ({ value: i, label: t(`checks.${i}`), count: data?.issueCounts?.[i] ?? 0 }));
+  // Duplicated text always has its chip, so it can be checked even when nothing is found.
+  const chips = ALL_ISSUES.filter((i) => i === "textDuplicate" || (data?.issueCounts?.[i] ?? 0) > 0 || picked.includes(i)).map((i) => ({ value: i, label: t(`checks.${i}`), count: data?.issueCounts?.[i] ?? 0 }));
   const filtered = url.get("search") || url.get("kind") || url.get("lang") || url.get("entry") || picked.length;
   const clear = () => url.set({ search: "", kind: "all", lang: "all", entry: "", issues: "" });
   const status = isLoading ? "loading" : error ? (statusOf(error) === 403 ? "forbidden" : "error") : "ready";
