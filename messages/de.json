@@ -257,7 +257,7 @@
     "noMatchBody": "Versuchen Sie eine andere Suche oder einen anderen Filter.",
     "notFound": "Diesen Eintrag gibt es nicht",
     "back": "Zurück zu {area}",
-    "slugHelp": "{host}{path}",
+    "slugHelp": "orgtik.ch{path}",
     "shared": "Für alle Sprachen gleich",
     "sharedNote": "Wird auf Englisch festgelegt und gilt für alle Sprachen.",
     "iconHelp": "Das Phosphor-Symbol, das die Website zeigt, z. B. ph-palette.",
@@ -1739,8 +1739,8 @@
     "issuesFound": "Gefundene Probleme",
     "seeIssues": "Die zu behebenden Probleme auf {page} anzeigen",
     "all": "Alle",
-    "ok": "Keine Probleme gefunden",
-    "allGood": "Keine Probleme gefunden",
+    "ok": "Alles gut",
+    "allGood": "Hier ist nichts zu tun",
     "colPage": "Seite",
     "colType": "Typ",
     "colStatus": "Status",
@@ -1758,15 +1758,7 @@
       "noSocialImage": "Kein Bild für geteilte Links",
       "imageNoAlt": "Hauptbild ohne Beschreibung",
       "focusMissing": "Keine Fokus-Keyphrase",
-      "keywordsMissing": "Keine Keywords",
-      "titleShort": "Titel unter 30 Zeichen",
-      "descriptionDuplicate": "Gleiche Beschreibung wie eine andere Seite",
-      "socialImageDefault": "Nutzt das Standard-Teilen-Bild der Website",
-      "canonicalHost": "Canonical auf einer anderen Website",
-      "canonicalUnreachable": "Canonical-Adresse nicht auf der Website",
-      "canonicalOther": "Canonical nennt eine andere Seite",
-      "canonicalSitemap": "In der Sitemap, aber Canonical woanders",
-      "schemaInvalid": "Strukturierte Daten unvollständig"
+      "keywordsMissing": "Keine Keywords"
     },
     "redirectsTitle": "Weiterleitungen",
     "redirectsDescription": "Alte Adressen und wohin sie jetzt führen, damit Links und Suchergebnisse funktionieren.",
@@ -1907,9 +1899,7 @@
       "addressUsedOn": "{pages} verwendet diese Adresse bereits. Ändern Sie eine davon, damit jede Seite gefunden wird.",
       "focusTooManyWords": "Diese Keyphrase hat {count} Wörter. Beschränken Sie sie auf {max}.",
       "keywordTooManyWords": "{count} Wörter. Jedes Keyword sollte höchstens {max} Wörter haben.",
-      "keywordsTooLong": "Länger als {max} Wörter: {keywords}. Bitte kürzen.",
-      "editSearchResult": "Suchergebnis bearbeiten: Titel und Beschreibung",
-      "editSocialPreview": "Linkvorschau bearbeiten: Titel, Beschreibung und Bild"
+      "keywordsTooLong": "Länger als {max} Wörter: {keywords}. Bitte kürzen."
     },
     "fromArchive": "Archivierter Inhalt",
     "showAllPages": "Alle Seiten anzeigen",
@@ -1920,16 +1910,14 @@
       "description": "Jede Seite, bei der für Suchergebnisse, geteilte Links oder Screenreader etwas zu beheben ist, gruppiert wie im SEO-Editor. Seiten auf der Website stehen oben.",
       "tabs": {
         "all": "Alle Probleme",
-        "images": "Bilder",
-        "technical": "Technisch"
+        "images": "Bilder"
       },
       "why": {
         "all": "Jede Seite mit mindestens einem Problem. Beheben Sie zuerst die Seiten auf der Website.",
         "search": "Titel und Beschreibung: was Menschen im Suchergebnis lesen, bevor sie klicken.",
         "keywords": "Die Fokus-Keyphrase und Keywords, auf die sich die Prüfungen des Editors und die Planung des Teams stützen.",
         "sharing": "Das Bild, das erscheint, wenn die Seite in sozialen Medien oder Chats geteilt wird.",
-        "images": "Beschreibungen des Hauptbildes, die Screenreader und die Bildersuche lesen.",
-        "technical": "Canonical-Adressen und strukturierte Daten: welche Adresse Suchmaschinen als Original behandeln sollen und welche Zusatzangaben sie lesen können."
+        "images": "Beschreibungen des Hauptbildes, die Screenreader und die Bildersuche lesen."
       },
       "colIssues": "Probleme",
       "colStatus": "Status",
@@ -1940,15 +1928,14 @@
       "fixIn": "{page} öffnen, um zu beheben: {issue}",
       "allLanguages": "Alle",
       "showAllPages": "Alle Seiten anzeigen",
-      "empty": "Keine Probleme gefunden",
+      "empty": "Hier ist nichts zu beheben",
       "emptyFiltered": "Keine Seite entspricht diesen Filtern.",
       "clearFilters": "Filter zurücksetzen",
       "issueFilter": "Probleme",
       "duplicateHint": {
         "title": "Gleicher Titel wie {pages}",
         "address": "Gleiche Adresse wie {pages}",
-        "focus": "Doppeltes Keyword: auch der Fokus von {pages}. Bitte ändern.",
-        "description": "Gleiche Beschreibung wie {pages}"
+        "focus": "Doppeltes Keyword: auch der Fokus von {pages}. Bitte ändern."
       }
     },
     "languageNotPublic": "{language} ist für die Website nicht aktiviert",
@@ -1965,49 +1952,6 @@
       "disabled": "Bleibt hier gespeichert, leitet aber nicht mehr weiter."
     },
     "openOnSite": "{path} auf der Website öffnen",
-    "health": {
-      "ran": "Prüfung fertig: {checked} Zeilen geprüft, {errors} mit Problemen, {guidance} nur mit Hinweisen",
-      "runFailed": "Die Prüfung konnte nicht laufen. Bitte erneut versuchen.",
-      "lastRun": "Letzte Prüfung {time}: {checked} Zeilen, {errors} mit Problemen, {guidance} nur mit Hinweisen.",
-      "changedSince": "Seitdem wurden Inhalte geändert. Prüfung erneut ausführen.",
-      "notRunYet": "Noch keine Prüfung ausgeführt. Die Liste unten ist immer aktuell; Prüfung ausführen hält Ergebnis und Zeit fest.",
-      "cards": {
-        "titleMissing": "SEO-Titel fehlt",
-        "titleDuplicate": "Doppelte Titel",
-        "descriptionMissing": "Meta Description fehlt",
-        "descriptionDuplicate": "Doppelte Beschreibungen",
-        "noSocialImage": "Open-Graph-Bild fehlt",
-        "other": "Weitere Probleme"
-      },
-      "legend": "Eine Seite kann mehrere Probleme haben und zählt bei jedem. Orange Probleme müssen behoben werden; graue sind Hinweise, einen Blick wert, aber kein Urteil. Keine Probleme gefunden heißt: Die Seite hat diese Prüfungen bestanden, nicht jeden Faktor der Suchmaschinen.",
-      "searchLabel": "Nach Seitenname oder Adresse suchen",
-      "issueFilter": "Problem",
-      "levelFilter": "Prüfstatus",
-      "level": {
-        "error": "Mit Problemen",
-        "guidance": "Nur Hinweise",
-        "ok": "Keine Probleme gefunden"
-      },
-      "emptyFiltered": "Keine Seite passt zu diesen Filtern.",
-      "emptyHelp": "Alle geprüften Seiten haben die verfügbaren Prüfungen bestanden.",
-      "preview": "Vorschau",
-      "previewOf": "Vorschau von {page} in Suchergebnissen und als geteilter Link",
-      "previewNote": "Eine Annäherung: Suchmaschinen und soziale Netzwerke können kürzen oder ändern, was sie zeigen.",
-      "editSeo": "SEO bearbeiten",
-      "detail": {
-        "canonicalHost": "Verweist auf {value}",
-        "canonicalUnreachable": "{value} ist keine Adresse der Website",
-        "canonicalOther": "Nennt {value} als Original",
-        "canonicalSitemap": "Die Sitemap führt diese Adresse, obwohl sie eine andere als Original nennt"
-      },
-      "duplicateWith": {
-        "title": "Gleicher Titel wie",
-        "description": "Gleiche Beschreibung wie",
-        "address": "Gleiche Adresse wie",
-        "focus": "Gleiche Fokus-Keyphrase wie"
-      },
-      "andMore": "und {count} weitere"
-    },
     "live": {
       "title": "Live-Website",
       "helpRedirects": "Hier gespeicherte Weiterleitungen gelangen auf die Website, wenn sie veröffentlicht wird. Hier wird die Website mit diesen Einstellungen verglichen.",

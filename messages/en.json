@@ -257,7 +257,7 @@
     "noMatchBody": "Try another search or filter.",
     "notFound": "This entry doesn’t exist",
     "back": "Back to {area}",
-    "slugHelp": "{host}{path}",
+    "slugHelp": "orgtik.ch{path}",
     "shared": "Shared by every language",
     "sharedNote": "Set in English; every language uses the same.",
     "iconHelp": "The Phosphor icon the website shows, e.g. ph-palette.",
@@ -1739,8 +1739,8 @@
     "issuesFound": "Issues found",
     "seeIssues": "See the issues to fix on {page}",
     "all": "All",
-    "ok": "No issues found",
-    "allGood": "No issues found",
+    "ok": "All good",
+    "allGood": "Nothing to fix here",
     "colPage": "Page",
     "colType": "Type",
     "colStatus": "Status",
@@ -1758,15 +1758,7 @@
       "noSocialImage": "No image for shared links",
       "imageNoAlt": "Main image without a description",
       "focusMissing": "No focus keyphrase",
-      "keywordsMissing": "No keywords",
-      "titleShort": "Title under 30 characters",
-      "descriptionDuplicate": "Same description as another page",
-      "socialImageDefault": "Uses the site's default share image",
-      "canonicalHost": "Canonical on another website",
-      "canonicalUnreachable": "Canonical address not on the site",
-      "canonicalOther": "Canonical names another page",
-      "canonicalSitemap": "In the sitemap but canonical elsewhere",
-      "schemaInvalid": "Structured data incomplete"
+      "keywordsMissing": "No keywords"
     },
     "redirectsTitle": "Redirects",
     "redirectsDescription": "Old addresses and where they lead now, so links and search results keep working.",
@@ -1907,9 +1899,7 @@
       "addressUsedOn": "{pages} already uses this address. Change one of them so each page can be found.",
       "focusTooManyWords": "This keyphrase has {count} words. Keep it to {max}.",
       "keywordTooManyWords": "{count} words. Keep each keyword to {max} words or fewer.",
-      "keywordsTooLong": "Longer than {max} words: {keywords}. Shorten them.",
-      "editSearchResult": "Edit the search result: title and description",
-      "editSocialPreview": "Edit the link preview: title, description and image"
+      "keywordsTooLong": "Longer than {max} words: {keywords}. Shorten them."
     },
     "fromArchive": "Archived content",
     "showAllPages": "Show all pages",
@@ -1920,16 +1910,14 @@
       "description": "Every page with something to fix for search results, shared links or screen readers, grouped like the SEO editor. Pages on the site come first.",
       "tabs": {
         "all": "All issues",
-        "images": "Images",
-        "technical": "Technical"
+        "images": "Images"
       },
       "why": {
         "all": "Every page with at least one issue. Fix the ones on the site first.",
         "search": "Title and description: what people read in a search result before they click.",
         "keywords": "The focus keyphrase and keywords the editor's checks and the team's planning rely on.",
         "sharing": "The picture that shows when the page is posted to social media or a chat.",
-        "images": "Descriptions of the main image, read by screen readers and image search.",
-        "technical": "Canonical addresses and structured data: which address search engines should treat as the original, and the extra details they can read."
+        "images": "Descriptions of the main image, read by screen readers and image search."
       },
       "colIssues": "Issues",
       "colStatus": "Status",
@@ -1940,15 +1928,14 @@
       "fixIn": "Open {page} to fix: {issue}",
       "allLanguages": "All",
       "showAllPages": "Show all pages",
-      "empty": "No issues found",
+      "empty": "Nothing to fix here",
       "emptyFiltered": "No page matches these filters.",
       "clearFilters": "Clear filters",
       "issueFilter": "Issues",
       "duplicateHint": {
         "title": "Same title as {pages}",
         "address": "Same address as {pages}",
-        "focus": "Duplicated keyword: also the focus of {pages}. Change it.",
-        "description": "Same description as {pages}"
+        "focus": "Duplicated keyword: also the focus of {pages}. Change it."
       }
     },
     "languageNotPublic": "{language} isn’t switched on for the site",
@@ -1965,49 +1952,6 @@
       "disabled": "Kept here, but visitors are no longer sent on."
     },
     "openOnSite": "Open {path} on the website",
-    "health": {
-      "ran": "Check finished: {checked} rows checked, {errors} with errors, {guidance} with guidance only",
-      "runFailed": "The check couldn't run. Try again.",
-      "lastRun": "Last check {time}: {checked} rows, {errors} with errors, {guidance} with guidance only.",
-      "changedSince": "Content changed since then. Run the check again.",
-      "notRunYet": "No check run yet. The list below is always current; Run check records the result and its time.",
-      "cards": {
-        "titleMissing": "Missing SEO title",
-        "titleDuplicate": "Duplicate titles",
-        "descriptionMissing": "Missing meta description",
-        "descriptionDuplicate": "Duplicate descriptions",
-        "noSocialImage": "Missing Open Graph image",
-        "other": "Other issues"
-      },
-      "legend": "One page can have several issues and is counted on each. Orange issues need fixing; grey ones are guidance, worth a look but not a verdict. No issues found means the page passed these checks, not every factor search engines use.",
-      "searchLabel": "Search by page name or address",
-      "issueFilter": "Issue",
-      "levelFilter": "Check status",
-      "level": {
-        "error": "Has issues to fix",
-        "guidance": "Guidance only",
-        "ok": "No issues found"
-      },
-      "emptyFiltered": "No page matches these filters.",
-      "emptyHelp": "Every checked page passed the available checks.",
-      "preview": "Preview",
-      "previewOf": "Preview {page} in search results and as a shared link",
-      "previewNote": "An approximation: search engines and social networks may cut or change what they show.",
-      "editSeo": "Edit SEO",
-      "detail": {
-        "canonicalHost": "Points to {value}",
-        "canonicalUnreachable": "{value} isn't an address the site serves",
-        "canonicalOther": "Names {value} as the original",
-        "canonicalSitemap": "The sitemap lists this address while it names another as the original"
-      },
-      "duplicateWith": {
-        "title": "Same title as",
-        "description": "Same description as",
-        "address": "Same address as",
-        "focus": "Same focus keyphrase as"
-      },
-      "andMore": "and {count} more"
-    },
     "live": {
       "title": "Live website",
       "helpRedirects": "Redirects saved here reach the site when it is published. This compares the site with these settings.",

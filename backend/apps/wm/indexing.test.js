@@ -53,3 +53,17 @@ test('robots.txt can be written here, reset to the generated one, and needs a re
   library.setRobots({ key: 'mona' }, null, 'Back to the generated file');
   assert.equal(library.robots(), generated);
 });
+
+test('Validate finds canonicals on another website or not served by the site, on its own', () => {
+  const { store, library } = setup();
+  assert.deepEqual(library.canonicalProblems(), []);
+  const e = [...store.entries.values()].find((x) => x.type === 'page' && x.live && x.workflow.visibility === 'live');
+  e.live.seo.en = { ...e.live.seo.en, canonical: 'https://elsewhere.test/x' };
+  assert.deepEqual(library.canonicalProblems().map((p) => p.kind), ['otherHost']);
+  e.live.seo.en.canonical = `${library.settings.canonicalHost}/no-such-page`;
+  assert.deepEqual(library.canonicalProblems().map((p) => p.kind), ['notServed']);
+  // Naming another live page is a choice, not a problem.
+  const other = library.indexingUrls().find((u) => u.id !== e.id && u.locale === 'en');
+  e.live.seo.en.canonical = other.loc;
+  assert.deepEqual(library.canonicalProblems(), []);
+});
