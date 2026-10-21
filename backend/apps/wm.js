@@ -752,8 +752,9 @@ module.exports = {
       if (!x) return fail(res, 404, "not_found", "This redirect doesn't exist (any more).");
       const want = lib.expectedTest(x);
       const got = await liveSite.probe(want.probe);
-      if (!got.configured) return fail(res, 503, "site_not_configured", "No website address is set (NEXT_PUBLIC_WEBSITE_URL).");
-      if (!got.status) return fail(res, 503, "site_unreachable", "The website couldn't be reached.");
+      // 502, not 503: the website is the problem, and the proxy retries a 503 (a busy store) on its own.
+      if (!got.configured) return fail(res, 502, "site_not_configured", "No website address is set (NEXT_PUBLIC_WEBSITE_URL).");
+      if (!got.status) return fail(res, 502, "site_unreachable", "The website couldn't be reached.");
       const base = new URL(got.url).origin;
       const expectedUrl = new URL(want.to, base);
       if (want.query) expectedUrl.searchParams.set("redirect-test", "1");
