@@ -118,7 +118,7 @@ module.exports = {
     const store = makeStore(() => new Date().toISOString(), { demo: true });
     // Metadata restoration must not delete existing bytes during a build/cold start.
     const UPLOADS = ctx.uploadsDir || path.join(__dirname, "wm", "uploads");
-    const lib = makeLibrary({ seed: store.seed, store, now: () => new Date().toISOString(), uploads: UPLOADS, demo: true, locales: () => ops.site.locales.filter((l) => l.enabled).map((l) => l.code) });
+    const lib = makeLibrary({ seed: store.seed, store, now: () => new Date().toISOString(), uploads: UPLOADS, demo: true, locales: () => ops.site.locales.filter((l) => l.enabled).map((l) => l.code), site: () => ops.site });
     const ops = makeOps({ store, now: () => new Date().toISOString() });
     const previews = new Map();
     const submissions = require("./wm/ideas").ideaSubmissions(store.ideas);
@@ -139,7 +139,7 @@ module.exports = {
       // Media issues come from the library: files in use without a description or clear rights.
       const mediaIssues = [...lib.media.values()].filter((m) => lib.mediaOut(m).issues.some((i) => i !== "unused")).length;
       const newLeads = [...ops.leads.values()].filter((l) => l.status === "new").length;
-      ok(res, { queue: { ...store.queue(who(req)), seoIssues: lib.health().counts.descriptionMissing, mediaIssues, newLeads } }, { generatedAt: new Date().toISOString() });
+      ok(res, { queue: { ...store.queue(who(req)), seoIssues: lib.health().rows.filter((row) => row.level === "error").length, mediaIssues, newLeads } }, { generatedAt: new Date().toISOString() });
     });
 
     // Test control: the seed as the website has it, without Claude's suggestions (flows that count
@@ -684,14 +684,25 @@ module.exports = {
       // Every page is checked once per language; the summary cards count the chosen language.
       const checked = req.query.lang ? h.rows.filter((row) => row.locale === req.query.lang) : h.rows;
       const issue = String(req.query.issue ?? "");
-      // "none" lists the pages that pass every check, "any" the pages with at least one issue (the summary cards).
-      let rows = issue === "none" ? checked.filter((r) => !r.issues.length) : issue === "any" ? checked.filter((r) => r.issues.length) : issue ? checked.filter((r) => r.issues.includes(issue)) : checked;
+      if (issue && !["none", "any", "other", ...lib.CHECKS].includes(issue)) return fail(res, 422, "invalid_issue", "Unknown SEO check.");
+      // "none" lists the pages that pass every check, "any" the pages with at least one issue, "other"
+      // the pages with an issue beyond the five headline checks (the summary cards).
+      let rows = issue === "none" ? checked.filter((r) => !r.issues.length) : issue === "any" ? checked.filter((r) => r.issues.length) : issue === "other" ? checked.filter(lib.hasOther) : issue ? checked.filter((r) => r.issues.includes(issue)) : checked;
+      // Check status: errors, guidance only, or no issues found.
+      const level = String(req.query.level ?? "");
+      if (level && !["error", "guidance", "ok"].includes(level)) return fail(res, 422, "invalid_level", "Unknown check status.");
+      if (level) rows = rows.filter((r) => r.level === level);
       const search = String(req.query.search ?? "").trim().toLowerCase();
       if (search) rows = rows.filter(row => `${row.name} ${row.path} ${row.title}`.toLowerCase().includes(search));
       if (req.query.kind) rows = rows.filter(row => row.type === req.query.kind);
       const result = page(req, rows);
       const counts = Object.fromEntries(lib.CHECKS.map((k) => [k, checked.filter((r) => r.issues.includes(k)).length]));
-      ok(res, result.rows, { ...result.meta, counts, healthy: checked.filter((r) => !r.issues.length).length, checked: checked.length, locales: lib.checkedLocales() });
+      ok(res, result.rows, { ...result.meta, counts, other: checked.filter(lib.hasOther).length, healthy: checked.filter((r) => !r.issues.length).length, checked: checked.length, guidance: [...lib.GUIDANCE], locales: lib.checkedLocales(), lastRun: lib.healthRunState() });
+    });
+    // Run check: records the current results and when; the list itself is always computed live.
+    app.post("/v2/admin/seo/health/run", need("seo:view"), (req, res) => {
+      lib.runHealth(who(req));
+      ok(res, lib.healthRunState());
     });
     // Pages, per language, whose meta title, meta description or keywords are empty.
     app.get("/v2/admin/seo/missing", need("seo:view"), (req, res) => {
@@ -755,7 +766,7 @@ module.exports = {
       res.status(204).end();
     });
     app.get("/v2/admin/seo/indexing", need("seo:view"), (req, res) => {
-      ok(res, { settings: { ...lib.settings, history: lib.settings.history.map((h) => ({ ...h, by: person(h.by) })) }, urls: lib.indexingUrls(), sitemap: lib.sitemap(), robots: lib.robots() });
+      ok(res, { settings: { ...lib.settings, history: lib.settings.history.map((h) => ({ ...h, by: person(h.by) })) }, site: { titleTemplate: ops.site.titleTemplate, defaultOgImage: ops.site.defaultOgImage ?? null }, urls: lib.indexingUrls(), sitemap: lib.sitemap(), robots: lib.robots() });
     });
     app.patch("/v2/admin/seo/indexing", need("seo:view"), (req, res) => {
       if (!req.who.permissions.includes("site:visibility")) return fail(res, 403, "forbidden", "Changing search visibility needs site:visibility.", { required: "site:visibility" });

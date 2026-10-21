@@ -170,7 +170,7 @@ test('Supabase selection is explicit and local and Redis media stores retain exi
 
 test('replacement runtime retains original and replacement image versions across Supabase cold starts', async t => {
   const f = fixture(t), media = {id:'md_01', file:'brand-cards.webp', version:1, kind:'image', source:'website'}, state = {mediaVersions:{}}, store = {audit:[]};
-  const original = fs.readFileSync(path.resolve(__dirname, '../../../apps/website/landing-directions/public/assets/brand-cards.webp'));
+  const original = fs.readFileSync(path.resolve(__dirname, '../../website-assets/brand-cards.webp'));
   const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScLbtAAAAABJRU5ErkJggg==', 'base64');
   await replaceImage({lib:{media:new Map([[media.id, media]])}, state, store, uploadsDir:path.join(f.root, 'runtime'), imageStore:f.store('runtime'), now:() => '2026-10-16T00:00:00Z', who:{user:{key:'fixture'}}, key:media.id, file:{buffer:png, mimetype:'image/png', originalname:'replacement.png'}, version:1});
   assert.equal(media.version, 2);

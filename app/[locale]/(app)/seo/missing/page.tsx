@@ -10,19 +10,19 @@ import { Link } from "@/i18n/routing";
 import { useListState } from "@/lib/useListState";
 import { TYPES } from "@/lib/contentTypes";
 import { useEntryName } from "@/lib/entryName";
+import { DUPLICATE_OF, fieldOf, isGuidance } from "@/lib/seoChecks";
 import { statusOf, useSeoMissingQuery, type Locale, type SeoGroup, type SeoIssue, type SeoMissingRow } from "@/store/api";
 
 // The SEO editor's sections, in its order, then the image (fixed in the content editor).
-const GROUPS: SeoGroup[] = ["search", "keywords", "sharing", "images"];
+const GROUPS: SeoGroup[] = ["search", "keywords", "sharing", "images", "technical"];
 const GROUP_ISSUES: Record<SeoGroup, SeoIssue[]> = {
-  search: ["titleMissing", "titleLong", "titleDuplicate", "descriptionMissing", "descriptionShort", "descriptionLong", "addressDuplicate"],
+  search: ["titleMissing", "titleShort", "titleLong", "titleDuplicate", "descriptionMissing", "descriptionShort", "descriptionLong", "descriptionDuplicate", "addressDuplicate"],
   keywords: ["focusMissing", "focusDuplicate", "keywordsMissing"],
-  sharing: ["noSocialImage"],
+  sharing: ["noSocialImage", "socialImageDefault"],
   images: ["imageNoAlt"],
+  technical: ["canonicalHost", "canonicalUnreachable", "canonicalOther", "canonicalSitemap", "schemaInvalid"],
 };
 const ALL_ISSUES = Object.values(GROUP_ISSUES).flat();
-// Which duplicate each issue is, so its hint can name the other pages.
-const DUPLICATE_OF: Partial<Record<SeoIssue, "title" | "address" | "focus">> = { titleDuplicate: "title", addressDuplicate: "address", focusDuplicate: "focus" };
 const LOCALES: Locale[] = ["en", "ar", "de", "fr", "it"];
 const NATIVE: Record<Locale, string> = { en: "English", ar: "العربية", de: "Deutsch", fr: "Français", it: "Italiano" };
 const COLUMN_ORDER = ["page", "issues", "status", "type", "lang", "updated", "fix"];
@@ -42,7 +42,7 @@ function Missing() {
   const tab = url.get("group", "all");
   const group = isGroup(tab) ? tab : undefined;
   const { data, isLoading, error, refetch, isFetching } = useSeoMissingQuery({ group, entry: url.get("entry"), issues: url.get("issues"), search: url.get("search"), kind: url.get("kind"), lang: url.get("lang"), page: url.page, pageSize: 10 });
-  const groupLabel = (value: SeoGroup | "all") => (value === "all" ? tm("tabs.all") : value === "images" ? tm("tabs.images") : tb(value === "sharing" ? "social" : value));
+  const groupLabel = (value: SeoGroup | "all") => (value === "all" || value === "images" || value === "technical" ? tm(`tabs.${value}`) : tb(value === "sharing" ? "social" : value));
 
   // Only switched-on languages are checked; say so rather than claim another one is fine.
   const lang = url.get("lang");
@@ -62,7 +62,7 @@ function Missing() {
       const langs = issue ? langsFor(r).filter((l) => r.byLanguage?.[l]?.includes(issue)) : langsFor(r);
       return langs.includes(lang as Locale) ? lang : langs[0] ?? r.locale;
     };
-    const fixHref = (r: SeoMissingRow, issue?: SeoIssue) => (issue === "imageNoAlt" ? `/content/${TYPES[r.type].area}/${r.id}?lang=${openIn(r, issue)}&returnTo=${returnTo}` : `/seo/content/${r.id}?lang=${openIn(r, issue)}&returnTo=${returnTo}`);
+    const fixHref = (r: SeoMissingRow, issue?: SeoIssue) => (issue === "imageNoAlt" ? `/content/${TYPES[r.type].area}/${r.id}?lang=${openIn(r, issue)}&returnTo=${returnTo}` : `/seo/content/${r.id}?lang=${openIn(r, issue)}${issue && fieldOf(issue) ? `&field=${fieldOf(issue)}` : ""}&returnTo=${returnTo}`);
     const columns: ColumnDef<SeoMissingRow, unknown>[] = [
       {
         id: "page",
@@ -84,7 +84,7 @@ function Missing() {
           <span className="flex min-w-56 flex-wrap gap-1">
             {shown(row.original).map((issue) => (
               <Link key={issue} href={fixHref(row.original, issue)} aria-label={tm("fixIn", { issue: t(`checks.${issue}`), page: entryName(row.original) })} className="rounded-pill focus-visible:outline-2 focus-visible:outline-focus">
-                <Badge size="sm" tone={GROUP_ISSUES.search.includes(issue) || DUPLICATE_OF[issue] ? "warning" : "neutral"} className="hover:underline">{t(`checks.${issue}`)}</Badge>
+                <Badge size="sm" tone={isGuidance(issue) ? "neutral" : "warning"} className="hover:underline">{t(`checks.${issue}`)}</Badge>
               </Link>
             ))}
             {/* A duplicate says which page already uses the title, address or keyphrase. */}

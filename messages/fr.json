@@ -1739,8 +1739,8 @@
     "issuesFound": "Problèmes détectés",
     "seeIssues": "Voir les problèmes à corriger sur {page}",
     "all": "Toutes",
-    "ok": "Tout est bon",
-    "allGood": "Rien à corriger ici",
+    "ok": "Aucun problème détecté",
+    "allGood": "Aucun problème détecté",
     "colPage": "Page",
     "colType": "Type",
     "colStatus": "Statut",
@@ -1758,7 +1758,15 @@
       "noSocialImage": "Pas d’image pour les liens partagés",
       "imageNoAlt": "Image principale sans description",
       "focusMissing": "Aucune expression clé principale",
-      "keywordsMissing": "Aucun mot-clé"
+      "keywordsMissing": "Aucun mot-clé",
+      "titleShort": "Titre de moins de 30 caractères",
+      "descriptionDuplicate": "Même description qu’une autre page",
+      "socialImageDefault": "Utilise l’image de partage par défaut du site",
+      "canonicalHost": "Canonique sur un autre site",
+      "canonicalUnreachable": "Adresse canonique absente du site",
+      "canonicalOther": "Le canonique désigne une autre page",
+      "canonicalSitemap": "Dans le sitemap mais canonique ailleurs",
+      "schemaInvalid": "Données structurées incomplètes"
     },
     "redirectsTitle": "Redirections",
     "redirectsDescription": "Les anciennes adresses et où elles mènent maintenant, pour que liens et résultats de recherche fonctionnent.",
@@ -1898,7 +1906,9 @@
       "addressUsedOn": "{pages} utilise déjà cette adresse. Changez l’une d’elles pour que chaque page puisse être trouvée.",
       "focusTooManyWords": "Cette expression clé compte {count} mots. Limitez-la à {max}.",
       "keywordTooManyWords": "{count} mots. Gardez chaque mot-clé à {max} mots ou moins.",
-      "keywordsTooLong": "Plus de {max} mots : {keywords}. Raccourcissez-les."
+      "keywordsTooLong": "Plus de {max} mots : {keywords}. Raccourcissez-les.",
+      "editSearchResult": "Modifier le résultat de recherche : titre et description",
+      "editSocialPreview": "Modifier l’aperçu du lien : titre, description et image"
     },
     "fromArchive": "Contenu archivé",
     "showAllPages": "Afficher toutes les pages",
@@ -1909,14 +1919,16 @@
       "description": "Chaque page avec quelque chose à corriger pour les résultats de recherche, les liens partagés ou les lecteurs d’écran, regroupé comme dans l’éditeur SEO. Les pages en ligne apparaissent en premier.",
       "tabs": {
         "all": "Tous les problèmes",
-        "images": "Images"
+        "images": "Images",
+        "technical": "Technique"
       },
       "why": {
         "all": "Chaque page avec au moins un problème. Corrigez d’abord celles qui sont en ligne.",
         "search": "Titre et description : ce que les gens lisent dans un résultat de recherche avant de cliquer.",
         "keywords": "L’expression clé principale et les mots-clés sur lesquels reposent les vérifications de l’éditeur et la planification de l’équipe.",
         "sharing": "L’image affichée quand la page est publiée sur les réseaux sociaux ou dans une messagerie.",
-        "images": "Les descriptions de l’image principale, lues par les lecteurs d’écran et la recherche d’images."
+        "images": "Les descriptions de l’image principale, lues par les lecteurs d’écran et la recherche d’images.",
+        "technical": "Adresses canoniques et données structurées : quelle adresse les moteurs doivent considérer comme l’original, et les informations supplémentaires qu’ils peuvent lire."
       },
       "colIssues": "Problèmes",
       "colStatus": "Statut",
@@ -1927,14 +1939,15 @@
       "fixIn": "Ouvrir {page} pour corriger : {issue}",
       "allLanguages": "Toutes",
       "showAllPages": "Afficher toutes les pages",
-      "empty": "Rien à corriger ici",
+      "empty": "Aucun problème détecté",
       "emptyFiltered": "Aucune page ne correspond à ces filtres.",
       "clearFilters": "Effacer les filtres",
       "issueFilter": "Problèmes",
       "duplicateHint": {
         "title": "Même titre que {pages}",
         "address": "Même adresse que {pages}",
-        "focus": "Mot-clé en double : c’est aussi l’expression clé de {pages}. Changez-le."
+        "focus": "Mot-clé en double : c’est aussi l’expression clé de {pages}. Changez-le.",
+        "description": "Même description que {pages}"
       }
     },
     "languageNotPublic": "{language} n’est pas activé pour le site",
@@ -1950,7 +1963,49 @@
       "attention": "Redirige toujours, et est signalée pour qu’une personne la vérifie.",
       "disabled": "Conservée ici, mais ne redirige plus les visiteurs."
     },
-    "openOnSite": "Ouvrir {path} sur le site"
+    "openOnSite": "Ouvrir {path} sur le site",
+    "health": {
+      "ran": "Vérification terminée : {checked} lignes vérifiées, {errors} avec problèmes, {guidance} avec conseils seulement",
+      "runFailed": "La vérification n’a pas pu s’exécuter. Réessayez.",
+      "lastRun": "Dernière vérification {time} : {checked} lignes, {errors} avec problèmes, {guidance} avec conseils seulement.",
+      "changedSince": "Le contenu a changé depuis. Relancez la vérification.",
+      "notRunYet": "Aucune vérification lancée. La liste ci-dessous est toujours à jour ; Lancer la vérification enregistre le résultat et l’heure.",
+      "cards": {
+        "titleMissing": "Titre SEO manquant",
+        "titleDuplicate": "Titres en double",
+        "descriptionMissing": "Meta description manquante",
+        "descriptionDuplicate": "Descriptions en double",
+        "noSocialImage": "Image Open Graph manquante",
+        "other": "Autres problèmes"
+      },
+      "legend": "Une page peut avoir plusieurs problèmes et compte dans chacun. Les problèmes orange sont à corriger ; les gris sont des conseils, à regarder mais pas un verdict. Aucun problème détecté signifie que la page a passé ces vérifications, pas tous les critères des moteurs.",
+      "searchLabel": "Rechercher par nom de page ou adresse",
+      "issueFilter": "Problème",
+      "levelFilter": "État de la vérification",
+      "level": {
+        "error": "Problèmes à corriger",
+        "guidance": "Conseils seulement",
+        "ok": "Aucun problème détecté"
+      },
+      "emptyFiltered": "Aucune page ne correspond à ces filtres.",
+      "emptyHelp": "Toutes les pages vérifiées ont passé les vérifications disponibles.",
+      "preview": "Aperçu",
+      "previewOf": "Aperçu de {page} dans les résultats de recherche et en lien partagé",
+      "previewNote": "Une approximation : moteurs de recherche et réseaux sociaux peuvent couper ou modifier ce qu’ils affichent.",
+      "editSeo": "Modifier le SEO",
+      "detail": {
+        "canonicalHost": "Pointe vers {value}",
+        "canonicalUnreachable": "{value} n’est pas une adresse servie par le site",
+        "canonicalOther": "Désigne {value} comme l’original",
+        "canonicalSitemap": "Le sitemap liste cette adresse alors qu’elle en désigne une autre comme l’original"
+      },
+      "duplicateWith": {
+        "title": "Même titre que",
+        "description": "Même description que",
+        "address": "Même adresse que",
+        "focus": "Même expression clé que"
+      }
+    }
   },
   "Site": {
     "title": "Site",

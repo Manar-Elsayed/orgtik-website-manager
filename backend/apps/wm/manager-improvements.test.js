@@ -621,7 +621,7 @@ test("website images can be replaced without losing metadata, references or immu
   const f = await fixture(t), id = "md_01", route = `/admin/media/${id}`;
   const initial = (await f.call(route)).data;
   const edited = await f.call(route, "PATCH", {description:"Preserved description",tags:["retained"],alt:{en:"Preserved alternative text"},rights:{status:"owned"},focal:{x:30,y:70}}, initial.version);
-  const before = edited.data, original = fs.readFileSync(path.resolve(__dirname, "../../../apps/website/landing-directions/public/assets", initial.file));
+  const before = edited.data, original = fs.readFileSync(path.resolve(__dirname, "../../website-assets", initial.file));
   const snapshot = f.hooks.exportState();
   const story = snapshot.data.content.entries.find(([key]) => key === "cs_01")[1];
   story.live.image.src = initial.file;
@@ -649,7 +649,7 @@ test("website images can be replaced without losing metadata, references or immu
   let history=(await f.call(`/admin/studio/media/${id}`)).data;assert.equal(history.versions.length,2);assert.equal(history.canReplace,false);
   assert.deepEqual(Buffer.from(await(await fetch(f.base+"/v2/media/"+media.file)).arrayBuffer()),png);
   const firstVersion=history.versions[0];assert.deepEqual(Buffer.from(await(await fetch(f.base+firstVersion.path)).arrayBuffer()),original);
-  const webp=fs.readFileSync(path.resolve(__dirname,"../../../apps/website/landing-directions/public/assets/brand-glass.webp"));
+  const webp=fs.readFileSync(path.resolve(__dirname,"../../website-assets/brand-glass.webp"));
   const next=await replace(webp,"image/webp",media.version);assert.equal(next.status,200);assert.equal(next.data.width,1920);assert.equal(next.data.height,1072);
   history=(await f.call(`/admin/studio/media/${id}`)).data;assert.equal(history.versions.length,3);
   assert.deepEqual(Buffer.from(await(await fetch(f.base+firstVersion.path)).arrayBuffer()),original);

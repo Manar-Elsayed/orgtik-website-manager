@@ -8,7 +8,7 @@ const setup = () => { const store = makeStore(now); return { store, library: mak
 test('SEO missing lists each page once, with every SEO health issue plus the keyword fields', () => {
   const { library } = setup();
   const health = library.health(), missing = library.missingSeo();
-  assert.deepEqual(Object.keys(library.SEO_GROUPS), ['search', 'keywords', 'sharing', 'images']);
+  assert.deepEqual(Object.keys(library.SEO_GROUPS), ['search', 'keywords', 'sharing', 'images', 'technical']);
   const order = Object.values(library.SEO_GROUPS).flat();
   assert.deepEqual([...library.CHECKS].sort(), order.filter(i => !['focusMissing', 'keywordsMissing'].includes(i)).sort(), 'every SEO health check has a category');
   assert.equal(new Set(missing.rows.map(r => r.id)).size, missing.rows.length, 'one row per page');

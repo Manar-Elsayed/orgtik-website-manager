@@ -565,15 +565,29 @@ export type MediaPatch = {
 // ---- SEO ----
 export type SeoCheck =
   | "titleMissing"
+  | "titleShort"
   | "titleLong"
   | "titleDuplicate"
   | "descriptionMissing"
   | "descriptionShort"
   | "descriptionLong"
+  | "descriptionDuplicate"
   | "addressDuplicate"
   | "focusDuplicate"
   | "noSocialImage"
-  | "imageNoAlt";
+  | "socialImageDefault"
+  | "imageNoAlt"
+  | "canonicalHost"
+  | "canonicalUnreachable"
+  | "canonicalOther"
+  | "canonicalSitemap"
+  | "schemaInvalid";
+/** Errors stop a page from showing well; guidance is worth a look but isn't a verdict. */
+export type SeoLevel = "error" | "guidance" | "ok";
+/** What a search result and a shared link would show for one page in one language. */
+export type SeoPreview = { url: string; title: string; description: string; ogTitle: string; ogDescription: string; ogImage: string | null };
+/** The last Run check: when, by whom, and what it found; changedSince when content moved on. */
+export type SeoHealthRun = { at: string; by: string; checked: number; errors: number; guidance: number; healthy: number; changedSince: boolean };
 export type SeoRow = {
   id: string;
   type: EntryType;
@@ -581,26 +595,40 @@ export type SeoRow = {
   path: string;
   locale: Locale;
   title: string;
+  /** The title as search results show it: the site's title template applied. */
+  renderedTitle?: string;
+  /** The page's own address in this language, on the canonical host. */
+  url?: string;
   titleLength: number;
   descriptionLength: number;
   keywords: number;
   issues: SeoCheck[];
+  level?: SeoLevel;
+  /** The reason behind a check, where there is more to say (the canonical it found, the schema properties missing). */
+  details?: Partial<Record<SeoCheck, string[]>>;
+  preview?: SeoPreview;
+  updatedAt?: string | null;
   /** For each duplicate issue, the other pages using the same title, address or focus keyphrase. */
   duplicates?: SeoDuplicates;
   state: WorkflowState;
 };
 /** Another page, named in a duplicate warning. */
 export type SeoPageRef = { id: string; type: EntryType; name: string; path: string };
-export type SeoDuplicates = Partial<Record<"title" | "address" | "focus", SeoPageRef[]>>;
+export type SeoDuplicates = Partial<Record<"title" | "description" | "address" | "focus", SeoPageRef[]>>;
 export type SeoHealth = Page<SeoRow> & {
   counts: Record<SeoCheck, number>;
+  /** Rows with an issue beyond the five headline checks. */
+  other: number;
   healthy: number;
   checked: number;
+  /** The checks that are guidance rather than errors. */
+  guidance: SeoCheck[];
+  lastRun: SeoHealthRun | null;
   /** The languages checked: every language switched on for the site. */
   locales: Locale[];
 };
 /** SEO missing's categories, matching the SEO editor's sections (plus the content editor's image). */
-export type SeoGroup = "search" | "keywords" | "sharing" | "images";
+export type SeoGroup = "search" | "keywords" | "sharing" | "images" | "technical";
 /** SEO health's checks plus the keyword fields. */
 export type SeoIssue = SeoCheck | "focusMissing" | "keywordsMissing";
 /** One page, with every issue it has in any public language. */
@@ -679,6 +707,8 @@ export type Redirect = {
   version: number;
 };
 export type Indexing = {
+  /** What the site wraps titles in, and its default shared image (for previews). */
+  site?: { titleTemplate: string; defaultOgImage: string | null };
   urls: { id: string; type: EntryType; locale: string; loc: string; canonical: string; policy: "index" | "noindex"; reason: "siteOverride" | "pagePolicy" | "allowed"; inSitemap: boolean; lastmod: string }[];
   settings: {
     canonicalHost: string;
@@ -1021,9 +1051,13 @@ export const api = createApi({
       query: (id) => ({ url: `/admin/media/${id}`, method: "DELETE" }),
       invalidatesTags: ["MediaList", "Overview"],
     }),
-    seoHealth: b.query<SeoHealth, { issue?: string; search?: string; kind?: string; lang?: string; page?: number; pageSize?: number }>({
+    seoHealth: b.query<SeoHealth, { issue?: string; level?: string; search?: string; kind?: string; lang?: string; page?: number; pageSize?: number }>({
       query: (params) => ({ url: "/admin/seo/health", params }),
       providesTags: ["Seo", "EntryList"],
+    }),
+    runSeoCheck: b.mutation<SeoHealthRun, void>({
+      query: () => ({ url: "/admin/seo/health/run", method: "POST" }),
+      invalidatesTags: ["Seo"],
     }),
     seoConflicts: b.query<Required<SeoDuplicates>, { entry: string; lang: string; title?: string; focus?: string }>({
       query: (params) => ({ url: "/admin/seo/conflicts", params }),
@@ -1286,6 +1320,7 @@ export const {
   useMembersQuery,
   useAuditQuery,
   useSiteQuery,
+  useRunSeoCheckMutation,
   useUpdateSiteMutation,
   usePageSourcesQuery,
   useManagerOrderQuery,

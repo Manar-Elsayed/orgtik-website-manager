@@ -3,12 +3,13 @@
 // An entry's SEO block, in one language (plan: "Metadata and slugs on everything"): how it shows in
 // search results and link previews, its keywords and the checks they drive, indexing, and
 // structured data. Lengths are measured the way results are cut: by width in pixels, not letters.
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { ArrowClockwise, CheckCircle, Circle, Code, Globe, Info, MagnifyingGlass, ShareNetwork, Warning } from "@phosphor-icons/react";
 import { Badge, Button, Card, Checkbox, Field, Input, Select, Tag, Textarea, cn, toast, useFormatter } from "@orgtik/ui";
-import { mediaUrl } from "@/lib/env";
 import { useEntryName } from "@/lib/entryName";
+import { DESCRIPTION_PX, SearchResultPreview, SocialPreview, TITLE_PX, widthOf } from "@/components/seo/SeoPreviews";
 import { useSeoConflictsQuery, type Locale, type SeoPageRef } from "@/store/api";
 
 export type SeoBlock = {
@@ -25,22 +26,11 @@ export type SeoBlock = {
   jsonLd?: unknown;
 };
 
-// Search results cut titles at about 600px (20px Arial) and descriptions at about two lines.
-const TITLE_PX = 600;
-const DESCRIPTION_PX = 920;
-let canvas: HTMLCanvasElement | null = null;
-function widthOf(text: string, font: string) {
-  if (typeof document === "undefined") return text.length * 8;
-  canvas ??= document.createElement("canvas");
-  const ctx = canvas.getContext("2d")!;
-  ctx.font = font;
-  return Math.round(ctx.measureText(text).width);
-}
-function cut(text: string, font: string, max: number) {
-  if (widthOf(text, font) <= max) return text;
-  let s = text;
-  while (s && widthOf(`${s}…`, font) > max) s = s.slice(0, -1);
-  return `${s.trimEnd()}…`;
+/** The title as the site renders it: a title already in the template's form is kept, otherwise wrapped. */
+export function renderTitle(own: string, template = "{page} | OrgTik") {
+  if (!own) return "";
+  const [before, after = ""] = template.split("{page}");
+  return (before || after) && own.startsWith(before) && own.endsWith(after) ? own : template.replace("{page}", own);
 }
 const has = (text: string, phrase: string) => Boolean(phrase.trim()) && text.toLowerCase().includes(phrase.trim().toLowerCase());
 
@@ -99,6 +89,7 @@ export function SeoPanel({
   onChange,
   fullWidthFields = false,
   entryId,
+  titleTemplate,
 }: {
   lang: Locale;
   seo: SeoBlock;
@@ -119,11 +110,13 @@ export function SeoPanel({
   fullWidthFields?: boolean;
   /** This page, so duplicate warnings can leave it out. */
   entryId?: string;
+  /** The site's title template ("{page} | OrgTik"): results show the title wrapped in it. */
+  titleTemplate?: string;
 }) {
   const t = useTranslations("Seo.block");
   const title = seo.title ?? "";
   const description = seo.description ?? "";
-  const shownTitle = title || english.title || "";
+  const shownTitle = renderTitle(title || english.title || "", titleTemplate);
   const shownDescription = description || english.description || "";
   const titlePx = widthOf(shownTitle, "20px Arial");
   const descriptionPx = widthOf(shownDescription, "14px Arial");
@@ -133,6 +126,19 @@ export function SeoPanel({
   const [jsonError, setJsonError] = useState(false);
   const focus = seo.focus ?? "";
   const ogTitle = seo.ogTitle || shownTitle;
+  // ?field=title (from SEO health) opens the editor with that field in view and focused.
+  const asked = useSearchParams().get("field");
+  const root = useRef<HTMLDivElement>(null);
+  const focusField = (field: string) => {
+    const el = root.current?.querySelector<HTMLElement>(`[data-seo-field="${field}"]`);
+    el?.scrollIntoView({ behavior: "smooth", block: "center" });
+    el?.focus({ preventScroll: true });
+  };
+  useEffect(() => {
+    if (asked) requestAnimationFrame(() => focusField(asked));
+    // Only on arrival: later edits keep the person where they are.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [asked, lang]);
   const ogDescription = seo.ogDescription || shownDescription;
   const ogImage = seo.ogImage || english.ogImage || entryImage;
   const err = (k: string) => errors[`seo.${k}`];
@@ -175,17 +181,8 @@ export function SeoPanel({
 
   const linkPreview = (
     <Section icon={<ShareNetwork />} title={t("socialPreview")}>
-      {/* A link preview as social networks draw it: image, site, title, description. */}
-      <div role="img" aria-label={t("socialPreview")} className="overflow-hidden rounded-field border border-line bg-raised">
-        {ogImage ? <img src={mediaUrl(ogImage)} alt="" className="aspect-[1.91/1] w-full object-cover" /> : <div className="grid aspect-[1.91/1] place-items-center bg-sunken text-body-sm text-fg-subtle">{t("noImage")}</div>}
-        <div className="flex flex-col gap-0.5 p-3" dir={lang === "ar" ? "rtl" : "ltr"} lang={lang}>
-          <span dir="ltr" className="text-start text-caption uppercase text-fg-subtle">
-            orgtik.ch
-          </span>
-          <span className="line-clamp-2 text-body font-medium text-fg">{ogTitle || t("noTitle")}</span>
-          <span className="line-clamp-2 text-body-sm text-fg-muted">{ogDescription}</span>
-        </div>
-      </div>
+      {/* A link preview as social networks draw it; choosing it opens the fields it shows. */}
+      <SocialPreview url={address} title={ogTitle} description={ogDescription} image={ogImage} lang={lang} onEdit={can.edit ? () => focusField("ogTitle") : undefined} />
     </Section>
   );
 
@@ -197,35 +194,24 @@ export function SeoPanel({
   };
 
   return (
-    <div className={fullWidthFields ? "grid min-w-0 gap-4" : "grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)]"}>
+    <div ref={root} className={fullWidthFields ? "grid min-w-0 gap-4" : "grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)]"}>
       <div className="flex min-w-0 flex-col gap-4">
         <Section icon={<MagnifyingGlass />} title={t("search")}>
-          {/* The result as a search engine shows it: address, title and description, cut where they'd be cut.
-              Its colours are the search engine's own, on purpose and in both themes: it shows what people see there. */}
-          <div aria-label={t("searchPreview")} role="img" className="rounded-field border border-line bg-white p-4 text-start" dir={lang === "ar" ? "rtl" : "ltr"} lang={lang}>
-            <div dir="ltr" className="truncate text-start text-[12px] text-[#4D5156]">
-              {address}
-            </div>
-            <div className="mt-1 truncate text-[20px] leading-7 text-[#1A0DAB]" style={{ fontFamily: "Arial, sans-serif" }}>
-              {shownTitle ? cut(shownTitle, "20px Arial", TITLE_PX) : <span className="text-[#70757A]">{t("noTitle")}</span>}
-            </div>
-            <p className="mt-1 line-clamp-2 text-[14px] leading-[22px] text-[#4D5156]" style={{ fontFamily: "Arial, sans-serif" }}>
-              {shownDescription ? cut(shownDescription, "14px Arial", DESCRIPTION_PX) : <span className="text-[#70757A]">{t("noDescription")}</span>}
-            </p>
-          </div>
+          {/* The result as a search engine shows it, cut where it'd be cut; choosing it opens the title. */}
+          <SearchResultPreview url={address} title={shownTitle} description={shownDescription} lang={lang} onEdit={can.edit ? () => focusField("title") : undefined} />
           <DuplicateHint pages={conflicts?.address} message={(pages) => t("addressUsedOn", { pages })} />
           <Field label={t("title")} description={t("pixels", { used: titlePx, max: TITLE_PX })} error={tooLong("title")}>
-            <Input dir="auto" lang={lang} readOnly={!can.edit} value={title} placeholder={lang === "en" ? undefined : english.title} onChange={(e) => onChange({ title: e.target.value })} />
+            <Input data-seo-field="title" dir="auto" lang={lang} readOnly={!can.edit} value={title} placeholder={lang === "en" ? undefined : english.title} onChange={(e) => onChange({ title: e.target.value })} />
           </Field>
           <DuplicateHint pages={probe.title === title.trim() ? conflicts?.title : undefined} message={(pages) => t("titleUsedOn", { pages })} />
           <Field label={t("description")} description={t("descriptionHelp", { count: description.length, used: descriptionPx, max: DESCRIPTION_PX })} error={tooLong("description")}>
-            <Textarea dir="auto" lang={lang} rows={3} readOnly={!can.edit} value={description} placeholder={lang === "en" ? undefined : english.description} onChange={(e) => onChange({ description: e.target.value })} />
+            <Textarea data-seo-field="description" dir="auto" lang={lang} rows={3} readOnly={!can.edit} value={description} placeholder={lang === "en" ? undefined : english.description} onChange={(e) => onChange({ description: e.target.value })} />
           </Field>
         </Section>
 
         <Section icon={<Info />} title={t("keywords")}>
           <Field label={t("focus")} description={t.rich("focusHelp", { b: strong, max: FOCUS_WORDS })} error={tooLong("focus")}>
-            <Input dir="auto" lang={lang} readOnly={!can.edit} value={focus} onChange={(e) => onChange({ focus: e.target.value })} />
+            <Input data-seo-field="focus" dir="auto" lang={lang} readOnly={!can.edit} value={focus} onChange={(e) => onChange({ focus: e.target.value })} />
           </Field>
           {wordsIn(focus) > FOCUS_WORDS ? <WarningNote>{t("focusTooManyWords", { count: wordsIn(focus), max: FOCUS_WORDS })}</WarningNote> : null}
           <DuplicateHint pages={probe.focus === focus.trim() ? conflicts?.focus : undefined} message={(pages) => t("focusUsedOn", { pages })} />
@@ -269,13 +255,13 @@ export function SeoPanel({
 
         <Section icon={<ShareNetwork />} title={t("social")}>
           <Field label={t("ogTitle")} description={t("ogFallback")} error={tooLong("ogTitle")}>
-            <Input dir="auto" lang={lang} readOnly={!can.edit} value={seo.ogTitle ?? ""} placeholder={shownTitle} onChange={(e) => onChange({ ogTitle: e.target.value })} />
+            <Input data-seo-field="ogTitle" dir="auto" lang={lang} readOnly={!can.edit} value={seo.ogTitle ?? ""} placeholder={shownTitle} onChange={(e) => onChange({ ogTitle: e.target.value })} />
           </Field>
           <Field label={t("ogDescription")} description={t("ogFallback")} error={tooLong("ogDescription")}>
             <Textarea dir="auto" lang={lang} rows={2} readOnly={!can.edit} value={seo.ogDescription ?? ""} placeholder={shownDescription} onChange={(e) => onChange({ ogDescription: e.target.value })} />
           </Field>
           <Field label={t("ogImage")} description={t("ogImageHelp")}>
-            <Select readOnly={!can.edit} value={seo.ogImage || "default"} onValueChange={(v) => onChange({ ogImage: !v || v === "default" ? "" : v })} options={[{ value: "default", label: t("ogImageDefault") }, ...images.map((i) => ({ value: i.value, label: <span dir="ltr">{i.label}</span> }))]} />
+            <Select data-seo-field="ogImage" readOnly={!can.edit} value={seo.ogImage || "default"} onValueChange={(v) => onChange({ ogImage: !v || v === "default" ? "" : v })} options={[{ value: "default", label: t("ogImageDefault") }, ...images.map((i) => ({ value: i.value, label: <span dir="ltr">{i.label}</span> }))]} />
           </Field>
         </Section>
 
@@ -303,7 +289,7 @@ export function SeoPanel({
             </div>
           </div>
           <Field label={t("canonical")} description={can.canonical ? t("canonicalHelp", { address }) : t("canonicalSeoOnly")} error={err("canonical") ? t("canonicalInvalid") : undefined}>
-            <Input dir="ltr" readOnly={!can.canonical} value={seo.canonical ?? ""} placeholder={address.startsWith("http") ? address : `https://${address}`} onChange={(e) => onChange({ canonical: e.target.value.trim() })} />
+            <Input data-seo-field="canonical" dir="ltr" readOnly={!can.canonical} value={seo.canonical ?? ""} placeholder={address.startsWith("http") ? address : `https://${address}`} onChange={(e) => onChange({ canonical: e.target.value.trim() })} />
           </Field>
         </Section>
 
@@ -315,6 +301,7 @@ export function SeoPanel({
             error={jsonError ? t("jsonInvalid") : err("jsonLd") ? t("jsonType") : undefined}
           >
             <Textarea
+              data-seo-field="jsonLd"
               dir="ltr"
               rows={6}
               className="font-mono text-body-sm"
