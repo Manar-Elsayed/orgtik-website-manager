@@ -3,8 +3,8 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { WarningCircle } from "@phosphor-icons/react";
 
-// The field an SEO issue points at, when the editor was opened from that issue (SEO missing): a
-// red outline and the issue's name, scrolled into view once. Otherwise the field as it is.
+// The field an SEO issue points at, when the editor was opened from that issue (SEO missing): the
+// issue's name above it, scrolled into view. Otherwise the field as it is.
 export function IssueSpot({ active, label, children }: { active: boolean; label: string; children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -32,13 +32,7 @@ export function IssueSpot({ active, label, children }: { active: boolean; label:
   }, [active]);
   if (!active) return <>{children}</>;
   return (
-    // The red stroke goes on the input itself (every control is .ot-control); a spot without one,
-    // such as a note, is outlined as a whole.
-    <div
-      ref={ref}
-      data-issue-spot
-      className="flex min-w-0 flex-col gap-2 rounded-field [&_.ot-control]:border-danger [&_.ot-control]:ring-1 [&_.ot-control]:ring-danger [&:not(:has(.ot-control))]:outline-2 [&:not(:has(.ot-control))]:outline-offset-4 [&:not(:has(.ot-control))]:outline-danger"
-    >
+    <div ref={ref} data-issue-spot className="flex min-w-0 flex-col gap-2">
       <p role="alert" className="flex items-center gap-1.5 text-body-sm font-semibold text-danger">
         <WarningCircle aria-hidden="true" weight="fill" className="size-4 shrink-0" />
         {label}
