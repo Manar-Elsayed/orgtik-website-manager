@@ -1936,7 +1936,10 @@
         "title": "Gleicher Titel wie {pages}",
         "address": "Gleiche Adresse wie {pages}",
         "focus": "Doppeltes Keyword: auch der Fokus von {pages}. Bitte ändern."
-      }
+      },
+      "moreIssues": "+{count}",
+      "moreIssuesLabel": "{count} weitere Probleme für {page} anzeigen",
+      "fewerIssues": "Weniger anzeigen"
     },
     "languageNotPublic": "{language} ist für die Website nicht aktiviert",
     "languageNotPublicHelp": "Geprüft werden nur die in den Website-Einstellungen aktivierten Sprachen. Aktivieren Sie diese dort, um ihre Seiten zu prüfen.",

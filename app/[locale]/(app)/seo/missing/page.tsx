@@ -1,63 +1,59 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { ArrowRight } from "@phosphor-icons/react";
-import { Badge, Button, FilterChips, Input, Select, PageHeader, StatusBadge, Tabs, TabsList, buttonVariants, cn, useFormatter } from "@orgtik/ui";
+import { Badge, Button, FilterChips, Input, Select, PageHeader, StatusBadge, buttonVariants, cn, useFormatter } from "@orgtik/ui";
 import { DataTable, type ColumnDef } from "@orgtik/ui/table";
 import { RequirePermission } from "@/components/frame/RequirePermission";
 import { Link } from "@/i18n/routing";
 import { useListState } from "@/lib/useListState";
 import { TYPES } from "@/lib/contentTypes";
 import { useEntryName } from "@/lib/entryName";
-import { statusOf, useSeoMissingQuery, type Locale, type SeoGroup, type SeoIssue, type SeoMissingRow } from "@/store/api";
+import { statusOf, useSeoMissingQuery, type Locale, type SeoIssue, type SeoMissingRow } from "@/store/api";
 
-// The SEO editor's sections, in its order, then the image (fixed in the content editor).
-const GROUPS: SeoGroup[] = ["search", "keywords", "sharing", "images"];
-const GROUP_ISSUES: Record<SeoGroup, SeoIssue[]> = {
-  search: ["titleMissing", "titleLong", "titleDuplicate", "descriptionMissing", "descriptionShort", "descriptionLong", "addressDuplicate"],
-  keywords: ["focusMissing", "focusDuplicate", "keywordsMissing"],
-  sharing: ["noSocialImage"],
-  images: ["imageNoAlt"],
-};
-const ALL_ISSUES = Object.values(GROUP_ISSUES).flat();
+// In the SEO editor's order, then the image (fixed in the content editor).
+const SEARCH_ISSUES: SeoIssue[] = ["titleMissing", "titleLong", "titleDuplicate", "descriptionMissing", "descriptionShort", "descriptionLong", "addressDuplicate"];
+const ALL_ISSUES: SeoIssue[] = [...SEARCH_ISSUES, "focusMissing", "focusDuplicate", "keywordsMissing", "noSocialImage", "imageNoAlt"];
 // Which duplicate each issue is, so its hint can name the other pages.
 const DUPLICATE_OF: Partial<Record<SeoIssue, "title" | "address" | "focus">> = { titleDuplicate: "title", addressDuplicate: "address", focusDuplicate: "focus" };
 const LOCALES: Locale[] = ["en", "ar", "de", "fr", "it"];
 const NATIVE: Record<Locale, string> = { en: "English", ar: "العربية", de: "Deutsch", fr: "Français", it: "Italiano" };
+// Issues shown per row before the rest fold behind "+N".
+const VISIBLE_ISSUES = 3;
 const COLUMN_ORDER = ["page", "issues", "status", "type", "lang", "updated", "fix"];
-const isGroup = (value: string): value is SeoGroup => (GROUPS as string[]).includes(value);
 
 // Every page with something to fix for search results, shared links or screen readers, one row
-// per page. The tabs are the SEO editor's sections; each issue opens the editor that fixes it.
+// per page. Each issue opens the editor that fixes it.
 function Missing() {
   const t = useTranslations("Seo");
-  const tb = useTranslations("Seo.block");
   const tm = useTranslations("Seo.missing");
   const tt = useTranslations("Types");
   const ti = useTranslations("Improvements");
   const f = useFormatter();
   const entryName = useEntryName();
   const url = useListState();
-  const tab = url.get("group", "all");
-  const group = isGroup(tab) ? tab : undefined;
-  const { data, isLoading, error, refetch, isFetching } = useSeoMissingQuery({ group, entry: url.get("entry"), issues: url.get("issues"), search: url.get("search"), kind: url.get("kind"), lang: url.get("lang"), page: url.page, pageSize: 10 });
-  const groupLabel = (value: SeoGroup | "all") => (value === "all" ? tm("tabs.all") : value === "images" ? tm("tabs.images") : tb(value === "sharing" ? "social" : value));
+  const { data, isLoading, error, refetch, isFetching } = useSeoMissingQuery({ entry: url.get("entry"), issues: url.get("issues"), search: url.get("search"), kind: url.get("kind"), lang: url.get("lang"), page: url.page, pageSize: 10 });
 
   // Only switched-on languages are checked; say so rather than claim another one is fine.
   const lang = url.get("lang");
   const locales = data?.locales ?? LOCALES;
   const unpublished = Boolean(lang && data && !data.locales.includes(lang as Locale));
+  const picked = url.get("issues").split(",").filter(Boolean) as SeoIssue[];
+  const pickedKey = picked.join(",");
+  // Rows whose folded issues have been opened with "+N".
+  const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
+  const toggle = (id: string) => setExpanded((open) => { const next = new Set(open); if (next.has(id)) next.delete(id); else next.add(id); return next; });
   const columns = useMemo<ColumnDef<SeoMissingRow, unknown>[]>(() => {
     const returnTo = encodeURIComponent(url.href);
     // Image descriptions are edited with the image, in the content editor; everything else in the SEO editor.
-    // The issues in this tab, and only the chosen language's when the list is filtered by one.
-    const shown = (r: SeoMissingRow) => {
-      const own = lang && r.byLanguage?.[lang as Locale] ? r.byLanguage[lang as Locale]! : r.issues;
-      return group ? own.filter((i) => GROUP_ISSUES[group].includes(i)) : own;
-    };
-    // The languages with something to fix in this tab; the editor opens in the filtered one, else the first.
-    const langsFor = (r: SeoMissingRow) => (group ? r.languages.filter((l) => r.byLanguage?.[l]?.some((i) => GROUP_ISSUES[group].includes(i))) : r.languages);
+    // Every issue, or only the picked ones.
+    const chosen = pickedKey ? pickedKey.split(",") : [];
+    const inView = (i: SeoIssue) => !chosen.length || chosen.includes(i);
+    // The issues in view, and only the chosen language's when the list is filtered by one.
+    const shown = (r: SeoMissingRow) => (lang && r.byLanguage?.[lang as Locale] ? r.byLanguage[lang as Locale]! : r.issues).filter(inView);
+    // The languages with an issue in view; the editor opens in the filtered one, else the first.
+    const langsFor = (r: SeoMissingRow) => (chosen.length ? r.languages.filter((l) => r.byLanguage?.[l]?.some(inView)) : r.languages);
     const openIn = (r: SeoMissingRow, issue?: SeoIssue) => {
       const langs = issue ? langsFor(r).filter((l) => r.byLanguage?.[l]?.includes(issue)) : langsFor(r);
       return langs.includes(lang as Locale) ? lang : langs[0] ?? r.locale;
@@ -80,20 +76,29 @@ function Missing() {
       {
         id: "issues",
         header: tm("colIssues"),
-        cell: ({ row }) => (
-          <span className="flex min-w-56 flex-wrap gap-1">
-            {shown(row.original).map((issue) => (
+        cell: ({ row }) => {
+          const all = shown(row.original), open = expanded.has(row.original.id);
+          const visible = open ? all : all.slice(0, VISIBLE_ISSUES), more = all.length - VISIBLE_ISSUES;
+          return (
+          <span className="flex min-w-56 flex-wrap items-center gap-1">
+            {visible.map((issue) => (
               <Link key={issue} href={fixHref(row.original, issue)} aria-label={tm("fixIn", { issue: t(`checks.${issue}`), page: entryName(row.original) })} className="rounded-pill focus-visible:outline-2 focus-visible:outline-focus">
-                <Badge size="sm" tone={GROUP_ISSUES.search.includes(issue) || DUPLICATE_OF[issue] ? "warning" : "neutral"} className="hover:underline">{t(`checks.${issue}`)}</Badge>
+                <Badge size="sm" tone={SEARCH_ISSUES.includes(issue) || DUPLICATE_OF[issue] ? "warning" : "neutral"} className="hover:underline">{t(`checks.${issue}`)}</Badge>
               </Link>
             ))}
+            {more > 0 ? (
+              <button type="button" onClick={() => toggle(row.original.id)} aria-expanded={open} aria-label={open ? tm("fewerIssues") : tm("moreIssuesLabel", { count: more, page: entryName(row.original) })} className="rounded-pill focus-visible:outline-2 focus-visible:outline-focus">
+                <Badge size="sm" tone="neutral" className="hover:underline">{open ? tm("fewerIssues") : tm("moreIssues", { count: more })}</Badge>
+              </button>
+            ) : null}
             {/* A duplicate says which page already uses the title, address or keyphrase. */}
-            {shown(row.original).map((issue) => {
+            {visible.map((issue) => {
               const kind = DUPLICATE_OF[issue], others = kind ? row.original.duplicates?.[openIn(row.original, issue) as Locale]?.[kind] : undefined;
               return kind && others?.length ? <span key={`${issue}-hint`} className="w-full text-caption text-warning">{tm(`duplicateHint.${kind}`, { pages: others.map((o) => entryName(o)).join(", ") })}</span> : null;
             })}
           </span>
-        ),
+          );
+        },
       },
       { id: "status", header: tm("colStatus"), meta: { width: "1%" }, cell: ({ row }) => <StatusBadge size="sm" entity="cms_revision" state={row.original.state} /> },
       { id: "type", header: t("colType"), meta: { width: "1%" }, cell: ({ row }) => <span className="whitespace-nowrap text-fg-muted">{tt(`${row.original.type}.one`)}</span> },
@@ -101,7 +106,7 @@ function Missing() {
         id: "lang",
         header: tm("colLanguage"),
         meta: { width: "1%" },
-        // "All" when every checked language has something to fix in this tab, otherwise the codes that do (EN AR).
+        // "All" when every checked language has an issue in view, otherwise the codes that do (EN AR).
         cell: ({ row }) => {
           const langs = langsFor(row.original);
           return langs.length > 1 && langs.length === locales.length ? (
@@ -131,12 +136,10 @@ function Missing() {
     ];
     // What needs fixing sits next to the page name, so it stays in view when the table scrolls.
     return COLUMN_ORDER.map((id) => columns.find((column) => column.id === id)!);
-  }, [t, tm, tt, f, entryName, url.href, group, lang, locales]);
+  }, [t, tm, tt, f, entryName, url.href, lang, locales, pickedKey, expanded]);
 
-  const tabs = [{ value: "all", label: groupLabel("all"), count: data?.incomplete }, ...GROUPS.map((value) => ({ value, label: groupLabel(value), count: data?.counts[value] }))];
-  // One chip per issue in this tab that some listed page has (with how many), plus any already chosen.
-  const picked = url.get("issues").split(",").filter(Boolean) as SeoIssue[];
-  const chips = (group ? GROUP_ISSUES[group] : ALL_ISSUES).filter((i) => (data?.issueCounts?.[i] ?? 0) > 0 || picked.includes(i)).map((i) => ({ value: i, label: t(`checks.${i}`), count: data?.issueCounts?.[i] ?? 0 }));
+  // One chip per issue that some listed page has (with how many), plus any already chosen.
+  const chips = ALL_ISSUES.filter((i) => (data?.issueCounts?.[i] ?? 0) > 0 || picked.includes(i)).map((i) => ({ value: i, label: t(`checks.${i}`), count: data?.issueCounts?.[i] ?? 0 }));
   const filtered = url.get("search") || url.get("kind") || url.get("lang") || url.get("entry") || picked.length;
   const clear = () => url.set({ search: "", kind: "all", lang: "all", entry: "", issues: "" });
   const status = isLoading ? "loading" : error ? (statusOf(error) === 403 ? "forbidden" : "error") : "ready";
@@ -150,11 +153,7 @@ function Missing() {
           <Select size="sm" label={tm("colLanguage")} value={url.get("lang", "all")} onValueChange={(lang) => url.set({ lang })} options={[{ value: "all", label: ti("all") }, ...LOCALES.map((value) => ({ value, label: NATIVE[value] }))]} />
           {url.get("entry") ? <Button size="sm" variant="ghost" onClick={clear}>{tm("showAllPages")}</Button> : null}
         </div>
-        <Tabs value={group ?? "all"} onValueChange={(value) => url.set({ group: String(value), issues: "" })}>
-          <TabsList items={tabs} />
-        </Tabs>
-        <section aria-label={groupLabel(group ?? "all")} className="flex flex-col gap-4">
-          <p className="text-body-sm text-fg-muted">{tm(`why.${group ?? "all"}`)}</p>
+        <section aria-label={tm("title")} className="flex flex-col gap-4">
           {chips.length ? <FilterChips label={tm("issueFilter")} chips={chips} value={picked} onValueChange={(value) => url.set({ issues: value.join(",") })} /> : null}
           <DataTable
             label={tm("title")}

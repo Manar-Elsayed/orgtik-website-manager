@@ -689,7 +689,7 @@ module.exports = {
       const search = String(req.query.search ?? "").trim().toLowerCase();
       if (search) rows = rows.filter(row => `${row.name} ${row.path} ${row.title}`.toLowerCase().includes(search));
       if (req.query.kind) rows = rows.filter(row => row.type === req.query.kind);
-      const result = page(req, rows);
+      const result = page(req, lib.groupHealthRows(rows));
       const counts = Object.fromEntries(lib.CHECKS.map((k) => [k, checked.filter((r) => r.issues.includes(k)).length]));
       ok(res, result.rows, { ...result.meta, counts, healthy: checked.filter((r) => !r.issues.length).length, checked: checked.length, locales: lib.checkedLocales() });
     });

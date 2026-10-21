@@ -197,6 +197,18 @@ function makeLibrary({ seed, store, now, uploads, demo = false, locales, site, p
     const counts = Object.fromEntries(CHECKS.map((k) => [k, rows.filter((r) => r.issues.includes(k)).length]));
     return { rows, counts, healthy: rows.filter((r) => !r.issues.length).length };
   }
+  // The SEO health table: one row per page and set of issues, so languages with exactly the same
+  // issues share a row.
+  function groupHealthRows(rows) {
+    const groups = new Map();
+    for (const row of rows) {
+      const key = `${row.id}|${row.issues.join(",")}`;
+      const g = groups.get(key);
+      if (!g) groups.set(key, { ...row, locales: [row.locale], titleLengths: [row.titleLength], descriptionLengths: [row.descriptionLength] });
+      else { g.locales.push(row.locale); g.titleLengths.push(row.titleLength); g.descriptionLengths.push(row.descriptionLength); }
+    }
+    return [...groups.values()];
+  }
   // What the SEO editor warns about while typing: other pages in this language already using the
   // title, focus keyphrase or address.
   function seoConflicts({ entry, lang, title, focus }) {
@@ -569,7 +581,7 @@ function makeLibrary({ seed, store, now, uploads, demo = false, locales, site, p
     return { data: { media: rows, redirects: redirects_, settings: settings_, lastPublish: incoming.data.lastPublish ?? null, lastValidation: incoming.data.lastValidation ?? null, demoVersion: incoming.data.demoVersion ?? 0 }, sequences: { nextMedia: codec.sequence(incoming.sequences?.nextMedia, rows, "md"), nextRedirect: codec.sequence(incoming.sequences?.nextRedirect, redirects_, "rd") } };
   };
   const importState = value => { const incoming = validateState(value); codec.replaceMap(media, incoming.data.media); codec.replaceMap(redirects, incoming.data.redirects); codec.replaceObject(settings, incoming.data.settings); lastPublish = incoming.data.lastPublish; lastValidation = incoming.data.lastValidation; nextMedia = incoming.sequences.nextMedia; nextRedirect = incoming.sequences.nextRedirect; if (incoming.data.demoVersion < 1) ensureDemo(); else if (demo && incoming.data.demoVersion < 2) require("./seed/workflow-examples").mediaExamples(media); if (demo && incoming.data.demoVersion < 3) require("./seed/demo-states").redirectStatusExamples(redirects); };
-  return { media, redirects, settings, mediaOut, resolveMedia, updateMedia, addUpload, removeMedia, serverRedirects, redirectProblems, executionOf, expectedTest, recordTest, normPath, applyRedirect, QUERY_MODES, recordPublish, lastPublish: () => lastPublish, recordValidation, lastValidation: () => lastValidation, health, CHECKS, missingSeo, SEO_GROUPS, checkedLocales, seoConflicts, saveRedirect, removeRedirect, REDIRECT_STATUSES, sitemap, indexingUrls, canonicalProblems, robots, generatedRobots, robotsWarnings, robotsTools, setRobots, sitePublicLocales, setVisibility, setCanonicalHost, RIGHTS, keepAddresses, previewAddresses, exportState, importState, validateState };
+  return { media, redirects, settings, mediaOut, resolveMedia, updateMedia, addUpload, removeMedia, serverRedirects, redirectProblems, executionOf, expectedTest, recordTest, normPath, applyRedirect, QUERY_MODES, recordPublish, lastPublish: () => lastPublish, recordValidation, lastValidation: () => lastValidation, health, groupHealthRows, CHECKS, missingSeo, SEO_GROUPS, checkedLocales, seoConflicts, saveRedirect, removeRedirect, REDIRECT_STATUSES, sitemap, indexingUrls, canonicalProblems, robots, generatedRobots, robotsWarnings, robotsTools, setRobots, sitePublicLocales, setVisibility, setCanonicalHost, RIGHTS, keepAddresses, previewAddresses, exportState, importState, validateState };
 }
 
 module.exports = { makeLibrary };
