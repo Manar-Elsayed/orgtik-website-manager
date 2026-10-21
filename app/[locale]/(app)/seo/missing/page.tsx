@@ -11,15 +11,11 @@ import { useListState } from "@/lib/useListState";
 import { TABLE_ROWS } from "@/lib/tableRows";
 import { TYPES } from "@/lib/contentTypes";
 import { useEntryName } from "@/lib/entryName";
-import { statusOf, useSeoMissingQuery, type Locale, type SeoDuplicateKind, type SeoIssue, type SeoMissingRow } from "@/store/api";
+import { statusOf, useSeoMissingQuery, type Locale, type SeoIssue, type SeoMissingRow } from "@/store/api";
 
 // In the SEO editor's order, then the image (fixed in the content editor).
 const SEARCH_ISSUES: SeoIssue[] = ["titleMissing", "titleLong", "titleDuplicate", "descriptionMissing", "descriptionShort", "descriptionLong", "descriptionDuplicate", "addressDuplicate"];
 const ALL_ISSUES: SeoIssue[] = [...SEARCH_ISSUES, "focusMissing", "focusDuplicate", "keywordsMissing", "noSocialImage", "imageNoAlt"];
-// A duplicate issue opens a note naming the other pages and what they share.
-const DUPLICATE_OF: Partial<Record<SeoIssue, SeoDuplicateKind>> = { titleDuplicate: "title", descriptionDuplicate: "description", addressDuplicate: "address", focusDuplicate: "focus" };
-// Pages named in a note before the rest are counted.
-const NOTE_PAGES = 5;
 const LOCALES: Locale[] = ["en", "ar", "de", "fr", "it"];
 const NATIVE: Record<Locale, string> = { en: "English", ar: "العربية", de: "Deutsch", fr: "Français", it: "Italiano" };
 // Issues shown per row before the rest fold behind "+N".
@@ -47,9 +43,6 @@ function Missing() {
   // Rows whose folded issues have been opened with "+N".
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
   const toggle = (id: string) => setExpanded((open) => { const next = new Set(open); if (next.has(id)) next.delete(id); else next.add(id); return next; });
-  // The duplicate issue whose note is open, per row.
-  const [notes, setNotes] = useState<Record<string, SeoIssue | undefined>>({});
-  const toggleNote = (id: string, issue: SeoIssue) => setNotes((open) => ({ ...open, [id]: open[id] === issue ? undefined : issue }));
   const columns = useMemo<ColumnDef<SeoMissingRow, unknown>[]>(() => {
     const returnTo = encodeURIComponent(url.href);
     // Image descriptions are edited with the image, in the content editor; everything else in the SEO editor.
@@ -87,11 +80,7 @@ function Missing() {
           const visible = open ? all : all.slice(0, VISIBLE_ISSUES), more = all.length - VISIBLE_ISSUES;
           return (
           <span className="flex min-w-56 flex-wrap items-center gap-1">
-            {visible.map((issue) => DUPLICATE_OF[issue] ? (
-              <button key={issue} type="button" onClick={() => toggleNote(row.original.id, issue)} aria-expanded={notes[row.original.id] === issue} aria-controls={`dup-${row.original.id}`} className="rounded-pill focus-visible:outline-2 focus-visible:outline-focus">
-                <Badge size="sm" tone="warning" className={cn("hover:underline", notes[row.original.id] === issue && "underline")}>{t(`checks.${issue}`)}</Badge>
-              </button>
-            ) : (
+            {visible.map((issue) => (
               <Link key={issue} href={fixHref(row.original, issue)} aria-label={tm("fixIn", { issue: t(`checks.${issue}`), page: entryName(row.original) })} className="rounded-pill focus-visible:outline-2 focus-visible:outline-focus">
                 <Badge size="sm" tone="warning" className="hover:underline">{t(`checks.${issue}`)}</Badge>
               </Link>
@@ -101,36 +90,6 @@ function Missing() {
                 <Badge size="sm" tone="neutral" className="hover:underline">{open ? tm("fewerIssues") : tm("moreIssues", { count: more })}</Badge>
               </button>
             ) : null}
-            {(() => {
-              // What the open duplicate clashes with, in each language that has it.
-              const issue = notes[row.original.id], kind = issue ? DUPLICATE_OF[issue] : undefined;
-              if (!issue || !kind || !all.includes(issue)) return null;
-              const langs = langsFor(row.original).filter((l) => row.original.byLanguage?.[l]?.includes(issue));
-              return (
-                <span id={`dup-${row.original.id}`} className="flex w-full max-w-md flex-col gap-2 whitespace-normal break-words rounded-field bg-info-subtle px-3 py-2 text-body-sm text-info">
-                  {langs.map((l) => {
-                    const others = row.original.duplicates?.[l]?.[kind] ?? [], text = row.original.duplicateText?.[l]?.[kind];
-                    return (
-                      <span key={l} className="flex flex-col gap-1">
-                        <span>
-                          {langs.length > 1 ? <span dir="ltr" className="me-2 font-mono text-caption">{l.toUpperCase()}</span> : null}
-                          {tm(`duplicateNote.${kind}`)}
-                        </span>
-                        {text ? <span dir={kind === "address" ? "ltr" : "auto"} lang={l} className={cn("line-clamp-2 font-semibold", kind === "address" && "font-mono text-start")}>{kind === "address" ? text : `“${text}”`}</span> : null}
-                        <span className="flex flex-col">
-                          {others.slice(0, NOTE_PAGES).map((o) => (
-                            <Link key={o.id} href={`/seo/content/${o.id}?lang=${l}&returnTo=${encodeURIComponent(url.href)}`} className="w-fit underline hover:no-underline focus-visible:outline-2 focus-visible:outline-focus">
-                              {entryName(o)} <span dir="ltr" className="font-mono text-caption">{o.path}</span>
-                            </Link>
-                          ))}
-                          {others.length > NOTE_PAGES ? <span>{tm("duplicateMore", { count: others.length - NOTE_PAGES })}</span> : null}
-                        </span>
-                      </span>
-                    );
-                  })}
-                </span>
-              );
-            })()}
           </span>
           );
         },
@@ -171,7 +130,7 @@ function Missing() {
     ];
     // What needs fixing sits next to the page name, so it stays in view when the table scrolls.
     return COLUMN_ORDER.map((id) => columns.find((column) => column.id === id)!);
-  }, [t, tm, tt, f, entryName, url.href, lang, locales, pickedKey, expanded, notes]);
+  }, [t, tm, tt, f, entryName, url.href, lang, locales, pickedKey, expanded]);
 
   // One chip per issue that some listed page has (with how many), plus any already chosen.
   const chips = ALL_ISSUES.filter((i) => (data?.issueCounts?.[i] ?? 0) > 0 || picked.includes(i)).map((i) => ({ value: i, label: t(`checks.${i}`), count: data?.issueCounts?.[i] ?? 0 }));

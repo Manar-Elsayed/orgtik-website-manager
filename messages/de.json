@@ -1752,7 +1752,7 @@
       "titleLong": "Titel über 60 Zeichen",
       "titleDuplicate": "Gleicher Titel wie eine andere Seite",
       "descriptionMissing": "Keine Suchbeschreibung",
-      "descriptionShort": "Beschreibung unter 50 Zeichen",
+      "descriptionShort": "Beschreibung unter 60 Zeichen",
       "descriptionLong": "Beschreibung über 160 Zeichen",
       "descriptionDuplicate": "Gleiche Beschreibung wie eine andere Seite",
       "addressDuplicate": "Gleiche Adresse wie eine andere Seite",
@@ -1880,7 +1880,7 @@
       "check": {
         "titleSet": "Hat einen eigenen Suchtitel",
         "titleFits": "Der Titel passt in ein Suchergebnis",
-        "descriptionSet": "Hat eine Beschreibung mit mindestens 50 Zeichen",
+        "descriptionSet": "Hat eine Beschreibung mit mindestens 60 Zeichen",
         "descriptionFits": "Die Beschreibung passt in ein Suchergebnis",
         "focusInTitle": "Die Fokus-Keyphrase steht im Titel",
         "focusInDescription": "Die Fokus-Keyphrase steht in der Beschreibung",
@@ -1899,7 +1899,15 @@
       "addressUsedOn": "{pages} verwendet diese Adresse bereits. Ändern Sie eine davon, damit jede Seite gefunden wird.",
       "focusTooManyWords": "Diese Keyphrase hat {count} Wörter. Beschränken Sie sie auf {max}.",
       "keywordTooManyWords": "{count} Wörter. Jedes Keyword sollte höchstens {max} Wörter haben.",
-      "keywordsTooLong": "Länger als {max} Wörter: {keywords}. Bitte kürzen."
+      "keywordsTooLong": "Länger als {max} Wörter: {keywords}. Bitte kürzen.",
+      "descriptionUsedOn": "Diese Beschreibung wird bereits auf {pages} verwendet. Ändern Sie sie, damit jede Seite eine eigene hat.",
+      "duplicatesTitle": "Diese Seite teilt Text mit anderen Seiten",
+      "duplicateOf": {
+        "title": "Gleicher Titel wie:",
+        "description": "Gleiche Beschreibung wie:",
+        "focus": "Gleiche Fokus-Keyphrase wie:",
+        "address": "Gleiche Adresse wie:"
+      }
     },
     "fromArchive": "Archivierter Inhalt",
     "showAllPages": "Alle Seiten anzeigen",
@@ -1934,14 +1942,7 @@
       "issueFilter": "Probleme",
       "moreIssues": "+{count}",
       "moreIssuesLabel": "{count} weitere Probleme für {page} anzeigen",
-      "fewerIssues": "Weniger anzeigen",
-      "duplicateNote": {
-        "title": "Dieser Titel wird auch verwendet auf:",
-        "description": "Diese Beschreibung wird auch verwendet auf:",
-        "address": "Diese Adresse wird auch verwendet von:",
-        "focus": "Diese Fokus-Keyphrase ist auch der Fokus von:"
-      },
-      "duplicateMore": "und {count, plural, one {# weitere Seite} other {# weitere Seiten}}"
+      "fewerIssues": "Weniger anzeigen"
     },
     "languageNotPublic": "{language} ist für die Website nicht aktiviert",
     "languageNotPublicHelp": "Geprüft werden nur die in den Website-Einstellungen aktivierten Sprachen. Aktivieren Sie diese dort, um ihre Seiten zu prüfen.",

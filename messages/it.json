@@ -1752,7 +1752,7 @@
       "titleLong": "Titolo oltre 60 caratteri",
       "titleDuplicate": "Stesso titolo di un’altra pagina",
       "descriptionMissing": "Nessuna descrizione di ricerca",
-      "descriptionShort": "Descrizione sotto i 50 caratteri",
+      "descriptionShort": "Descrizione sotto i 60 caratteri",
       "descriptionLong": "Descrizione oltre 160 caratteri",
       "descriptionDuplicate": "Stessa descrizione di un’altra pagina",
       "addressDuplicate": "Stesso indirizzo di un’altra pagina",
@@ -1880,7 +1880,7 @@
       "check": {
         "titleSet": "Ha un proprio titolo di ricerca",
         "titleFits": "Il titolo sta in un risultato di ricerca",
-        "descriptionSet": "Ha una descrizione di almeno 50 caratteri",
+        "descriptionSet": "Ha una descrizione di almeno 60 caratteri",
         "descriptionFits": "La descrizione sta in un risultato di ricerca",
         "focusInTitle": "La frase chiave è nel titolo",
         "focusInDescription": "La frase chiave è nella descrizione",
@@ -1899,7 +1899,15 @@
       "addressUsedOn": "{pages} usa già questo indirizzo. Cambiane uno perché ogni pagina possa essere trovata.",
       "focusTooManyWords": "Questa frase chiave ha {count} parole. Limitala a {max}.",
       "keywordTooManyWords": "{count} parole. Tieni ogni parola chiave entro {max} parole.",
-      "keywordsTooLong": "Più di {max} parole: {keywords}. Accorciale."
+      "keywordsTooLong": "Più di {max} parole: {keywords}. Accorciale.",
+      "descriptionUsedOn": "Questa descrizione è già usata su {pages}. Cambiala perché ogni pagina abbia la sua.",
+      "duplicatesTitle": "Questa pagina condivide testo con altre pagine",
+      "duplicateOf": {
+        "title": "Stesso titolo di:",
+        "description": "Stessa descrizione di:",
+        "focus": "Stessa frase chiave di:",
+        "address": "Stesso indirizzo di:"
+      }
     },
     "fromArchive": "Contenuto archiviato",
     "showAllPages": "Mostra tutte le pagine",
@@ -1934,14 +1942,7 @@
       "issueFilter": "Problemi",
       "moreIssues": "+{count}",
       "moreIssuesLabel": "Mostra altri {count} problemi per {page}",
-      "fewerIssues": "Mostra meno",
-      "duplicateNote": {
-        "title": "Questo titolo è usato anche su:",
-        "description": "Questa descrizione è usata anche su:",
-        "address": "Questo indirizzo è usato anche da:",
-        "focus": "Questa frase chiave è anche il focus di:"
-      },
-      "duplicateMore": "e {count, plural, one {# altra pagina} other {altre # pagine}}"
+      "fewerIssues": "Mostra meno"
     },
     "languageNotPublic": "{language} non è attivata per il sito",
     "languageNotPublicHelp": "Vengono controllate solo le lingue attivate nelle impostazioni del sito. Attiva questa lingua per controllarne le pagine.",

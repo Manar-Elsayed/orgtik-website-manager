@@ -90,7 +90,7 @@ test('duplicate titles, addresses and focus keyphrases name the other page, and 
   assert.deepEqual(live.title.map(p => p.id).sort(), ['pg_about', 'pg_home']);
   assert.deepEqual(live.focus.map(p => p.id).sort(), ['pg_plans', 'pg_software']);
   assert.deepEqual(live.address, []);
-  assert.deepEqual(library.seoConflicts({ entry: 'pg_home', lang: 'en', title: '', focus: '' }), { title: [], focus: [], address: [] });
+  assert.deepEqual(library.seoConflicts({ entry: 'pg_home', lang: 'en', title: '', focus: '' }), { title: [], description: [], focus: [], address: [] });
 });
 
 test('SEO health shows a page once for every set of languages with exactly the same issues', () => {
@@ -111,7 +111,7 @@ test('SEO health shows a page once for every set of languages with exactly the s
   }
 });
 
-test('two pages with the same description are both flagged, with the page and the text for the note', () => {
+test('two pages with the same description are both flagged, and the editor names the other page', () => {
   const { store, library } = setup();
   const [a, b] = library.health().rows.filter((r) => r.locale === 'en').slice(0, 2);
   const text = 'One description shared by two pages, long enough to pass the length checks.';
@@ -120,10 +120,9 @@ test('two pages with the same description are both flagged, with the page and th
   for (const r of rows) {
     assert.ok(r.issues.includes('descriptionDuplicate'), `${r.id} flagged`);
     assert.deepEqual(r.duplicates.description.map((o) => o.id), [r.id === a.id ? b.id : a.id]);
-    assert.equal(r.duplicateText.description, text);
   }
   const row = library.missingSeo().rows.find((r) => r.id === a.id);
   assert.ok(row.issues.includes('descriptionDuplicate'));
   assert.equal(row.duplicates.en.description[0].id, b.id);
-  assert.equal(row.duplicateText.en.description, text);
+  assert.deepEqual(library.seoConflicts({ entry: a.id, lang: 'en', description: text }).description.map((o) => o.id), [b.id]);
 });

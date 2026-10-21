@@ -1752,7 +1752,7 @@
       "titleLong": "Titre de plus de 60 caractères",
       "titleDuplicate": "Même titre qu’une autre page",
       "descriptionMissing": "Pas de description de recherche",
-      "descriptionShort": "Description de moins de 50 caractères",
+      "descriptionShort": "Description de moins de 60 caractères",
       "descriptionLong": "Description de plus de 160 caractères",
       "descriptionDuplicate": "Même description qu’une autre page",
       "addressDuplicate": "Même adresse qu’une autre page",
@@ -1880,7 +1880,7 @@
       "check": {
         "titleSet": "A son propre titre de recherche",
         "titleFits": "Le titre tient dans un résultat de recherche",
-        "descriptionSet": "A une description de 50 caractères ou plus",
+        "descriptionSet": "A une description de 60 caractères ou plus",
         "descriptionFits": "La description tient dans un résultat de recherche",
         "focusInTitle": "L’expression clé est dans le titre",
         "focusInDescription": "L’expression clé est dans la description",
@@ -1899,7 +1899,15 @@
       "addressUsedOn": "{pages} utilise déjà cette adresse. Changez l’une d’elles pour que chaque page puisse être trouvée.",
       "focusTooManyWords": "Cette expression clé compte {count} mots. Limitez-la à {max}.",
       "keywordTooManyWords": "{count} mots. Gardez chaque mot-clé à {max} mots ou moins.",
-      "keywordsTooLong": "Plus de {max} mots : {keywords}. Raccourcissez-les."
+      "keywordsTooLong": "Plus de {max} mots : {keywords}. Raccourcissez-les.",
+      "descriptionUsedOn": "Cette description est déjà utilisée sur {pages}. Modifiez-la pour que chaque page ait la sienne.",
+      "duplicatesTitle": "Cette page partage du texte avec d’autres pages",
+      "duplicateOf": {
+        "title": "Même titre que :",
+        "description": "Même description que :",
+        "focus": "Même expression clé que :",
+        "address": "Même adresse que :"
+      }
     },
     "fromArchive": "Contenu archivé",
     "showAllPages": "Afficher toutes les pages",
@@ -1934,14 +1942,7 @@
       "issueFilter": "Problèmes",
       "moreIssues": "+{count}",
       "moreIssuesLabel": "Afficher {count} autres problèmes pour {page}",
-      "fewerIssues": "Afficher moins",
-      "duplicateNote": {
-        "title": "Ce titre est aussi utilisé sur :",
-        "description": "Cette description est aussi utilisée sur :",
-        "address": "Cette adresse est aussi utilisée par :",
-        "focus": "Cette expression clé est aussi le focus de :"
-      },
-      "duplicateMore": "et {count, plural, one {# autre page} other {# autres pages}}"
+      "fewerIssues": "Afficher moins"
     },
     "languageNotPublic": "{language} n’est pas activé pour le site",
     "languageNotPublicHelp": "Seules les langues activées dans les paramètres du site sont vérifiées. Activez celle-ci pour vérifier ses pages.",
