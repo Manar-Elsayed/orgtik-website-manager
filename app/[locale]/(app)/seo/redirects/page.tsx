@@ -244,8 +244,9 @@ function Redirects() {
             <MenuItem icon={<Eye />} onClick={() => setViewing(row.original)}>{ti("view")}</MenuItem>
             <MenuItem icon={<PencilSimple />} disabled={!editable} onClick={() => setEditing(draftOf(row.original))}>{ti("edit")}</MenuItem>
             <MenuItem icon={<Flask />} disabled={testing.isLoading} onClick={() => test(row.original)}>{tr("test")}</MenuItem>
-            <MenuItem icon={<Power />} disabled={!editable} onClick={() => toggle(row.original)}>{tr(row.original.status === "disabled" ? "enable" : "disable")}</MenuItem>
             <MenuSeparator />
+            {/* Disabling stops a live redirect, so it sits with Delete in the danger tone; enabling doesn't. */}
+            <MenuItem icon={<Power />} tone={row.original.status === "disabled" ? undefined : "danger"} disabled={!editable} onClick={() => toggle(row.original)}>{tr(row.original.status === "disabled" ? "enable" : "disable")}</MenuItem>
             <MenuItem icon={<Trash />} tone="danger" disabled={!deletable} onClick={() => setDeleting(row.original)}>{ti("delete")}</MenuItem>
           </RowActionsMenu>
         ),
