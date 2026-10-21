@@ -836,7 +836,7 @@ module.exports = {
     // ---- the live website: what it serves, compared with the settings here, and publishing it ----
     const liveSite = require("./wm/live-site").makeLiveSite();
     const { readSitemap, hash } = require("./wm/live-site");
-    const hookConfigured = () => /^https:///.test(String(process.env.SITE_DEPLOY_HOOK_URL ?? ""));
+    const hookConfigured = () => String(process.env.SITE_DEPLOY_HOOK_URL ?? "").startsWith("https://");
     const latestPublished = () => [...store.entries.values()].reduce((max, e) => (e.workflow.visibility === "live" && e.workflow.publishedAt && e.workflow.publishedAt > max ? e.workflow.publishedAt : max), "");
     async function liveStatus(fresh) {
       const snap = await liveSite.snapshot({ fresh });
