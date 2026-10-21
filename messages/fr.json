@@ -1862,9 +1862,7 @@
       "robotsNoindex": "Ne pas référencer cette page",
       "inSitemap": "Inclure dans le plan du site",
       "canonical": "Adresse canonique",
-      "canonicalHelp": "Laissez vide : l’adresse de la page ({address}) est utilisée. À remplir seulement si une autre adresse porte le même contenu.",
-      "canonicalSeoOnly": "Définie par l’équipe SEO ; vide signifie l’adresse de la page.",
-      "canonicalInvalid": "Utilisez une adresse complète en https://.",
+      "canonicalHelp": "Défini automatiquement à partir de l’adresse de la page et de l’hôte canonique (SEO › Indexation), et mis à jour quand l’adresse change. Il n’est pas modifiable : personne ne peut le faire pointer vers une autre adresse.",
       "structured": "Données structurées",
       "structuredGenerated": "Le site écrit {type} pour cette page à partir de son contenu. Rien à remplir.",
       "structuredNone": "Le site n’écrit pas de données structurées pour ce type de page.",
@@ -1932,11 +1930,6 @@
       "emptyFiltered": "Aucune page ne correspond à ces filtres.",
       "clearFilters": "Effacer les filtres",
       "issueFilter": "Problèmes",
-      "duplicateHint": {
-        "title": "Même titre que {pages}",
-        "address": "Même adresse que {pages}",
-        "focus": "Mot-clé en double : c’est aussi l’expression clé de {pages}. Changez-le."
-      },
       "moreIssues": "+{count}",
       "moreIssuesLabel": "Afficher {count} autres problèmes pour {page}",
       "fewerIssues": "Afficher moins"

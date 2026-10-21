@@ -1862,9 +1862,7 @@
       "robotsNoindex": "Don't list this page",
       "inSitemap": "Include in the sitemap",
       "canonical": "Canonical address",
-      "canonicalHelp": "Leave empty: the page's own address ({address}) is used. Set it only when another address holds the same content.",
-      "canonicalSeoOnly": "Set by the SEO team; empty means the page's own address.",
-      "canonicalInvalid": "Use a full https:// address.",
+      "canonicalHelp": "Set automatically from the page's address and the canonical host (SEO › Indexing), and kept up to date when the address changes. It can't be edited, so no one can point it to another address.",
       "structured": "Structured data",
       "structuredGenerated": "The site writes {type} for this page from its content. Nothing to fill in.",
       "structuredNone": "The site writes no structured data for this kind of page.",
@@ -1932,11 +1930,6 @@
       "emptyFiltered": "No page matches these filters.",
       "clearFilters": "Clear filters",
       "issueFilter": "Issues",
-      "duplicateHint": {
-        "title": "Same title as {pages}",
-        "address": "Same address as {pages}",
-        "focus": "Duplicated keyword: also the focus of {pages}. Change it."
-      },
       "moreIssues": "+{count}",
       "moreIssuesLabel": "Show {count} more issues for {page}",
       "fewerIssues": "Show less"

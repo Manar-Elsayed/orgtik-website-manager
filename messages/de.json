@@ -1862,9 +1862,7 @@
       "robotsNoindex": "Diese Seite nicht aufnehmen",
       "inSitemap": "In die Sitemap aufnehmen",
       "canonical": "Kanonische Adresse",
-      "canonicalHelp": "Leer lassen: Die eigene Adresse der Seite ({address}) wird verwendet. Nur setzen, wenn eine andere Adresse denselben Inhalt hat.",
-      "canonicalSeoOnly": "Wird vom SEO-Team gesetzt; leer heißt die eigene Adresse der Seite.",
-      "canonicalInvalid": "Bitte eine vollständige https://-Adresse.",
+      "canonicalHelp": "Wird automatisch aus der Adresse der Seite und dem kanonischen Host (SEO › Indexierung) gebildet und bei Adressänderungen aktualisiert. Sie lässt sich nicht bearbeiten, daher kann niemand sie auf eine andere Adresse umleiten.",
       "structured": "Strukturierte Daten",
       "structuredGenerated": "Die Website schreibt für diese Seite {type} aus ihrem Inhalt. Nichts auszufüllen.",
       "structuredNone": "Für diese Art Seite schreibt die Website keine strukturierten Daten.",
@@ -1932,11 +1930,6 @@
       "emptyFiltered": "Keine Seite entspricht diesen Filtern.",
       "clearFilters": "Filter zurücksetzen",
       "issueFilter": "Probleme",
-      "duplicateHint": {
-        "title": "Gleicher Titel wie {pages}",
-        "address": "Gleiche Adresse wie {pages}",
-        "focus": "Doppeltes Keyword: auch der Fokus von {pages}. Bitte ändern."
-      },
       "moreIssues": "+{count}",
       "moreIssuesLabel": "{count} weitere Probleme für {page} anzeigen",
       "fewerIssues": "Weniger anzeigen"

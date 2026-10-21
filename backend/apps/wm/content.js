@@ -254,7 +254,6 @@ function makeStore(now, { demo = false } = {}) {
       if ("keywords" in seo && !(Array.isArray(seo.keywords) && seo.keywords.length <= 20 && seo.keywords.every((k) => typeof k === "string" && k.trim() && k.length <= 60))) errors[`seo.${l}.keywords`] = "keywords";
       if ("robots" in seo && !["index", "noindex"].includes(seo.robots)) errors[`seo.${l}.robots`] = "required";
       if ("inSitemap" in seo && typeof seo.inSitemap !== "boolean") errors[`seo.${l}.inSitemap`] = "required";
-      if (seo.canonical && !/^https:\/\/[^\s/]+(\/\S*)?$/.test(seo.canonical)) errors[`seo.${l}.canonical`] = "canonical_format";
       if (seo.jsonLd != null && (typeof seo.jsonLd !== "object" || (!Array.isArray(seo.jsonLd) && !seo.jsonLd["@type"]))) errors[`seo.${l}.jsonLd`] = "jsonld_type";
     }
     return errors;
@@ -376,7 +375,13 @@ function makeStore(now, { demo = false } = {}) {
         copyNumbers(next.locales.en, next.locales[l]);
         for (const sec of next.layout ?? []) if (sec.kind === "data" && next.locales[l][sec.key]) copyNeutral(sec.node, next.locales.en[sec.key], next.locales[l][sec.key]);
       }
-    if (patch.seo && patch.locale) next.seo[patch.locale] = { ...(next.seo[patch.locale] ?? {}), ...patch.seo };
+    // The canonical address is always the page's own, built from its address: nobody sets it, and an
+    // older override is dropped the next time the language is saved.
+    if (patch.seo && patch.locale) {
+      const { canonical: _ignored, ...seoPatch } = patch.seo;
+      const { canonical: _old, ...kept } = next.seo[patch.locale] ?? {};
+      next.seo[patch.locale] = { ...kept, ...seoPatch };
+    }
     if (patch.slug && patch.locale) next.slug[patch.locale] = patch.slug;
     if (patch.image) next.image = { ...next.image, ...patch.image };
     if (patch.presentation) next.presentation = { ...(next.presentation ?? {}), ...clone(patch.presentation) };
@@ -396,12 +401,10 @@ function makeStore(now, { demo = false } = {}) {
       const after = JSON.stringify({ ...figures(next.locales.en), mode: next.priceMode });
       if (before !== after) return { status: 403, code: "forbidden", required: "pricing:edit" };
     }
-    // The canonical override is the SEO team's (plan: "automatic, with an SEO-only override"),
-    // and custom structured data needs its own permission.
+    // Custom structured data needs its own permission.
     for (const l of Object.keys(next.seo ?? {})) {
       const was = base.seo?.[l] ?? {};
       const now_ = next.seo[l] ?? {};
-      if ((was.canonical ?? "") !== (now_.canonical ?? "") && !can("seo:edit")) return { status: 403, code: "forbidden", required: "seo:edit" };
       if (!same(was.jsonLd ?? null, now_.jsonLd ?? null) && !can("seo:custom-jsonld")) return { status: 403, code: "forbidden", required: "seo:custom-jsonld" };
     }
     // Approval covers the previous figures. Revoke it before narrative validation.

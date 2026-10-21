@@ -759,3 +759,14 @@ test("roadmap year navigation covers the whole collection and stays stable acros
   assert.deepEqual((await f.call("/admin/entries/roadmapItem")).meta.years, ["2024", "2025", "2026"]);
   assert.equal((await f.call("/admin/entries/page")).meta.years, undefined);
 });
+
+test("the canonical address can't be set: a sent value is dropped, along with an older override", async (t) => {
+  const f = await fixture(t);
+  f.as("wm_seo");
+  const page = await f.call("/admin/entries/page/pg_home");
+  const saved = await f.call("/admin/entries/page/pg_home", "PATCH", { locale: "en", seo: { title: "Home", canonical: "https://elsewhere.test/x" } }, page.data.version);
+  assert.equal(saved.status, 200);
+  const after = await f.call("/admin/entries/page/pg_home");
+  assert.equal(after.data.content.seo.en.title, "Home");
+  assert.equal("canonical" in after.data.content.seo.en, false);
+});
