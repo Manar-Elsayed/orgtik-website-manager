@@ -9,6 +9,7 @@ import { ArrowClockwise, CheckCircle, Circle, Code, Globe, Info, MagnifyingGlass
 import { Badge, Button, Card, Checkbox, Field, Input, Select, Tag, Textarea, cn, toast, useFormatter } from "@orgtik/ui";
 import { mediaUrl } from "@/lib/env";
 import { useEntryName } from "@/lib/entryName";
+import { IssueSpot } from "@/components/seo/IssueSpot";
 import { Link } from "@/i18n/routing";
 import { useSeoConflictsQuery, type Locale, type SeoDuplicateKind, type SeoDuplicates, type SeoPageRef } from "@/store/api";
 
@@ -90,6 +91,13 @@ function DuplicatesNote({ conflicts, lang }: { conflicts: Partial<SeoDuplicates>
   );
 }
 
+// Where each SEO missing issue is fixed in this panel (address and image description are the editor's).
+const FIELD_OF: Record<string, keyof SeoBlock | "text"> = {
+  titleMissing: "title", titleLong: "title", titleDuplicate: "title",
+  descriptionMissing: "description", descriptionShort: "description", descriptionLong: "description", descriptionDuplicate: "description",
+  focusMissing: "focus", focusDuplicate: "focus", keywordsMissing: "keywords", noSocialImage: "ogImage", textDuplicate: "text",
+};
+
 // A focus keyphrase is a short search (2 words); each other keyword stays at 4 words or fewer.
 const FOCUS_WORDS = 2;
 const KEYWORD_WORDS = 4;
@@ -128,6 +136,7 @@ export function SeoPanel({
   errors,
   can,
   onChange,
+  spot,
   fullWidthFields = false,
   entryId,
 }: {
@@ -151,11 +160,22 @@ export function SeoPanel({
   errors: Record<string, string>;
   can: { edit: boolean; jsonLd: boolean };
   onChange: (patch: Partial<SeoBlock>) => void;
+  /** The SEO missing issue the editor was opened from: its field is outlined until it is edited. */
+  spot?: string;
   fullWidthFields?: boolean;
   /** This page, so duplicate warnings can leave it out. */
   entryId?: string;
 }) {
   const t = useTranslations("Seo.block");
+  const ts = useTranslations("Seo");
+  const [spotIssue, setSpotIssue] = useState(spot && FIELD_OF[spot] ? spot : undefined);
+  const spotField = spotIssue ? FIELD_OF[spotIssue] : undefined;
+  const spotLabel = spotIssue ? t("fixHere", { issue: ts(`checks.${spotIssue}`) }) : "";
+  // Editing the outlined field means it is being fixed: the outline goes.
+  const edit = (patch: Partial<SeoBlock>) => {
+    if (spotField && spotField in patch) setSpotIssue(undefined);
+    onChange(patch);
+  };
   const title = seo.title ?? "";
   const description = seo.description ?? "";
   const shownTitle = title || english.title || "";
@@ -235,14 +255,16 @@ export function SeoPanel({
   const addKeyword = () => {
     const k = keyword.trim();
     if (!k || keywords.some((x) => x.toLowerCase() === k.toLowerCase())) return setKeyword("");
-    onChange({ keywords: [...keywords, k] });
+    edit({ keywords: [...keywords, k] });
     setKeyword("");
   };
 
   return (
     <div className={fullWidthFields ? "grid min-w-0 gap-4" : "grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)]"}>
       <div className="flex min-w-0 flex-col gap-4">
-        <DuplicatesNote conflicts={current} lang={lang} />
+        <IssueSpot active={spotField === "text"} label={spotLabel}>
+          <DuplicatesNote conflicts={current} lang={lang} />
+        </IssueSpot>
         {addressCard}
         <Section icon={<MagnifyingGlass />} title={t("search")}>
           {/* The result as a search engine shows it: address, title and description, cut where they'd be cut.
@@ -259,29 +281,36 @@ export function SeoPanel({
             </p>
           </div>
           <DuplicateHint pages={current?.address} message={(pages) => t("addressUsedOn", { pages })} />
+          <IssueSpot active={spotField === "title"} label={spotLabel}>
           <Field label={t("title")} description={t("pixels", { used: titlePx, max: TITLE_PX })} error={tooLong("title")}>
-            <Input dir="auto" lang={lang} readOnly={!can.edit} value={title} placeholder={lang === "en" ? undefined : english.title} onChange={(e) => onChange({ title: e.target.value })} />
+            <Input dir="auto" lang={lang} readOnly={!can.edit} value={title} placeholder={lang === "en" ? undefined : english.title} onChange={(e) => edit({ title: e.target.value })} />
           </Field>
+          </IssueSpot>
           <DuplicateHint pages={current?.title} message={(pages) => t("titleUsedOn", { pages })} />
+          <IssueSpot active={spotField === "description"} label={spotLabel}>
           <Field label={t("description")} description={t("descriptionHelp", { count: description.length, used: descriptionPx, max: DESCRIPTION_PX })} error={tooLong("description")}>
-            <Textarea dir="auto" lang={lang} rows={3} readOnly={!can.edit} value={description} placeholder={lang === "en" ? undefined : english.description} onChange={(e) => onChange({ description: e.target.value })} />
+            <Textarea dir="auto" lang={lang} rows={3} readOnly={!can.edit} value={description} placeholder={lang === "en" ? undefined : english.description} onChange={(e) => edit({ description: e.target.value })} />
           </Field>
+          </IssueSpot>
           <DuplicateHint pages={current?.description} message={(pages) => t("descriptionUsedOn", { pages })} />
         </Section>
 
         <Section icon={<Info />} title={t("keywords")}>
+          <IssueSpot active={spotField === "focus"} label={spotLabel}>
           <Field label={t("focus")} description={t.rich("focusHelp", { b: strong, max: FOCUS_WORDS })} error={tooLong("focus")}>
-            <Input dir="auto" lang={lang} readOnly={!can.edit} value={focus} onChange={(e) => onChange({ focus: e.target.value })} />
+            <Input dir="auto" lang={lang} readOnly={!can.edit} value={focus} onChange={(e) => edit({ focus: e.target.value })} />
           </Field>
+          </IssueSpot>
           {wordsIn(focus) > FOCUS_WORDS ? <WarningNote>{t("focusTooManyWords", { count: wordsIn(focus), max: FOCUS_WORDS })}</WarningNote> : null}
           <DuplicateHint pages={current?.focus} message={(pages) => t("focusUsedOn", { pages })} />
+          <IssueSpot active={spotField === "keywords"} label={spotLabel}>
           <Field label={t("keywordList")} description={t.rich("keywordListHelp", { b: strong, max: KEYWORD_WORDS })} error={err("keywords") ? t("keywordsInvalid") : undefined}>
             <div className="flex flex-col gap-2">
               {keywords.length ? (
                 <ul className="flex flex-wrap gap-1.5">
                   {keywords.map((k) => (
                     <li key={k}>
-                      <Tag className={wordsIn(k) > KEYWORD_WORDS ? "border-warning text-warning" : undefined} onRemove={can.edit ? () => onChange({ keywords: keywords.filter((x) => x !== k) }) : undefined}>
+                      <Tag className={wordsIn(k) > KEYWORD_WORDS ? "border-warning text-warning" : undefined} onRemove={can.edit ? () => edit({ keywords: keywords.filter((x) => x !== k) }) : undefined}>
                         <bdi>{k}</bdi>
                       </Tag>
                     </li>
@@ -306,6 +335,7 @@ export function SeoPanel({
               ) : null}
             </div>
           </Field>
+          </IssueSpot>
           {/* While typing, then for any keyword already added that runs long (marked in the list above). */}
           {wordsIn(keyword) > KEYWORD_WORDS ? <WarningNote>{t("keywordTooManyWords", { count: wordsIn(keyword), max: KEYWORD_WORDS })}</WarningNote> : null}
           {keywords.some((k) => wordsIn(k) > KEYWORD_WORDS) ? (
@@ -315,14 +345,16 @@ export function SeoPanel({
 
         <Section icon={<ShareNetwork />} title={t("social")}>
           <Field label={t("ogTitle")} description={t("ogFallback")} error={tooLong("ogTitle")}>
-            <Input dir="auto" lang={lang} readOnly={!can.edit} value={seo.ogTitle ?? ""} placeholder={shownTitle} onChange={(e) => onChange({ ogTitle: e.target.value })} />
+            <Input dir="auto" lang={lang} readOnly={!can.edit} value={seo.ogTitle ?? ""} placeholder={shownTitle} onChange={(e) => edit({ ogTitle: e.target.value })} />
           </Field>
           <Field label={t("ogDescription")} description={t("ogFallback")} error={tooLong("ogDescription")}>
-            <Textarea dir="auto" lang={lang} rows={2} readOnly={!can.edit} value={seo.ogDescription ?? ""} placeholder={shownDescription} onChange={(e) => onChange({ ogDescription: e.target.value })} />
+            <Textarea dir="auto" lang={lang} rows={2} readOnly={!can.edit} value={seo.ogDescription ?? ""} placeholder={shownDescription} onChange={(e) => edit({ ogDescription: e.target.value })} />
           </Field>
+          <IssueSpot active={spotField === "ogImage"} label={spotLabel}>
           <Field label={t("ogImage")} description={t("ogImageHelp")}>
-            <Select readOnly={!can.edit} value={seo.ogImage || "default"} onValueChange={(v) => onChange({ ogImage: !v || v === "default" ? "" : v })} options={[{ value: "default", label: t("ogImageDefault") }, ...images.map((i) => ({ value: i.value, label: <span dir="ltr">{i.label}</span> }))]} />
+            <Select readOnly={!can.edit} value={seo.ogImage || "default"} onValueChange={(v) => edit({ ogImage: !v || v === "default" ? "" : v })} options={[{ value: "default", label: t("ogImageDefault") }, ...images.map((i) => ({ value: i.value, label: <span dir="ltr">{i.label}</span> }))]} />
           </Field>
+          </IssueSpot>
         </Section>
 
         {/* Beside two columns, the preview sits under the fields it shows; the side column keeps the sticky checks. */}
@@ -337,7 +369,7 @@ export function SeoPanel({
               <Select
                 readOnly={!can.edit}
                 value={seo.robots ?? "index"}
-                onValueChange={(v) => onChange({ robots: v as "index" | "noindex" })}
+                onValueChange={(v) => edit({ robots: v as "index" | "noindex" })}
                 options={[
                   { value: "index", label: t("robotsIndex") },
                   { value: "noindex", label: t("robotsNoindex") },
@@ -345,7 +377,7 @@ export function SeoPanel({
               />
             </Field>
             <div className="flex items-end pb-2">
-              <Checkbox disabled={!can.edit} checked={seo.inSitemap !== false} onCheckedChange={(v: boolean) => onChange({ inSitemap: v })} label={t("inSitemap")} />
+              <Checkbox disabled={!can.edit} checked={seo.inSitemap !== false} onCheckedChange={(v: boolean) => edit({ inSitemap: v })} label={t("inSitemap")} />
             </div>
           </div>
           {/* Always the page's own address: set automatically, never typed in. */}
@@ -373,10 +405,10 @@ export function SeoPanel({
                 setJson(v);
                 if (!v.trim()) {
                   setJsonError(false);
-                  return onChange({ jsonLd: null });
+                  return edit({ jsonLd: null });
                 }
                 try {
-                  onChange({ jsonLd: JSON.parse(v) });
+                  edit({ jsonLd: JSON.parse(v) });
                   setJsonError(false);
                 } catch {
                   setJsonError(true);

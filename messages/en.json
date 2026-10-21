@@ -1909,7 +1909,9 @@
         "focus": "Same focus keyphrase as:",
         "address": "Same address as:",
         "text": "Duplicated text, also on:"
-      }
+      },
+      "fixHere": "Fix here: {issue}",
+      "fixAfterStart": "{issue}: start this translation, then add the image description"
     },
     "fromArchive": "Archived content",
     "showAllPages": "Show all pages",

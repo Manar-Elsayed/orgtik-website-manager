@@ -1909,7 +1909,9 @@
         "focus": "Gleiche Fokus-Keyphrase wie:",
         "address": "Gleiche Adresse wie:",
         "text": "Doppelter Text, auch auf:"
-      }
+      },
+      "fixHere": "Hier beheben: {issue}",
+      "fixAfterStart": "{issue}: Übersetzung beginnen, dann die Bildbeschreibung ergänzen"
     },
     "fromArchive": "Archivierter Inhalt",
     "showAllPages": "Alle Seiten anzeigen",

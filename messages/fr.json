@@ -1909,7 +1909,9 @@
         "focus": "Même expression clé que :",
         "address": "Même adresse que :",
         "text": "Texte dupliqué, aussi sur :"
-      }
+      },
+      "fixHere": "À corriger ici : {issue}",
+      "fixAfterStart": "{issue} : commencez cette traduction, puis ajoutez la description de l’image"
     },
     "fromArchive": "Contenu archivé",
     "showAllPages": "Afficher toutes les pages",
