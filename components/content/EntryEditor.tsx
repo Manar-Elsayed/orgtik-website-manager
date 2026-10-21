@@ -92,6 +92,7 @@ import { useEntryName } from "@/lib/entryName";
 import { useCan } from "@/lib/permissions";
 import { safeReturn } from "@/lib/useListState";
 import { WEBSITE_URL } from "@/lib/env";
+import { IssueSpot } from "@/components/seo/IssueSpot";
 import {
   api,
   statusOf,
@@ -173,6 +174,9 @@ function Editor({ entry, type, seoOnly = false }: { entry: Entry; type: ContentT
   const sections: EditorSection[] = seoOnly ? [] : [...type.sections(entry), ...Object.keys(references).map(value => ({ value, path: "", label: ti(value), node: { kind: "group" as const, fields: {} } })), ...(SHARED_PAGES[entry.id] ? [{ value: "shared-copy", path: "", label: ti("sharedCopy"), node: { kind: "group" as const, fields: {} } }] : [])];
   // ?lang=ar opens the editor in that language (from the localization matrix).
   const asked = useSearchParams().get("lang") as Locale | null;
+  const spotIssue = params.get("issue") ?? undefined;
+  const ts = useTranslations("Seo.block"), tc = useTranslations("Seo");
+  const spotLabel = spotIssue ? ts("fixHere", { issue: tc(`checks.${spotIssue}`) }) : "";
   const [lang, setLang] = useState<Locale>(
     asked && (contentLocales.includes(asked) || ["es","pt","nl"].includes(asked)) ? asked : "en",
   );
@@ -779,6 +783,7 @@ function Editor({ entry, type, seoOnly = false }: { entry: Entry; type: ContentT
         {errors["image.src"] ? <p role="alert" className="text-body-sm text-danger">{t("errorRequired")}</p> : null}
         <div className={ctx.fullWidthFields ? "grid min-w-0 items-start gap-4" : "grid min-w-0 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,0.65fr)]"}>
           <div className="min-w-0">{sharedImagePlacement ? <div className="mb-2 flex flex-col gap-1"><h4 className="text-label text-fg">{sharedImagePlacement.label}</h4>{sharedImagePlacement.hint ? <p className="text-body-sm text-fg-muted">{sharedImagePlacement.hint}</p> : null}</div> : null}<MediaPicker imagesOnly alwaysOpen={type.key === "caseStudy"} value={imageSrc ?? entry.content.image.src} onChange={(src, media) => { setImageSrc(src); setImageFocal(media?.focal); if (media?.alt) setAltEdits(media.alt); }} disabled={!editable || lang !== "en"} /></div>
+          <IssueSpot active={spotIssue === "imageNoAlt" && lang === asked && !alt[lang]} label={spotLabel}>
           <Field
             {...sharedField("image.alt", t("altText"), alt[lang] ? t("altHelp") : t("altMissing"))}
             className="min-w-0 flex-1"
@@ -794,6 +799,7 @@ function Editor({ entry, type, seoOnly = false }: { entry: Entry; type: ContentT
               }
             />
           </Field>
+          </IssueSpot>
         </div>
         </>
       ) : null}
@@ -1007,6 +1013,8 @@ function Editor({ entry, type, seoOnly = false }: { entry: Entry; type: ContentT
       ) : null}
 
       {!tree && !seoOnly ? (
+        // Opened from an issue in a language not started yet: the field appears once it is started.
+        <IssueSpot active={spotIssue === "imageNoAlt" && lang === asked} label={spotIssue === "imageNoAlt" ? ts("fixAfterStart", { issue: tc("checks.imageNoAlt") }) : ""}>
         <EmptyState
           size="compact"
           icon={<Translate />}
@@ -1022,6 +1030,7 @@ function Editor({ entry, type, seoOnly = false }: { entry: Entry; type: ContentT
             ) : undefined
           }
         />
+        </IssueSpot>
       ) : (
         <Tabs
           value={section}
@@ -1094,6 +1103,7 @@ function Editor({ entry, type, seoOnly = false }: { entry: Entry; type: ContentT
               <TabsPanel value="seo"><PagePlacementHint pageId={entry.id} section="seo" />
                 <SeoPanel
                   key={lang}
+                  spot={lang === asked ? spotIssue : undefined}
                   addressCard={
                     <div className="grid min-w-0 gap-4 rounded-card border border-line bg-raised p-4 sm:p-5">
                       {/* The SEO editor looks the same for every type; in the content editor a page's SEO tab names itself. */}
@@ -1101,7 +1111,7 @@ function Editor({ entry, type, seoOnly = false }: { entry: Entry; type: ContentT
                         <h3 className="min-w-0 text-title-sm font-semibold text-fg">{t("tabs.seo")}</h3>
                         <SectionPreviewLink href={previewHref("seo") ?? "/preview"} label={`${tp("button")} · ${t("tabs.seo")}`} iconOnly />
                       </div> : null}
-                      {(
+                      <IssueSpot active={spotIssue === "addressDuplicate" && lang === asked} label={spotLabel}>
                         <Field
                           label={t("slug")}
                           description={
@@ -1135,7 +1145,7 @@ function Editor({ entry, type, seoOnly = false }: { entry: Entry; type: ContentT
                             onChange={(e) => setSlugEdit(e.target.value)}
                           />
                         </Field>
-                      )}
+                      </IssueSpot>
                     </div>
                   }
                   entryId={entry.id}

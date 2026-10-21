@@ -58,7 +58,8 @@ function Missing() {
       const langs = issue ? langsFor(r).filter((l) => r.byLanguage?.[l]?.includes(issue)) : langsFor(r);
       return langs.includes(lang as Locale) ? lang : langs[0] ?? r.locale;
     };
-    const fixHref = (r: SeoMissingRow, issue?: SeoIssue) => (issue === "imageNoAlt" ? `/content/${TYPES[r.type].area}/${r.id}?lang=${openIn(r, issue)}&returnTo=${returnTo}` : `/seo/content/${r.id}?lang=${openIn(r, issue)}&returnTo=${returnTo}`);
+    // The issue rides along, so the editor outlines the field to fix.
+    const fixHref = (r: SeoMissingRow, issue?: SeoIssue) => `${issue === "imageNoAlt" ? `/content/${TYPES[r.type].area}` : "/seo/content"}/${r.id}?lang=${openIn(r, issue)}${issue ? `&issue=${issue}` : ""}&returnTo=${returnTo}`;
     const columns: ColumnDef<SeoMissingRow, unknown>[] = [
       {
         id: "page",
