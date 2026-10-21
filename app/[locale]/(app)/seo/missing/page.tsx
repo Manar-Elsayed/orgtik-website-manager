@@ -15,8 +15,6 @@ import { statusOf, useSeoMissingQuery, type Locale, type SeoDuplicateKind, type 
 // In the SEO editor's order, then the image (fixed in the content editor).
 const SEARCH_ISSUES: SeoIssue[] = ["titleMissing", "titleLong", "titleDuplicate", "descriptionMissing", "descriptionShort", "descriptionLong", "descriptionDuplicate", "addressDuplicate"];
 const ALL_ISSUES: SeoIssue[] = [...SEARCH_ISSUES, "focusMissing", "focusDuplicate", "keywordsMissing", "noSocialImage", "imageNoAlt"];
-// Issues shown in the warning tone: the search result ones and every duplicate.
-const WARNING_ISSUES: SeoIssue[] = [...SEARCH_ISSUES, "focusDuplicate"];
 // A duplicate issue opens a note naming the other pages and what they share.
 const DUPLICATE_OF: Partial<Record<SeoIssue, SeoDuplicateKind>> = { titleDuplicate: "title", descriptionDuplicate: "description", addressDuplicate: "address", focusDuplicate: "focus" };
 // Pages named in a note before the rest are counted.
@@ -94,7 +92,7 @@ function Missing() {
               </button>
             ) : (
               <Link key={issue} href={fixHref(row.original, issue)} aria-label={tm("fixIn", { issue: t(`checks.${issue}`), page: entryName(row.original) })} className="rounded-pill focus-visible:outline-2 focus-visible:outline-focus">
-                <Badge size="sm" tone={WARNING_ISSUES.includes(issue) ? "warning" : "neutral"} className="hover:underline">{t(`checks.${issue}`)}</Badge>
+                <Badge size="sm" tone="warning" className="hover:underline">{t(`checks.${issue}`)}</Badge>
               </Link>
             ))}
             {more > 0 ? (
