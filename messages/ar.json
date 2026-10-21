@@ -2274,7 +2274,8 @@
       "hostSaved": "تم حفظ المضيف الأساسي. انشر الموقع لتطبيقه.",
       "hostInvalid": "استخدم عنوان https:// بدون مسار، مثل https://orgtik.ch.",
       "showPassed": "إظهار الفحوص الناجحة ({count})",
-      "hidePassed": "إخفاء الفحوص الناجحة"
+      "hidePassed": "إخفاء الفحوص الناجحة",
+      "policyPublic": "عام"
     }
   },
   "Site": {

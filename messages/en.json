@@ -2274,7 +2274,8 @@
       "hostSaved": "Canonical host saved. Publish the website to apply it.",
       "hostInvalid": "Use an https:// address with no path, e.g. https://orgtik.ch.",
       "showPassed": "Show {count} passed checks",
-      "hidePassed": "Hide passed checks"
+      "hidePassed": "Hide passed checks",
+      "policyPublic": "Public"
     }
   },
   "Site": {

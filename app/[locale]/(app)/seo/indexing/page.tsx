@@ -227,13 +227,13 @@ function SitemapSection({ data }: { data: Indexing }) {
           );
         },
       },
-      { id: "own", header: tx("colOwnPolicy"), meta: { width: "1%" }, cell: ({ row }) => <Badge size="sm" tone={row.original.pagePolicy === "index" ? "success" : "neutral"}>{row.original.pagePolicy}</Badge> },
+      { id: "own", header: tx("colOwnPolicy"), meta: { width: "1%" }, cell: ({ row }) => <Badge size="sm" tone={row.original.pagePolicy === "index" ? "success" : "neutral"}>{row.original.pagePolicy === "index" ? tx("policyPublic") : "noindex"}</Badge> },
       {
         id: "effective",
         header: tx("colEffective"),
         cell: ({ row }) => (
           <span className="flex flex-col gap-0.5">
-            <Badge size="sm" tone={row.original.policy === "index" ? "success" : "warning"} className="w-fit">{row.original.policy}</Badge>
+            <Badge size="sm" tone={row.original.policy === "index" ? "success" : "warning"} className="w-fit">{row.original.policy === "index" ? tx("policyPublic") : "noindex"}</Badge>
             <span className="text-caption text-fg-muted">{ti(row.original.reason)}</span>
           </span>
         ),
@@ -243,12 +243,11 @@ function SitemapSection({ data }: { data: Indexing }) {
     ],
     [t, tx, tt, ti, f, url.href],
   );
-  const search = url.get("search").toLowerCase(), type = url.get("type"), policy = url.get("policy"), sitemap = url.get("sitemap"), warning = url.get("warning");
+  const search = url.get("search").toLowerCase(), policy = url.get("policy"), sitemap = url.get("sitemap"), warning = url.get("warning");
   const rows = useMemo(
-    () => data.urls.filter((r) => (!search || `${r.name} ${r.loc}`.toLowerCase().includes(search)) && (!type || r.type === type) && (!policy || r.policy === policy) && (!sitemap || (sitemap === "listed") === r.inSitemap) && (!warning || (warning === "any" ? r.warnings.length > 0 : r.warnings.includes(warning as IndexingUrl["warnings"][number])))),
-    [data.urls, search, type, policy, sitemap, warning],
+    () => data.urls.filter((r) => (!search || `${r.name} ${r.loc}`.toLowerCase().includes(search)) && (!policy || r.policy === policy) && (!sitemap || (sitemap === "listed") === r.inSitemap) && (!warning || (warning === "any" ? r.warnings.length > 0 : r.warnings.includes(warning as IndexingUrl["warnings"][number])))),
+    [data.urls, search, policy, sitemap, warning],
   );
-  const types = [...new Set(data.urls.map((r) => r.type))];
   const file = live.data?.sitemap;
   const hidden = data.settings.visibility === "noindex";
   return (
@@ -278,8 +277,7 @@ function SitemapSection({ data }: { data: Indexing }) {
       </Card>
       <div className="wm-table-filters">
         <Input size="sm" aria-label={tx("searchLabel")} placeholder={tx("searchLabel")} value={url.get("search")} onChange={(e) => url.set({ search: e.target.value })} className="wm-search" />
-        <Select size="sm" label={ti("type")} value={url.get("type", "all")} onValueChange={(type) => url.set({ type })} options={[{ value: "all", label: ti("all") }, ...types.map((value) => ({ value, label: tt(`${value}.many`) }))]} />
-        <Select size="sm" label={tx("colEffective")} value={url.get("policy", "all")} onValueChange={(policy) => url.set({ policy })} options={[{ value: "all", label: ti("all") }, { value: "index", label: "index" }, { value: "noindex", label: "noindex" }]} />
+        <Select size="sm" label={ti("indexing")} value={url.get("policy", "all")} onValueChange={(policy) => url.set({ policy })} options={[{ value: "all", label: ti("all") }, { value: "index", label: tx("policyPublic") }, { value: "noindex", label: "noindex" }]} />
         <Select size="sm" label={ti("sitemap")} value={url.get("sitemap", "all")} onValueChange={(sitemap) => url.set({ sitemap })} options={[{ value: "all", label: ti("all") }, { value: "listed", label: tx("listed") }, { value: "not", label: tx("notListed") }]} />
         <Select size="sm" label={tx("warningsFilter")} value={url.get("warning", "all")} onValueChange={(warning) => url.set({ warning })} options={[{ value: "all", label: ti("all") }, { value: "any", label: tx("anyWarning") }, { value: "noindexInSitemap", label: tx("warning.noindexInSitemap") }, { value: "canonicalElsewhere", label: tx("warning.canonicalElsewhere") }]} />
       </div>
