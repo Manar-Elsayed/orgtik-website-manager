@@ -30,7 +30,8 @@ function ValidationCard({ data }: { data: Indexing }) {
   const f = useFormatter();
   const [validate, validating] = useValidateIndexingMutation();
   const v = data.lastValidation;
-  const run = () => validate().unwrap().then((r) => toast.success(t("validated", { fail: r.summary.fail, warn: r.summary.warn }))).catch(() => toast.error(t("validateFailed")));
+  const [showPassed, setShowPassed] = useState(false);
+  const run =() => validate().unwrap().then((r) => toast.success(t("validated", { fail: r.summary.fail, warn: r.summary.warn }))).catch(() => toast.error(t("validateFailed")));
   return (
     <Card className="flex flex-col gap-3">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -48,8 +49,9 @@ function ValidationCard({ data }: { data: Indexing }) {
             {v.summary.warn ? <Badge size="sm" tone="warning">{t("summary.warn", { count: v.summary.warn })}</Badge> : null}
             {v.summary.fail ? <Badge size="sm" tone="danger">{t("summary.fail", { count: v.summary.fail })}</Badge> : null}
           </p>
+          {/* What needs attention first; the passed checks fold away until asked for. */}
           <ul className="flex flex-col divide-y divide-line">
-            {v.checks.map((c) => {
+            {(showPassed ? [...v.checks].sort((a, b) => Number(a.level === "pass") - Number(b.level === "pass")) : v.checks.filter((c) => c.level !== "pass")).map((c) => {
               const Icon = LEVEL_ICON[c.level];
               return (
                 <li key={c.id} className="flex flex-wrap items-start justify-between gap-2 py-2 text-body-sm">
@@ -65,6 +67,11 @@ function ValidationCard({ data }: { data: Indexing }) {
               );
             })}
           </ul>
+          {v.summary.pass ? (
+            <Button size="sm" variant="ghost" className="self-start" aria-expanded={showPassed} onClick={() => setShowPassed((value) => !value)}>
+              {showPassed ? t("hidePassed") : t("showPassed", { count: v.summary.pass })}
+            </Button>
+          ) : null}
         </>
       ) : (
         <p className="text-body-sm text-fg-muted">{t("notValidated")}</p>
@@ -201,23 +208,11 @@ function SitemapSection({ data }: { data: Indexing }) {
           <span className="flex min-w-0 flex-col">
             <Link href={`/seo/content/${row.original.id}?lang=${row.original.locale}&field=robots&returnTo=${encodeURIComponent(url.href)}`} dir="auto" className="truncate font-semibold text-fg hover:underline focus-visible:outline-2 focus-visible:outline-focus">{row.original.name}</Link>
             <span dir="ltr" className="truncate text-start font-mono text-caption text-fg-subtle">{row.original.loc.replace(/^https?:\/\/[^/]+/, "") || "/"}</span>
+            <span className="text-caption text-fg-subtle">{tt(`${row.original.type}.one`)} · <span dir="ltr">{row.original.locale.toUpperCase()}</span></span>
           </span>
         ),
       },
-      { id: "type", header: t("colType"), meta: { width: "1%" }, cell: ({ row }) => <span className="whitespace-nowrap text-fg-muted">{tt(`${row.original.type}.one`)}</span> },
-      { id: "lang", header: t("missing.colLanguage"), meta: { width: "1%" }, cell: ({ row }) => <span dir="ltr" className="font-mono text-caption text-fg-muted">{row.original.locale.toUpperCase()}</span> },
-      { id: "own", header: tx("colOwnPolicy"), meta: { width: "1%" }, cell: ({ row }) => <Badge size="sm" tone={row.original.pagePolicy === "index" ? "success" : "neutral"}>{row.original.pagePolicy}</Badge> },
-      {
-        id: "effective",
-        header: tx("colEffective"),
-        cell: ({ row }) => (
-          <span className="flex flex-col gap-0.5">
-            <Badge size="sm" tone={row.original.policy === "index" ? "success" : "warning"} className="w-fit">{row.original.policy}</Badge>
-            <span className="text-caption text-fg-muted">{ti(row.original.reason)}</span>
-          </span>
-        ),
-      },
-      { id: "canonical", header: ti("canonical"), cell: ({ row }) => (row.original.canonicalSelf ? <span className="text-fg-muted">{tx("canonicalSelf")}</span> : <span dir="ltr" className="break-all text-body-sm text-warning">{row.original.canonical}</span>) },
+      // Whether it is in the sitemap (and why not) sits next to the page, then the policies behind it.
       {
         id: "sitemap",
         header: ti("sitemap"),
@@ -232,6 +227,18 @@ function SitemapSection({ data }: { data: Indexing }) {
           );
         },
       },
+      { id: "own", header: tx("colOwnPolicy"), meta: { width: "1%" }, cell: ({ row }) => <Badge size="sm" tone={row.original.pagePolicy === "index" ? "success" : "neutral"}>{row.original.pagePolicy}</Badge> },
+      {
+        id: "effective",
+        header: tx("colEffective"),
+        cell: ({ row }) => (
+          <span className="flex flex-col gap-0.5">
+            <Badge size="sm" tone={row.original.policy === "index" ? "success" : "warning"} className="w-fit">{row.original.policy}</Badge>
+            <span className="text-caption text-fg-muted">{ti(row.original.reason)}</span>
+          </span>
+        ),
+      },
+      { id: "canonical", header: ti("canonical"), cell: ({ row }) => (row.original.canonicalSelf ? <span className="text-fg-muted">{tx("canonicalSelf")}</span> : <span dir="ltr" className="break-all text-body-sm text-warning">{row.original.canonical}</span>) },
       { id: "lastmod", header: t("colLastmod"), meta: { numeric: true, width: "1%" }, cell: ({ row }) => <span className="whitespace-nowrap text-fg-muted">{row.original.lastmod ? f.date(row.original.lastmod, { dateStyle: "medium", timeStyle: "short" }) : "–"}</span> },
     ],
     [t, tx, tt, ti, f, url.href],

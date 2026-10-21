@@ -257,7 +257,7 @@
     "noMatchBody": "Try another search or filter.",
     "notFound": "This entry doesn’t exist",
     "back": "Back to {area}",
-    "slugHelp": "orgtik.ch{path}",
+    "slugHelp": "{host}{path}",
     "shared": "Shared by every language",
     "sharedNote": "Set in English; every language uses the same.",
     "iconHelp": "The Phosphor icon the website shows, e.g. ph-palette.",
@@ -2005,7 +2005,8 @@
         "description": "Same description as",
         "address": "Same address as",
         "focus": "Same focus keyphrase as"
-      }
+      },
+      "andMore": "and {count} more"
     },
     "live": {
       "title": "Live website",
@@ -2206,8 +2207,8 @@
           "warn": "Canonicals use {host}, but the site is served from {served}. Fine before a domain move; otherwise change the canonical host."
         }
       },
-      "hiddenBody": "Every page asks search engines not to index it, until the content is approved. {own} pages are set to index on their own and would become indexable if this is switched on; right now {indexable} are.",
-      "visibleBody": "Search engines may index the site. {indexable} addresses are indexable; pages set to noindex stay out.",
+      "hiddenBody": "Every page asks search engines not to index it, until the content is approved. {own, plural, one {# page is set to index on its own and would become} other {# pages are set to index on their own and would become}} indexable if this is switched on; right now {indexable, plural, one {# is} other {# are}}.",
+      "visibleBody": "Search engines may index the site. {indexable, plural, one {# address is} other {# addresses are}} indexable; pages set to noindex stay out.",
       "overrideExplained": "While the site is hidden, it overrides every page: a page set to index is still sent noindex. Once it’s visible, each page’s own setting applies.",
       "notIndexedYet": "Allowing indexing doesn’t mean Google has indexed a page. Check that in Google Search Console.",
       "notRemovedAtOnce": "Hiding the site doesn’t remove pages from results at once: search engines drop them as they crawl again.",
@@ -2322,7 +2323,9 @@
       "hostConfirmTitle": "Change the canonical host?",
       "hostConfirmImpact": "Every canonical, hreflang and sitemap address will use {host} once the website is published. Search engines treat that host as the original.",
       "hostSaved": "Canonical host saved. Publish the website to apply it.",
-      "hostInvalid": "Use an https:// address with no path, e.g. https://orgtik.ch."
+      "hostInvalid": "Use an https:// address with no path, e.g. https://orgtik.ch.",
+      "showPassed": "Show {count} passed checks",
+      "hidePassed": "Hide passed checks"
     }
   },
   "Site": {

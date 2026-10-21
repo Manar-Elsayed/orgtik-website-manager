@@ -22,6 +22,8 @@ const NATIVE: Record<Locale, string> = { en: "English", ar: "العربية", de
 // Every check, in the order the issue filter lists them.
 const CHECKS: SeoCheck[] = ["titleMissing", "titleShort", "titleLong", "titleDuplicate", "descriptionMissing", "descriptionShort", "descriptionLong", "descriptionDuplicate", "addressDuplicate", "focusDuplicate", "noSocialImage", "socialImageDefault", "imageNoAlt", "canonicalHost", "canonicalUnreachable", "canonicalOther", "canonicalSitemap", "schemaInvalid"];
 const PAGE_SIZES = [10, 25, 50];
+// What needs fixing sits next to the page name, so it stays in view when the table scrolls.
+const COLUMN_ORDER = ["page", "issues", "type", "lang", "title", "description", "preview"];
 const LIST = "seo-health-list";
 
 // What a search result and a shared link need, page by page and language by language: a
@@ -56,6 +58,9 @@ function Health() {
   };
 
   const columns = useMemo<ColumnDef<SeoRow, any>[]>(() => {
+    const all = buildColumns();
+    return COLUMN_ORDER.map((id) => all.find((column) => column.id === id)!);
+    function buildColumns(): ColumnDef<SeoRow, any>[] {
     const returnTo = encodeURIComponent(url.href);
     const fixHref = (r: SeoRow, issue?: SeoCheck) => {
       if (issue === "imageNoAlt") return `/content/${TYPES[r.type].area}/${r.id}?lang=${r.locale}&returnTo=${returnTo}`;
@@ -111,14 +116,16 @@ function Health() {
                 const kind = DUPLICATE_OF[issue], others = kind ? r.duplicates?.[kind] : undefined;
                 if (others?.length)
                   return (
-                    <span key={`${issue}-hint`} className="text-caption text-warning">
+                    // Three pages by name, then how many more, so a widely shared text stays one short line.
+                    <span key={`${issue}-hint`} className="max-w-md whitespace-normal break-words text-caption text-warning">
                       {th(`duplicateWith.${kind}`)}{" "}
-                      {others.map((o, i) => (
+                      {others.slice(0, 3).map((o, i) => (
                         <span key={o.id}>
                           {i ? ", " : null}
                           <Link href={`/seo/content/${o.id}?lang=${r.locale}&field=${fieldOf(issue) ?? "title"}&returnTo=${returnTo}`} dir="auto" className="underline hover:no-underline focus-visible:outline-2 focus-visible:outline-focus">{entryName(o)}</Link>
                         </span>
                       ))}
+                      {others.length > 3 ? ` ${th("andMore", { count: others.length - 3 })}` : null}
                     </span>
                   );
                 const why = issue.startsWith("canonical") || issue === "schemaInvalid" ? detail(r, issue) : null;
@@ -139,6 +146,7 @@ function Health() {
         ),
       },
     ];
+    }
   }, [t, th, tm, tt, f, entryName, url.href]);
 
   // Only switched-on languages are checked; say so rather than claim another one is fine.
@@ -166,7 +174,7 @@ function Health() {
           : th("notRunYet")}
       </p>
       {data ? (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           <SeoCountCard label={t("checked")} count={data.checked} active={check === "all"} hint={t("showAllPages")} onSelect={() => { url.set({ issue: "all" }); revealList(LIST); }} />
           {card("none", t("healthy"), data.healthy)}
           {MAIN_CHECKS.map((issue) => card(issue, th(`cards.${issue}`), data.counts[issue] ?? 0))}

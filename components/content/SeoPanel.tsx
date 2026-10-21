@@ -135,7 +135,11 @@ export function SeoPanel({
     el?.focus({ preventScroll: true });
   };
   useEffect(() => {
-    if (asked) requestAnimationFrame(() => focusField(asked));
+    if (!asked) return;
+    // Again once the editor above has finished laying out, so the field ends up in view.
+    requestAnimationFrame(() => focusField(asked));
+    const settle = setTimeout(() => focusField(asked), 700);
+    return () => clearTimeout(settle);
     // Only on arrival: later edits keep the person where they are.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [asked, lang]);

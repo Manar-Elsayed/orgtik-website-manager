@@ -257,7 +257,7 @@
     "noMatchBody": "Versuchen Sie eine andere Suche oder einen anderen Filter.",
     "notFound": "Diesen Eintrag gibt es nicht",
     "back": "Zurück zu {area}",
-    "slugHelp": "orgtik.ch{path}",
+    "slugHelp": "{host}{path}",
     "shared": "Für alle Sprachen gleich",
     "sharedNote": "Wird auf Englisch festgelegt und gilt für alle Sprachen.",
     "iconHelp": "Das Phosphor-Symbol, das die Website zeigt, z. B. ph-palette.",
@@ -2005,7 +2005,8 @@
         "description": "Gleiche Beschreibung wie",
         "address": "Gleiche Adresse wie",
         "focus": "Gleiche Fokus-Keyphrase wie"
-      }
+      },
+      "andMore": "und {count} weitere"
     },
     "live": {
       "title": "Live-Website",
@@ -2206,8 +2207,8 @@
           "warn": "Canonicals nutzen {host}, die Website wird aber von {served} ausgeliefert. Vor einem Domainwechsel in Ordnung; sonst den Canonical-Host ändern."
         }
       },
-      "hiddenBody": "Jede Seite bittet Suchmaschinen, sie nicht zu indexieren, bis die Inhalte freigegeben sind. {own} Seiten sind selbst auf index gesetzt und würden beim Einschalten indexierbar; derzeit sind es {indexable}.",
-      "visibleBody": "Suchmaschinen dürfen die Website indexieren. {indexable} Adressen sind indexierbar; Seiten auf noindex bleiben draußen.",
+      "hiddenBody": "Jede Seite bittet Suchmaschinen, sie nicht zu indexieren, bis die Inhalte freigegeben sind. {own, plural, one {# Seite ist selbst auf index gesetzt und würde} other {# Seiten sind selbst auf index gesetzt und würden}} beim Einschalten indexierbar; derzeit {indexable, plural, one {ist es #} other {sind es #}}.",
+      "visibleBody": "Suchmaschinen dürfen die Website indexieren. {indexable, plural, one {# Adresse ist} other {# Adressen sind}} indexierbar; Seiten auf noindex bleiben draußen.",
       "overrideExplained": "Solange die Website verborgen ist, gilt das für jede Seite: Auch eine Seite auf index sendet noindex. Ist sie sichtbar, gilt die Einstellung jeder Seite.",
       "notIndexedYet": "Indexierung erlauben heißt nicht, dass Google eine Seite indexiert hat. Das zeigt die Google Search Console.",
       "notRemovedAtOnce": "Verbergen entfernt Seiten nicht sofort aus den Ergebnissen: Suchmaschinen lassen sie beim nächsten Crawlen fallen.",
@@ -2322,7 +2323,9 @@
       "hostConfirmTitle": "Canonical-Host ändern?",
       "hostConfirmImpact": "Alle Canonical-, hreflang- und Sitemap-Adressen nutzen {host}, sobald die Website veröffentlicht ist. Suchmaschinen sehen diesen Host als Original.",
       "hostSaved": "Canonical-Host gespeichert. Website veröffentlichen, um ihn zu übernehmen.",
-      "hostInvalid": "Eine https://-Adresse ohne Pfad verwenden, z. B. https://orgtik.ch."
+      "hostInvalid": "Eine https://-Adresse ohne Pfad verwenden, z. B. https://orgtik.ch.",
+      "showPassed": "{count} bestandene Prüfungen zeigen",
+      "hidePassed": "Bestandene Prüfungen ausblenden"
     }
   },
   "Site": {

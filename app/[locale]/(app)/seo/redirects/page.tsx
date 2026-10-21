@@ -195,10 +195,19 @@ function Redirects() {
 
   const columns = useMemo<ColumnDef<Redirect, any>[]>(
     () => [
-      { id: "from", header: tr("colSource"), cell: ({ row }) => <AddressLink path={row.original.from} label={t("openOnSite", { path: row.original.from })} className="text-fg" /> },
+      // The origin rides under the source, so the row fits without scrolling sideways.
+      {
+        id: "from",
+        header: tr("colSource"),
+        cell: ({ row }) => (
+          <span className="flex min-w-0 flex-col gap-0.5">
+            <AddressLink path={row.original.from} label={t("openOnSite", { path: row.original.from })} className="text-fg" />
+            <span className="text-caption text-fg-subtle">{tr(`origin.${row.original.source}`)}</span>
+          </span>
+        ),
+      },
       { id: "to", header: tr("colDestination"), cell: ({ row }) => <AddressLink path={row.original.to} label={t("openOnSite", { path: row.original.to })} className="text-fg-muted" /> },
       { id: "code", header: tr("colType"), meta: { width: "1%" }, cell: ({ row }) => <Badge size="sm">{row.original.code}</Badge> },
-      { id: "origin", header: tr("colOrigin"), cell: ({ row }) => <span className="whitespace-nowrap text-fg-muted">{tr(`origin.${row.original.source}`)}</span> },
       {
         id: "status",
         header: tr("colStatus"),
@@ -228,7 +237,7 @@ function Redirects() {
       },
       {
         id: "actions",
-        header: ti("actions"),
+        header: () => <span className="sr-only">{ti("actions")}</span>,
         meta: { numeric: true, width: "1%" },
         cell: ({ row }) => (
           <RowActionsMenu target={row.original.from}>

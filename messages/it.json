@@ -257,7 +257,7 @@
     "noMatchBody": "Prova un’altra ricerca o un altro filtro.",
     "notFound": "Questa voce non esiste",
     "back": "Torna a {area}",
-    "slugHelp": "orgtik.ch{path}",
+    "slugHelp": "{host}{path}",
     "shared": "Comune a tutte le lingue",
     "sharedNote": "Si imposta in inglese; vale per tutte le lingue.",
     "iconHelp": "L’icona Phosphor mostrata dal sito, ad esempio ph-palette.",
@@ -2005,7 +2005,8 @@
         "description": "Stessa descrizione di",
         "address": "Stesso indirizzo di",
         "focus": "Stessa frase chiave di"
-      }
+      },
+      "andMore": "e altri {count}"
     },
     "live": {
       "title": "Sito online",
@@ -2206,8 +2207,8 @@
           "warn": "I canonical usano {host}, ma il sito è servito da {served}. Va bene prima di un cambio di dominio; altrimenti cambia l’host canonical."
         }
       },
-      "hiddenBody": "Ogni pagina chiede ai motori di non indicizzarla finché i contenuti non sono approvati. {own} pagine sono impostate su index e diventerebbero indicizzabili attivando questa opzione; ora lo sono {indexable}.",
-      "visibleBody": "I motori possono indicizzare il sito. {indexable} indirizzi sono indicizzabili; le pagine in noindex restano fuori.",
+      "hiddenBody": "Ogni pagina chiede ai motori di non indicizzarla finché i contenuti non sono approvati. {own, plural, one {# pagina è impostata su index e diventerebbe indicizzabile} other {# pagine sono impostate su index e diventerebbero indicizzabili}} attivando questa opzione; ora {indexable, plural, one {lo è #} other {lo sono #}}.",
+      "visibleBody": "I motori possono indicizzare il sito. {indexable, plural, one {# indirizzo è indicizzabile} other {# indirizzi sono indicizzabili}}; le pagine in noindex restano fuori.",
       "overrideExplained": "Finché il sito è nascosto, questa impostazione vale per ogni pagina: anche una pagina su index invia noindex. Quando è visibile, vale l’impostazione di ogni pagina.",
       "notIndexedYet": "Consentire l’indicizzazione non significa che Google abbia indicizzato la pagina. Verificalo in Google Search Console.",
       "notRemovedAtOnce": "Nascondere il sito non toglie subito le pagine dai risultati: i motori le rimuovono quando le scansionano di nuovo.",
@@ -2322,7 +2323,9 @@
       "hostConfirmTitle": "Cambiare l’host canonical?",
       "hostConfirmImpact": "Tutti gli indirizzi canonical, hreflang e della sitemap useranno {host} dopo la pubblicazione del sito. I motori considerano quell’host l’originale.",
       "hostSaved": "Host canonical salvato. Pubblica il sito per applicarlo.",
-      "hostInvalid": "Usa un indirizzo https:// senza percorso, ad es. https://orgtik.ch."
+      "hostInvalid": "Usa un indirizzo https:// senza percorso, ad es. https://orgtik.ch.",
+      "showPassed": "Mostra {count} controlli superati",
+      "hidePassed": "Nascondi controlli superati"
     }
   },
   "Site": {

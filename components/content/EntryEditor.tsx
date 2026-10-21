@@ -1107,6 +1107,7 @@ function Editor({ entry, type, seoOnly = false }: { entry: Entry; type: ContentT
                                 old: type.path(liveSlug, familySlug),
                               })
                             : t("slugHelp", {
+                                host: siteHost,
                                 path: type.path(slug, familySlug),
                               })
                       }

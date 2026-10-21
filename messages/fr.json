@@ -257,7 +257,7 @@
     "noMatchBody": "Essayez une autre recherche ou un autre filtre.",
     "notFound": "Cette entrée n’existe pas",
     "back": "Retour à {area}",
-    "slugHelp": "orgtik.ch{path}",
+    "slugHelp": "{host}{path}",
     "shared": "Commun à toutes les langues",
     "sharedNote": "Réglé en anglais ; toutes les langues l’utilisent.",
     "iconHelp": "L’icône Phosphor affichée sur le site, par exemple ph-palette.",
@@ -2005,7 +2005,8 @@
         "description": "Même description que",
         "address": "Même adresse que",
         "focus": "Même expression clé que"
-      }
+      },
+      "andMore": "et {count} autres"
     },
     "live": {
       "title": "Site en ligne",
@@ -2206,8 +2207,8 @@
           "warn": "Les canoniques utilisent {host}, mais le site est servi depuis {served}. Normal avant un changement de domaine ; sinon modifiez l’hôte canonique."
         }
       },
-      "hiddenBody": "Chaque page demande aux moteurs de ne pas l’indexer, jusqu’à l’approbation du contenu. {own} pages sont réglées sur index et deviendraient indexables si ce réglage est activé ; actuellement {indexable} le sont.",
-      "visibleBody": "Les moteurs peuvent indexer le site. {indexable} adresses sont indexables ; les pages en noindex restent exclues.",
+      "hiddenBody": "Chaque page demande aux moteurs de ne pas l’indexer, jusqu’à l’approbation du contenu. {own, plural, one {# page est réglée sur index et deviendrait indexable} other {# pages sont réglées sur index et deviendraient indexables}} si ce réglage est activé ; actuellement {indexable, plural, one {# l’est} other {# le sont}}.",
+      "visibleBody": "Les moteurs peuvent indexer le site. {indexable, plural, one {# adresse est indexable} other {# adresses sont indexables}} ; les pages en noindex restent exclues.",
       "overrideExplained": "Tant que le site est masqué, ce réglage prime sur chaque page : une page réglée sur index envoie quand même noindex. Une fois visible, le réglage de chaque page s’applique.",
       "notIndexedYet": "Autoriser l’indexation ne veut pas dire que Google a indexé la page. Vérifiez-le dans Google Search Console.",
       "notRemovedAtOnce": "Masquer le site ne retire pas les pages des résultats tout de suite : les moteurs les retirent en les explorant à nouveau.",
@@ -2322,7 +2323,9 @@
       "hostConfirmTitle": "Changer l’hôte canonique ?",
       "hostConfirmImpact": "Toutes les adresses canoniques, hreflang et du sitemap utiliseront {host} une fois le site publié. Les moteurs considèrent cet hôte comme l’original.",
       "hostSaved": "Hôte canonique enregistré. Publiez le site pour l’appliquer.",
-      "hostInvalid": "Utilisez une adresse https:// sans chemin, par ex. https://orgtik.ch."
+      "hostInvalid": "Utilisez une adresse https:// sans chemin, par ex. https://orgtik.ch.",
+      "showPassed": "Afficher les {count} vérifications réussies",
+      "hidePassed": "Masquer les vérifications réussies"
     }
   },
   "Site": {
