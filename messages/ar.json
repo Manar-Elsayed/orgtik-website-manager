@@ -1754,6 +1754,7 @@
       "descriptionMissing": "بلا وصف بحث",
       "descriptionShort": "الوصف أقصر من 50 حرفًا",
       "descriptionLong": "الوصف أطول من 160 حرفًا",
+      "descriptionDuplicate": "الوصف نفسه مستخدم في صفحة أخرى",
       "addressDuplicate": "العنوان الإلكتروني نفسه لصفحة أخرى",
       "focusDuplicate": "العبارة المفتاحية نفسها لصفحة أخرى",
       "noSocialImage": "بلا صورة للروابط المشتركة",
@@ -1933,7 +1934,14 @@
       "issueFilter": "المشكلات",
       "moreIssues": "+{count}",
       "moreIssuesLabel": "عرض {count} مشكلات أخرى في {page}",
-      "fewerIssues": "عرض أقل"
+      "fewerIssues": "عرض أقل",
+      "duplicateNote": {
+        "title": "هذا العنوان مستخدم أيضًا في:",
+        "description": "هذا الوصف مستخدم أيضًا في:",
+        "address": "هذا العنوان (الرابط) مستخدم أيضًا في:",
+        "focus": "هذه العبارة المفتاحية هي أيضًا تركيز:"
+      },
+      "duplicateMore": "و{count} صفحات أخرى"
     },
     "languageNotPublic": "{language} غير مفعّلة للموقع",
     "languageNotPublicHelp": "يتم فحص اللغات المفعّلة في إعدادات الموقع فقط. فعّل هذه اللغة هناك لفحص صفحاتها.",

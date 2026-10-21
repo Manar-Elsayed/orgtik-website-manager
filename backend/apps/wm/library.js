@@ -152,12 +152,12 @@ function makeLibrary({ seed, store, now, uploads, demo = false, locales, site, p
   // Every language the site has switched on, published or not, so gaps are fixed before a language
   // goes live. Without a site list (tests, packaged tools), the public languages.
   const checkedLocales = () => locales?.() ?? settings.publicLocales;
-  const CHECKS = ["titleMissing", "titleLong", "titleDuplicate", "descriptionMissing", "descriptionShort", "descriptionLong", "addressDuplicate", "focusDuplicate", "noSocialImage", "imageNoAlt"];
-  // Two pages competing for one search result: the same title, address or focus keyphrase in one language.
-  const DUPLICATES = { title: "titleDuplicate", address: "addressDuplicate", focus: "focusDuplicate" };
+  const CHECKS = ["titleMissing", "titleLong", "titleDuplicate", "descriptionMissing", "descriptionShort", "descriptionLong", "descriptionDuplicate", "addressDuplicate", "focusDuplicate", "noSocialImage", "imageNoAlt"];
+  // Two pages competing for one search result: the same title, description, address or focus keyphrase in one language.
+  const DUPLICATES = { title: "titleDuplicate", description: "descriptionDuplicate", address: "addressDuplicate", focus: "focusDuplicate" };
   function health() {
     const rows = [];
-    const seen = { title: new Map(), address: new Map(), focus: new Map() };
+    const seen = { title: new Map(), description: new Map(), address: new Map(), focus: new Map() };
     const note = (kind, value, index) => { if (value) seen[kind].set(value, [...(seen[kind].get(value) ?? []), index]); };
     for (const e of store.entries.values()) {
       if (!ADDRESS[e.type]) continue;
@@ -179,18 +179,22 @@ function makeLibrary({ seed, store, now, uploads, demo = false, locales, site, p
         // Duplicates are per language: the same brand title in two languages is expected.
         const path = ADDRESS[e.type](e, c, store.entries), focus = String(seo.focus ?? "").trim().toLowerCase();
         note("title", title && `${l}:${title.toLowerCase()}`, rows.length);
+        note("description", description && `${l}:${description.toLowerCase()}`, rows.length);
         note("address", `${l}:${path}`, rows.length);
         note("focus", focus && `${l}:${focus}`, rows.length);
-        rows.push({ id: e.id, type: e.type, name: plain(c.locales.en?.name ?? c.name ?? e.id), path, locale: l, title, titleLength: title.length, descriptionLength: description.length, keywords, focus: String(seo.focus ?? "").trim(), issues, duplicates: {}, state: e.draft ? e.workflow.state : "published" });
+        rows.push({ id: e.id, type: e.type, name: plain(c.locales.en?.name ?? c.name ?? e.id), path, locale: l, title, description, titleLength: title.length, descriptionLength: description.length, keywords, focus: String(seo.focus ?? "").trim(), issues, duplicates: {}, state: e.draft ? e.workflow.state : "published" });
       }
     }
     // Each duplicate names the other pages, so the hint can say where the title or phrase is already used.
+    // ...and the text they share, so a note can quote it.
+    const textOf = { title: (r) => r.title, description: (r) => r.description, address: (r) => r.path, focus: (r) => r.focus };
     for (const [kind, issue] of Object.entries(DUPLICATES)) for (const idx of seen[kind].values()) {
       const pages = [...new Set(idx.map((i) => rows[i].id))];
       if (pages.length < 2) continue;
       for (const i of idx) {
         rows[i].issues.push(issue);
         rows[i].duplicates[kind] = idx.filter((j) => rows[j].id !== rows[i].id).map((j) => ({ id: rows[j].id, type: rows[j].type, name: rows[j].name, path: rows[j].path }));
+        rows[i].duplicateText = { ...rows[i].duplicateText, [kind]: textOf[kind](rows[i]) };
       }
     }
     for (const row of rows) row.issues = CHECKS.filter((k) => row.issues.includes(k));
@@ -226,7 +230,7 @@ function makeLibrary({ seed, store, now, uploads, demo = false, locales, site, p
   // sections (search results, keywords, shared links) and the content editor's image, one row per
   // page with the languages that have something to fix.
   const SEO_GROUPS = {
-    search: ["titleMissing", "titleLong", "titleDuplicate", "descriptionMissing", "descriptionShort", "descriptionLong", "addressDuplicate"],
+    search: ["titleMissing", "titleLong", "titleDuplicate", "descriptionMissing", "descriptionShort", "descriptionLong", "descriptionDuplicate", "addressDuplicate"],
     keywords: ["focusMissing", "focusDuplicate", "keywordsMissing"],
     sharing: ["noSocialImage"],
     images: ["imageNoAlt"],
@@ -234,15 +238,15 @@ function makeLibrary({ seed, store, now, uploads, demo = false, locales, site, p
   const SEO_ISSUES = Object.values(SEO_GROUPS).flat();
   function missingSeo() {
     const pages = new Map();
-    for (const { issues, duplicates, ...row } of health().rows) {
+    for (const { issues, duplicates, duplicateText, ...row } of health().rows) {
       const e = store.entries.get(row.id), seo = current(e).seo?.[row.locale] ?? {};
       const found = [...issues, ...(String(seo.focus ?? "").trim() ? [] : ["focusMissing"]), ...(row.keywords ? [] : ["keywordsMissing"])];
-      const page = pages.get(row.id) ?? { id: row.id, type: row.type, name: row.name, path: row.path, title: row.title, state: row.state, visibility: e.workflow.visibility, updatedAt: e.workflow.updatedAt, languages: [], issues: [], byLanguage: {}, duplicates: {} };
+      const page = pages.get(row.id) ?? { id: row.id, type: row.type, name: row.name, path: row.path, title: row.title, state: row.state, visibility: e.workflow.visibility, updatedAt: e.workflow.updatedAt, languages: [], issues: [], byLanguage: {}, duplicates: {}, duplicateText: {} };
       pages.set(row.id, page);
       if (!found.length) continue;
       page.languages.push(row.locale);
       page.byLanguage[row.locale] = SEO_ISSUES.filter((i) => found.includes(i));
-      if (Object.keys(duplicates).length) page.duplicates[row.locale] = duplicates;
+      if (Object.keys(duplicates).length) { page.duplicates[row.locale] = duplicates; page.duplicateText[row.locale] = duplicateText; }
       page.issues = SEO_ISSUES.filter((i) => page.issues.includes(i) || found.includes(i));
     }
     const locales = checkedLocales();

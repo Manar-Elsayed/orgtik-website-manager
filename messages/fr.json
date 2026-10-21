@@ -1754,6 +1754,7 @@
       "descriptionMissing": "Pas de description de recherche",
       "descriptionShort": "Description de moins de 50 caractères",
       "descriptionLong": "Description de plus de 160 caractères",
+      "descriptionDuplicate": "Même description qu’une autre page",
       "addressDuplicate": "Même adresse qu’une autre page",
       "focusDuplicate": "Même expression clé qu’une autre page",
       "noSocialImage": "Pas d’image pour les liens partagés",
@@ -1933,7 +1934,14 @@
       "issueFilter": "Problèmes",
       "moreIssues": "+{count}",
       "moreIssuesLabel": "Afficher {count} autres problèmes pour {page}",
-      "fewerIssues": "Afficher moins"
+      "fewerIssues": "Afficher moins",
+      "duplicateNote": {
+        "title": "Ce titre est aussi utilisé sur :",
+        "description": "Cette description est aussi utilisée sur :",
+        "address": "Cette adresse est aussi utilisée par :",
+        "focus": "Cette expression clé est aussi le focus de :"
+      },
+      "duplicateMore": "et {count, plural, one {# autre page} other {# autres pages}}"
     },
     "languageNotPublic": "{language} n’est pas activé pour le site",
     "languageNotPublicHelp": "Seules les langues activées dans les paramètres du site sont vérifiées. Activez celle-ci pour vérifier ses pages.",
