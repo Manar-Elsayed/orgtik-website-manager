@@ -389,7 +389,8 @@
     "platformPricingBody": "Le paiement utilise les tarifs régionaux actuels. Modifiez les textes ici, et les prix et règles d’offre dans Admin.",
     "historicalPricingBody": "Ces exemples en lecture seule proviennent d’un ancien catalogue. Ce sont des références, pas les tarifs actuels du paiement.",
     "platformPricingSource": "Tarifs Admin",
-    "catalogReferenceBody": "Les noms et fonctions des offres sont partagés avec le site. Modifiez les textes dans Pages et les tarifs actuels dans Admin."
+    "catalogReferenceBody": "Les noms et fonctions des offres sont partagés avec le site. Modifiez les textes dans Pages et les tarifs actuels dans Admin.",
+    "slugOtherLanguage": "Commune à toutes les langues ; modifiez-la en anglais. Adresse de cette langue : orgtik.ch{path}"
   },
   "EntryNames": {
     "pg_home": "Accueil",

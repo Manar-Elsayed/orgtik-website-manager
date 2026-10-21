@@ -1092,49 +1092,54 @@ function Editor({ entry, type, seoOnly = false }: { entry: Entry; type: ContentT
             ))}
             {type.seo ? (
               <TabsPanel value="seo"><PagePlacementHint pageId={entry.id} section="seo" />
-                {lang === "en" ? <div className={type.key === "page" ? "mb-5 grid min-w-0 gap-4 rounded-card border border-line bg-raised p-5" : ctx.fullWidthFields ? "mb-4 grid min-w-0 gap-4 rounded-card border border-line bg-raised p-4 sm:p-5" : "mb-4 grid max-w-2xl gap-4 rounded-card border border-line bg-raised p-4 sm:p-5"}>
-                  {type.key === "page" ? <div className="flex items-start justify-between gap-4">
-                    <h3 className="min-w-0 text-title-sm font-semibold text-fg">{t("tabs.seo")}</h3>
-                    <SectionPreviewLink href={previewHref("seo") ?? "/preview"} label={`${tp("button")} · ${t("tabs.seo")}`} iconOnly />
-                  </div> : null}
-                  {lang === "en" ? (
-                    <Field
-                      label={t("slug")}
-                      description={
-                        type.fixedAddress
-                          ? t("addressFixed")
-                          : liveSlug && liveSlug !== slug
-                            ? t("slugMoves", {
-                                path: type.path(slug, familySlug),
-                                old: type.path(liveSlug, familySlug),
-                              })
-                            : t("slugHelp", {
-                                path: type.path(slug, familySlug),
-                              })
-                      }
-                      error={
-                        errors.slug
-                          ? t(
-                              errors.slug === "slug_taken"
-                                ? "errorSlugTaken"
-                                : "errorSlug",
-                            )
-                          : undefined
-                      }
-                    >
-                      <Input
-                        dir="ltr"
-                        disabled={!editable || type.fixedAddress}
-                        value={type.fixedAddress ? `orgtik.ch${slug}` : slug}
-                        onChange={(e) => setSlugEdit(e.target.value)}
-                      />
-                    </Field>
-                  ) : null}
-                </div> : null}
                 <SeoPanel
                   key={lang}
+                  addressCard={
+                    <div className="grid min-w-0 gap-4 rounded-card border border-line bg-raised p-4 sm:p-5">
+                      {/* The SEO editor looks the same for every type; in the content editor a page's SEO tab names itself. */}
+                      {type.key === "page" && !seoOnly ? <div className="flex items-start justify-between gap-4">
+                        <h3 className="min-w-0 text-title-sm font-semibold text-fg">{t("tabs.seo")}</h3>
+                        <SectionPreviewLink href={previewHref("seo") ?? "/preview"} label={`${tp("button")} · ${t("tabs.seo")}`} iconOnly />
+                      </div> : null}
+                      {(
+                        <Field
+                          label={t("slug")}
+                          description={
+                            type.fixedAddress
+                              ? t("addressFixed")
+                              : lang !== "en"
+                                ? t("slugOtherLanguage", { path: `/${lang}${previewPath === "/" ? "" : previewPath}` })
+                              : liveSlug && liveSlug !== slug
+                                ? t("slugMoves", {
+                                    path: type.path(slug, familySlug),
+                                    old: type.path(liveSlug, familySlug),
+                                  })
+                                : t("slugHelp", {
+                                    path: type.path(slug, familySlug),
+                                  })
+                          }
+                          error={
+                            errors.slug
+                              ? t(
+                                  errors.slug === "slug_taken"
+                                    ? "errorSlugTaken"
+                                    : "errorSlug",
+                                )
+                              : undefined
+                          }
+                        >
+                          <Input
+                            dir="ltr"
+                            disabled={!editable || type.fixedAddress || lang !== "en"}
+                            value={type.fixedAddress ? `orgtik.ch${slug}` : slug}
+                            onChange={(e) => setSlugEdit(e.target.value)}
+                          />
+                        </Field>
+                      )}
+                    </div>
+                  }
                   entryId={entry.id}
-                  fullWidthFields={ctx.fullWidthFields}
+                  fullWidthFields={ctx.fullWidthFields && !seoOnly}
                   lang={lang}
                   seo={seo as SeoBlock}
                   english={(entry.content.seo.en ?? {}) as SeoBlock}
