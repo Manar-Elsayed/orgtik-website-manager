@@ -1,0 +1,42 @@
+{
+  "name": "orgtik-wm-backend",
+  "version": "1.0.0",
+  "private": true,
+  "main": "standalone.cjs",
+  "description": "Mock API (Website Manager, identity, website content) that runs inside the Website Manager.",
+  "scripts": {
+    "api": "node server.js"
+  },
+  "dependencies": {
+    "@iconify-json/bi": "1.2.7",
+    "@iconify-json/carbon": "1.2.28",
+    "@iconify-json/circle-flags": "1.2.11",
+    "@iconify-json/eos-icons": "1.2.4",
+    "@iconify-json/ep": "1.2.4",
+    "@iconify-json/fluent": "1.2.59",
+    "@iconify-json/heroicons": "1.2.3",
+    "@iconify-json/line-md": "1.2.16",
+    "@iconify-json/logos": "1.2.15",
+    "@iconify-json/lucide": "1.2.137",
+    "@iconify-json/mage": "1.2.4",
+    "@iconify-json/material-symbols": "1.2.93",
+    "@iconify-json/mdi": "1.2.3",
+    "@iconify-json/ph": "1.2.2",
+    "@iconify-json/prime": "1.2.5",
+    "@iconify-json/proicons": "1.2.20",
+    "@iconify-json/ri": "1.2.10",
+    "@iconify-json/skill-icons": "1.2.4",
+    "@iconify-json/solar": "1.2.13",
+    "@iconify-json/svg-spinners": "1.2.4",
+    "@iconify-json/tabler": "1.2.41",
+    "@iconify-json/vscode-icons": "1.2.83",
+    "@iconify/utils": "2.3.0",
+    "cors": "2.8.6",
+    "express": "4.22.3",
+    "multer": "2.4.0",
+    "socket.io": "4.8.4"
+  },
+  "devDependencies": {
+    "@babel/parser": "7.29.9"
+  }
+}

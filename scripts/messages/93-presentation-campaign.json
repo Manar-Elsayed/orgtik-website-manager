@@ -1,0 +1,9 @@
+{
+"Studio.campaign":{"en":"Marketing campaign","ar":"الحملة التسويقية","de":"Marketingkampagne","fr":"Campagne marketing","it":"Campagna marketing"},
+"Studio.noCampaign":{"en":"No registered campaign","ar":"دون حملة مسجلة","de":"Keine registrierte Kampagne","fr":"Aucune campagne enregistrée","it":"Nessuna campagna registrata"},
+"Studio.campaignHint":{"en":"Campaigns come from OrgTik’s Marketing scene. Accepted Partners form leads carry this campaign into OrgTik CRM and Marketing; customer workspace data stays separate.","ar":"تأتي الحملات من سيناريو Marketing لدى OrgTik. تحمل جهات نموذج الشركاء المقبولة الحملة إلى CRM وMarketing لدى OrgTik؛ تبقى بيانات مساحات العملاء منفصلة.","de":"Kampagnen stammen aus OrgTik Marketing. Akzeptierte Partnerformular-Leads übertragen die Kampagne an OrgTik CRM und Marketing; Kundendaten bleiben getrennt.","fr":"Les campagnes viennent de Marketing OrgTik. Les prospects acceptés du formulaire partenaires portent cette campagne vers CRM et Marketing OrgTik ; les données clients restent séparées.","it":"Le campagne arrivano da Marketing OrgTik. I lead accettati del modulo partner portano la campagna in CRM e Marketing OrgTik; i dati clienti restano separati."},
+"Studio.campaignReference":{"en":"Campaign","ar":"الحملة","de":"Kampagne","fr":"Campagne","it":"Campagna"},
+"Studio.crmReference":{"en":"OrgTik CRM lead","ar":"جهة CRM لدى OrgTik","de":"OrgTik CRM-Lead","fr":"Prospect CRM OrgTik","it":"Lead CRM OrgTik"},
+"Studio.visitorName":{"en":"Contact name","ar":"اسم جهة الاتصال","de":"Kontaktname","fr":"Nom du contact","it":"Nome contatto"},
+"Studio.visitorNameError":{"en":"Enter a contact name of 1–120 characters.","ar":"أدخل اسم جهة اتصال من 1 إلى 120 حرفًا.","de":"Kontaktnamen mit 1–120 Zeichen eingeben.","fr":"Saisissez un nom de contact de 1 à 120 caractères.","it":"Inserisci un nome contatto da 1 a 120 caratteri."}
+}

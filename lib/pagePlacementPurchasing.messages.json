@@ -1,0 +1,34 @@
+{
+  "ar": {
+    "purchasePagesPlansTitle": "الخطط ونصوص الشراء المشتركة",
+    "purchasePagesPlansWhere": "افتح الخطط لعرض دليل الباقات. اختر قسمًا أدناه لمعرفة موضعه الدقيق في الموقع. تظهر عناصر إنشاء الخطة المشتركة أيضًا في صفحات الخدمات والبرامج؛ وتفتح أزرار معاينتها تلك الصفحات.",
+    "purchasePagesCartTitle": "السلة ونوافذ الشراء المشتركة",
+    "purchasePagesCartWhere": "افتح السلة. تظهر المقدمة وحالة السلة الفارغة قبل إضافة خطة؛ وتتطلب عناصر التحكم في الخطط وجود عناصر في السلة. اختر قسمًا أدناه لمعرفة موضعه والإجراء الذي يُظهر النافذة أو الرسالة.",
+    "purchasePagesCheckoutTitle": "إتمام الشراء وتأكيد الدفع",
+    "purchasePagesCheckoutWhere": "يتطلب إتمام الشراء سلة صالحة. تظهر حقول الفوترة والدفع قبل الدفع؛ وتظهر نصوص التأكيد والإيصال بعد نجاح دفعة تجريبية. اختر قسمًا أدناه لمعرفة موضعه الدقيق والحالة المطلوبة لظهوره."
+  },
+  "de": {
+    "purchasePagesPlansTitle": "Pläne und gemeinsame Kauftexte",
+    "purchasePagesPlansWhere": "Öffnen Sie Pläne, um das Paketverzeichnis zu sehen. Wählen Sie unten einen Abschnitt, um seine genaue Position auf der Website zu finden. Gemeinsame Bedienelemente des Plan-Konfigurators erscheinen auch unter Services und Software; ihre Vorschau-Schaltflächen öffnen diese Seiten.",
+    "purchasePagesCartTitle": "Warenkorb und gemeinsame Kaufdialoge",
+    "purchasePagesCartWhere": "Öffnen Sie den Warenkorb. Einführung und Leerzustand erscheinen vor dem Hinzufügen eines Plans; die Plan-Bedienelemente erfordern Artikel im Warenkorb. Wählen Sie unten einen Abschnitt, um seine Position und die Aktion zu sehen, die einen Dialog oder eine Meldung einblendet.",
+    "purchasePagesCheckoutTitle": "Kasse und Zahlungsbestätigung",
+    "purchasePagesCheckoutWhere": "Die Kasse erfordert einen gültigen Warenkorb. Rechnungs- und Zahlungsfelder erscheinen vor der Zahlung; Bestätigung und Beleg erscheinen nach einer erfolgreichen Testzahlung. Wählen Sie unten einen Abschnitt, um seine genaue Position und den erforderlichen Zustand zu sehen."
+  },
+  "fr": {
+    "purchasePagesPlansTitle": "Offres et textes d’achat partagés",
+    "purchasePagesPlansWhere": "Ouvrez Offres pour afficher le catalogue de forfaits. Choisissez une section ci-dessous pour trouver son emplacement exact sur le site. Les commandes partagées du configurateur apparaissent aussi dans Services et Logiciels ; leurs boutons d’aperçu ouvrent ces pages.",
+    "purchasePagesCartTitle": "Panier et fenêtres d’achat partagées",
+    "purchasePagesCartWhere": "Ouvrez le panier. L’introduction et l’état vide apparaissent avant l’ajout d’une offre ; les commandes d’offre nécessitent des articles dans le panier. Choisissez une section ci-dessous pour voir son emplacement et l’action qui affiche une fenêtre ou un message.",
+    "purchasePagesCheckoutTitle": "Paiement et confirmation",
+    "purchasePagesCheckoutWhere": "Le paiement nécessite un panier valide. Les champs de facturation et de paiement apparaissent avant le paiement ; la confirmation et le reçu apparaissent après un paiement de test réussi. Choisissez une section ci-dessous pour voir son emplacement exact et l’état requis."
+  },
+  "it": {
+    "purchasePagesPlansTitle": "Piani e testi di acquisto condivisi",
+    "purchasePagesPlansWhere": "Apri Piani per vedere il catalogo dei pacchetti. Scegli una sezione qui sotto per trovare la sua posizione esatta sul sito. I controlli condivisi del configuratore compaiono anche in Servizi e Software; i relativi pulsanti di anteprima aprono quelle pagine.",
+    "purchasePagesCartTitle": "Carrello e finestre di acquisto condivise",
+    "purchasePagesCartWhere": "Apri il carrello. L’introduzione e lo stato vuoto compaiono prima di aggiungere un piano; i controlli del piano richiedono articoli nel carrello. Scegli una sezione qui sotto per vedere la sua posizione e l’azione che mostra una finestra o un messaggio.",
+    "purchasePagesCheckoutTitle": "Pagamento e conferma",
+    "purchasePagesCheckoutWhere": "Il pagamento richiede un carrello valido. I campi di fatturazione e pagamento compaiono prima del pagamento; la conferma e la ricevuta compaiono dopo un pagamento di prova riuscito. Scegli una sezione qui sotto per vedere la sua posizione esatta e lo stato richiesto."
+  }
+}
