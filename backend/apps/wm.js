@@ -772,7 +772,7 @@ module.exports = {
       if (!req.who.permissions.includes("site:visibility")) return fail(res, 403, "forbidden", "Changing search visibility needs site:visibility.", { required: "site:visibility" });
       const want = req.get("if-match");
       if (want != null && Number(want) !== lib.settings.version) return fail(res, 412, "stale", "Someone changed this since you opened it.", { current: lib.settings.version, by: person(lib.settings.history[0]?.by).name ?? "" });
-      const r = lib.setVisibility(who(req), req.body?.visibility, req.body?.reason);
+      const r = req.body?.canonicalHost !== undefined ? lib.setCanonicalHost(who(req), req.body.canonicalHost, req.body?.reason) : lib.setVisibility(who(req), req.body?.visibility, req.body?.reason);
       if (r.errors) return fail(res, 422, "invalid", "Some fields need attention.", { fieldErrors: r.errors });
       ok(res, { settings: { ...lib.settings, history: lib.settings.history.map((h) => ({ ...h, by: person(h.by) })) }, urls: lib.indexingUrls(), sitemap: lib.sitemap(), robots: lib.robots() });
     });

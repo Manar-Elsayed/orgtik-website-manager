@@ -485,6 +485,21 @@ function makeLibrary({ seed, store, now, uploads, demo = false, locales, site })
     return { settings };
   }
 
+  // The address every canonical, hreflang and sitemap URL is built on: an https origin, nothing more.
+  function setCanonicalHost(who, host, reason) {
+    let url = null;
+    try { url = new URL(String(host ?? "").trim()); } catch { /* reported below */ }
+    if (!url || url.protocol !== "https:" || url.pathname !== "/" || url.search || url.hash || url.username) return { errors: { canonicalHost: "origin_format" } };
+    if (!String(reason ?? "").trim()) return { errors: { reason: "required" } };
+    if (url.origin === settings.canonicalHost) return { settings };
+    const was = settings.canonicalHost;
+    settings.canonicalHost = url.origin;
+    settings.version += 1;
+    settings.history.unshift({ at: now(), by: who.key, visibility: settings.visibility, canonicalHost: url.origin, note: String(reason).trim() });
+    log(who.key, "canonical_host", "site", "settings", { from: was, to: url.origin });
+    return { settings };
+  }
+
   const exportState = () => ({ data: clone({ media: [...media], redirects: [...redirects], settings, healthRun, lastPublish, demoVersion: 3 }), sequences: { nextMedia, nextRedirect } });
   const validateState = value => {
     const incoming = codec.object(value), rows = codec.mapRows(incoming.data?.media), redirects_ = codec.mapRows(incoming.data?.redirects), settings_ = codec.object(incoming.data?.settings);
@@ -492,7 +507,7 @@ function makeLibrary({ seed, store, now, uploads, demo = false, locales, site })
     return { data: { media: rows, redirects: redirects_, settings: settings_, healthRun: incoming.data.healthRun ?? null, lastPublish: incoming.data.lastPublish ?? null, demoVersion: incoming.data.demoVersion ?? 0 }, sequences: { nextMedia: codec.sequence(incoming.sequences?.nextMedia, rows, "md"), nextRedirect: codec.sequence(incoming.sequences?.nextRedirect, redirects_, "rd") } };
   };
   const importState = value => { const incoming = validateState(value); codec.replaceMap(media, incoming.data.media); codec.replaceMap(redirects, incoming.data.redirects); codec.replaceObject(settings, incoming.data.settings); healthRun = incoming.data.healthRun; lastPublish = incoming.data.lastPublish; nextMedia = incoming.sequences.nextMedia; nextRedirect = incoming.sequences.nextRedirect; if (incoming.data.demoVersion < 1) ensureDemo(); else if (demo && incoming.data.demoVersion < 2) require("./seed/workflow-examples").mediaExamples(media); if (demo && incoming.data.demoVersion < 3) require("./seed/demo-states").redirectStatusExamples(redirects); };
-  return { media, redirects, settings, mediaOut, resolveMedia, updateMedia, addUpload, removeMedia, serverRedirects, recordPublish, lastPublish: () => lastPublish, health, CHECKS, GUIDANCE, MAIN_CHECKS, hasOther, runHealth, healthRunState, missingSeo, SEO_GROUPS, checkedLocales, seoConflicts, saveRedirect, removeRedirect, REDIRECT_STATUSES, sitemap, indexingUrls, robots, setVisibility, RIGHTS, keepAddresses, previewAddresses, exportState, importState, validateState };
+  return { media, redirects, settings, mediaOut, resolveMedia, updateMedia, addUpload, removeMedia, serverRedirects, recordPublish, lastPublish: () => lastPublish, health, CHECKS, GUIDANCE, MAIN_CHECKS, hasOther, runHealth, healthRunState, missingSeo, SEO_GROUPS, checkedLocales, seoConflicts, saveRedirect, removeRedirect, REDIRECT_STATUSES, sitemap, indexingUrls, robots, setVisibility, setCanonicalHost, RIGHTS, keepAddresses, previewAddresses, exportState, importState, validateState };
 }
 
 module.exports = { makeLibrary };
