@@ -7,6 +7,8 @@ const namespaces = new Set(["sos", "tasks", "files", "hr", "sales", "marketing",
 const forwarded = ["accept", "accept-language", "authorization", "content-type", "content-length", "range", "if-range", "if-match", "if-none-match", "x-workspace", "idempotency-key", "x-operation-id", "origin", "access-control-request-method", "access-control-request-headers"];
 // The public website calls the content API from its own origin, so CORS answers pass through.
 const responseHeaders = ["content-type", "content-disposition", "content-length", "content-range", "accept-ranges", "etag", "last-modified", "access-control-allow-origin", "access-control-allow-credentials", "access-control-allow-methods", "access-control-allow-headers", "access-control-expose-headers", "vary"];
+// Pauses before trying a request again after a 503 (see proxyBackend).
+const RETRY_MS = [250, 750];
 const failure = (status: number, code: string) => Response.json({ success: false, statusCode: status, code }, { status, headers: { "cache-control": "no-store" } });
 
 export async function proxyBackend(request: Request): Promise<Response> {
@@ -24,12 +26,21 @@ export async function proxyBackend(request: Request): Promise<Response> {
     const binding = process.env.ORGTIK_MOCK_URL || await backendOrigin();
     const base = new URL(binding.endsWith("/") ? binding : `${binding}/`);
     const target = new URL(path + incoming.search, base);
-    const init: RequestInit & { duplex?: "half" } = {
+    const init: RequestInit = {
       method: request.method, headers, cache: "no-store", redirect: "manual",
       signal: AbortSignal.any([request.signal, AbortSignal.timeout(55000)]),
     };
-    if (!["GET", "HEAD"].includes(request.method)) { init.body = request.body; init.duplex = "half"; }
-    const upstream = await fetch(target, init);
+    // The body is read once so the request can be sent again (below).
+    if (!["GET", "HEAD"].includes(request.method)) init.body = await request.arrayBuffer();
+    // Several server instances share one store: when two write at the same moment, the backend
+    // answers 503 and keeps nothing, so the same request can safely be tried again.
+    let upstream = await fetch(target, init);
+    for (const wait of RETRY_MS) {
+      if (upstream.status !== 503 || request.signal.aborted) break;
+      await upstream.body?.cancel();
+      await new Promise((resolve) => setTimeout(resolve, wait));
+      upstream = await fetch(target, init);
+    }
     const output = new Headers({ "cache-control": "no-store" });
     for (const name of responseHeaders) {
       const value = upstream.headers.get(name);
