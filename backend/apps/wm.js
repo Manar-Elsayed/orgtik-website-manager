@@ -790,7 +790,7 @@ module.exports = {
       return v ? String(v.versionLabel ?? "") : "";
     };
     // Disabled redirects are kept in the Website Manager but not served.
-    app.get("/v2/public/redirects", (req, res) => ok(res, [...lib.redirects.values()].filter((r) => r.status !== "disabled").map(({ from, to, code, handledBy }) => ({ from, to, code, handledBy: handledBy ?? "host" }))));
+    app.get("/v2/public/redirects", (req, res) => ok(res, [...lib.redirects.values()].filter((r) => r.status !== "disabled").map(({ id, from, to, code, handledBy, query }) => ({ id, from, to, code, query: query ?? "keep", handledBy: handledBy ?? "host" }))));
     app.get("/v2/public/robots.txt", (req, res) => res.type("text/plain").send(lib.robots()));
     app.get("/v2/public/sitemap.xml", (req, res) => {
       const urls = lib.sitemap().map((u) => `  <url><loc>${u.loc}</loc><lastmod>${u.lastmod}</lastmod></url>`).join("\n");
@@ -829,7 +829,63 @@ module.exports = {
       if (!TYPES.has(req.params.type)) return fail(res, 404, "unknown_type", `No content type ${req.params.type}.`);
       const rows = [...store.entries.values()].filter((e) => e.type === req.params.type && e.workflow.visibility === "live");
       rows.sort((a, b) => String(a.parent ?? "").localeCompare(String(b.parent ?? "")) || a.order - b.order);
-      ok(res, rows.map((e) => ({ id: e.id, order: e.order, ...(e.parent ? { parent: e.parent } : {}), ...(e.department ? { department: e.department, format: e.format } : {}), ...contentOut(e.live) })));
+      // lastModified: when the published version went live, for the sitemap's <lastmod>.
+      ok(res, rows.map((e) => ({ id: e.id, order: e.order, ...(e.parent ? { parent: e.parent } : {}), ...(e.department ? { department: e.department, format: e.format } : {}), ...contentOut(e.live), lastModified: e.workflow.publishedAt ?? e.workflow.updatedAt ?? null })));
+    });
+
+    // ---- the live website: what it serves, compared with the settings here, and publishing it ----
+    const liveSite = require("./wm/live-site").makeLiveSite();
+    const { readSitemap, hash } = require("./wm/live-site");
+    const hookConfigured = () => /^https:///.test(String(process.env.SITE_DEPLOY_HOOK_URL ?? ""));
+    const latestPublished = () => [...store.entries.values()].reduce((max, e) => (e.workflow.visibility === "live" && e.workflow.publishedAt && e.workflow.publishedAt > max ? e.workflow.publishedAt : max), "");
+    async function liveStatus(fresh) {
+      const snap = await liveSite.snapshot({ fresh });
+      const configured = { redirects: lib.serverRedirects(), robots: lib.robots(), visibility: lib.settings.visibility, canonicalHost: lib.settings.canonicalHost };
+      const base = { configured: snap.configured, reachable: snap.reachable, url: snap.url, hookConfigured: hookConfigured(), lastPublish: lib.lastPublish() ? { ...lib.lastPublish(), by: person(lib.lastPublish().by) } : null };
+      if (!snap.reachable) return { ...base, build: null, pending: null };
+      const build = snap.build && typeof snap.build === "object" ? snap.build : null;
+      const sitemap = readSitemap(snap.sitemap.xml, configured.canonicalHost);
+      // Redirects: what the server applies (from the last build) against what is set here.
+      const deployed = new Map((build?.redirects ?? []).map((r) => [r.from, r]));
+      const wanted = new Map(configured.redirects.map((r) => [r.from, r]));
+      const same = (a, b) => a.to === b.to && Number(a.code) === Number(b.code) && (a.query ?? "keep") === (b.query ?? "keep");
+      const redirects = build ? {
+        added: [...wanted.values()].filter((r) => !deployed.has(r.from)).map((r) => r.from),
+        removed: [...deployed.values()].filter((r) => !wanted.has(r.from)).map((r) => r.from),
+        changed: [...wanted.values()].filter((r) => deployed.has(r.from) && !same(r, deployed.get(r.from))).map((r) => r.from),
+      } : null;
+      const robotsLive = snap.robots.text;
+      const pending = {
+        redirects: redirects ? redirects.added.length + redirects.removed.length + redirects.changed.length : null,
+        robots: robotsLive == null ? null : robotsLive.trim() !== configured.robots.trim(),
+        settings: build ? build.site?.visibility !== configured.visibility || build.site?.canonicalHost !== configured.canonicalHost : null,
+        // Content published here after the site last pulled it.
+        content: build?.pulledAt ? latestPublished() > build.pulledAt : null,
+      };
+      pending.any = Boolean(!build || pending.redirects || pending.robots || pending.settings || pending.content);
+      return {
+        ...base,
+        build: build ? { builtAt: build.builtAt ?? null, pulledAt: build.pulledAt ?? null, source: build.source ?? null, commit: build.commit ?? null } : null,
+        sitemap: { url: `${snap.url}/sitemap.xml`, status: snap.sitemap.status, count: sitemap.urls.length, problems: sitemap.problems },
+        robots: { url: `${snap.url}/robots.txt`, status: snap.robots.status, live: robotsLive, configured: configured.robots, hash: hash(robotsLive) },
+        redirects,
+        deployedRedirects: build?.redirects ?? null,
+        pending,
+      };
+    }
+    app.get("/v2/admin/site/live", need("seo:view"), async (req, res) => ok(res, await liveStatus(req.query.fresh === "1")));
+    // Publish to site: asks the host to rebuild the website from what is published here (a Vercel
+    // Deploy Hook). The rebuild takes a minute or two; the page follows it through /site/live.
+    app.post("/v2/admin/site/publish", need("seo:view"), async (req, res) => {
+      if (!req.who.permissions.includes("site:visibility")) return fail(res, 403, "forbidden", "Publishing the website needs site:visibility.", { required: "site:visibility" });
+      if (!hookConfigured()) return fail(res, 503, "hook_missing", "No deploy hook is configured for the website (SITE_DEPLOY_HOOK_URL).");
+      let status = 0;
+      try { status = (await fetch(process.env.SITE_DEPLOY_HOOK_URL, { method: "POST", signal: AbortSignal.timeout(15000) })).status; } catch { status = 0; }
+      const okHook = status >= 200 && status < 300;
+      const record = lib.recordPublish(who(req), { ok: okHook, status, reason: req.body?.reason });
+      liveSite.forget();
+      if (!okHook) return fail(res, 502, "hook_failed", "The host didn't accept the publish request.", { status });
+      ok(res, { ...record, by: person(record.by) });
     });
 
     // Prices shown on the website (plan: Pricing). Read-only here: numbers need pricing:edit and

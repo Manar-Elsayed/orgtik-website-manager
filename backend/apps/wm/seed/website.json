@@ -14871,7 +14871,7 @@
       }
     ],
     "settings": {
-      "canonicalHost": "https://orgtik.ch",
+      "canonicalHost": "https://orgtik-site.vercel.app",
       "visibility": "noindex",
       "publicLocales": [
         "en"

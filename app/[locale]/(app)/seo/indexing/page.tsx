@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Eye, EyeSlash } from "@phosphor-icons/react";
 import { Badge, Input, Select, Switch, Card, ConfirmDialog, ErrorState, LoadingState, NoPermissionState, PageHeader, toast, useFormatter } from "@orgtik/ui";
 import { DataTable, type ColumnDef } from "@orgtik/ui/table";
+import { SitePublishCard } from "@/components/seo/SitePublishCard";
 import { RequirePermission } from "@/components/frame/RequirePermission";
 import { useListState } from "@/lib/useListState";
 import { useCan } from "@/lib/permissions";
@@ -46,6 +47,7 @@ function IndexingView() {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader title={t("indexingTitle")} description={t("indexingDescription")} />
+      <SitePublishCard focus="indexing" />
       <Card className="flex flex-col gap-4">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex min-w-0 flex-col gap-1">

@@ -25,6 +25,7 @@ import {
   toast,
 } from "@orgtik/ui";
 import { DataTable, type ColumnDef } from "@orgtik/ui/table";
+import { SitePublishCard } from "@/components/seo/SitePublishCard";
 import { RequirePermission } from "@/components/frame/RequirePermission";
 import { useListState } from "@/lib/useListState";
 import { useCan } from "@/lib/permissions";
@@ -163,6 +164,7 @@ function Redirects() {
         description={t("redirectsDescription")}
         actions={creatable ? <Button startIcon={<Plus />} onClick={() => setEditing({ from: "", to: "", code: 301, status: "active" })}>{t("addRedirect")}</Button> : null}
       />
+      <SitePublishCard focus="redirects" />
       <div className="wm-table-filters">
         <Input aria-label={ti("search")} placeholder={ti("search")} value={url.get("search")} onChange={e => url.set({ search: e.target.value })} className="wm-search" />
         <Select label={ti("kind")} value={url.get("kind", "all")} onValueChange={kind => url.set({ kind })} options={[{ value: "all", label: ti("all") }, { value: "301", label: t("code301") }, { value: "302", label: t("code302") }]} />

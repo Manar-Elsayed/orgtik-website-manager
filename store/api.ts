@@ -653,6 +653,24 @@ export type SeoMissing = Page<SeoMissingRow> & {
   checked: number;
   locales: Locale[];
 };
+/** One redirect as the website's server applies it (from the last build). */
+export type ServerRedirect = { id?: string; from: string; to: string; code: number; query: "keep" | "drop" };
+/** The live website compared with the settings here (GET /admin/site/live). */
+export type SiteLive = {
+  configured: boolean;
+  reachable: boolean;
+  url: string | null;
+  hookConfigured: boolean;
+  lastPublish: { at: string; by: Person; ok: boolean; status: number | null; reason: string | null } | null;
+  /** The last build of the website, from its /build.json; null when it predates the publish pipeline. */
+  build: { builtAt: string | null; pulledAt: string | null; source: "cms" | "packaged" | null; commit: string | null } | null;
+  sitemap?: { url: string; status: number; count: number; problems: ("missing" | "not_valid_xml" | "other_host" | "no_lastmod")[] };
+  robots?: { url: string; status: number; live: string | null; configured: string; hash: string };
+  /** Server redirects set here but not yet on the site, on the site but not set here, or different. */
+  redirects?: { added: string[]; removed: string[]; changed: string[] } | null;
+  deployedRedirects?: ServerRedirect[] | null;
+  pending: { redirects: number | null; robots: boolean | null; settings: boolean | null; content: boolean | null; any: boolean } | null;
+};
 export type AnalyticsPeriod = "30d" | "90d" | "12m";
 type Totals = {
   visits: number;
@@ -1104,6 +1122,14 @@ export const api = createApi({
     previewToken: b.mutation<{ token: string; expiresAt: string }, void>({
       query: () => ({ url: "/admin/preview-token", method: "POST" }),
     }),
+    siteLive: b.query<SiteLive, { fresh?: boolean } | void>({
+      query: (args) => ({ url: "/admin/site/live", params: args && args.fresh ? { fresh: "1" } : undefined }),
+      providesTags: ["Seo"],
+    }),
+    publishSite: b.mutation<SiteLive["lastPublish"], { reason?: string }>({
+      query: (body) => ({ url: "/admin/site/publish", method: "POST", body }),
+      invalidatesTags: ["Seo"],
+    }),
     indexing: b.query<Indexing, void>({
       query: () => "/admin/seo/indexing",
       providesTags: ["Seo"],
@@ -1304,6 +1330,9 @@ export const {
   useSaveRedirectMutation,
   useDeleteRedirectMutation,
   useIndexingQuery,
+  useSiteLiveQuery,
+  useLazySiteLiveQuery,
+  usePublishSiteMutation,
   usePreviewAddressesQuery,
   usePreviewTokenMutation,
   useSetVisibilityMutation,

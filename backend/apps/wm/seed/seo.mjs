@@ -30,7 +30,7 @@ export function buildSeo({ ref, read, SEEDED_AT }) {
     return { id: `rd_${String(i + 1).padStart(2, "0")}`, ...r, code: 301, source: "website", handledBy: handledBy ?? "host", createdAt: SEEDED_AT, createdBy: "seed", version: 1 };
   });
   const settings = {
-    canonicalHost: "https://orgtik.ch",
+    canonicalHost: "https://orgtik-site.vercel.app",
     visibility: "noindex",
     // Only English is public today (LanguageMenu shows EN; the others are previews).
     publicLocales: ["en"],

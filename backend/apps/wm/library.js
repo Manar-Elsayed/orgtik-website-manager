@@ -29,7 +29,7 @@ const plain = (s) => String(s ?? "").replace(/<[^>]+>/g, "").trim();
 function makeLibrary({ seed, store, now, uploads, demo = false, locales, site }) {
   const media = new Map((seed.media ?? []).map((m) => [m.id, clone(m)]));
   const redirects = new Map((seed.seo?.redirects ?? []).map((r) => [r.id, clone(r)]));
-  const settings = clone(seed.seo?.settings ?? { visibility: "noindex", canonicalHost: "https://orgtik.ch", publicLocales: ["en"], version: 1, history: [] });
+  const settings = clone(seed.seo?.settings ?? { visibility: "noindex", canonicalHost: "https://orgtik-site.vercel.app", publicLocales: ["en"], version: 1, history: [] });
   let nextMedia = media.size + 1;
   let nextRedirect = redirects.size + 1;
   const ensureDemo = () => { if (demo) { require("./seed/demo-states").redirectExamples(redirects, now); require("./seed/workflow-examples").mediaExamples(media); } };
@@ -372,6 +372,16 @@ function makeLibrary({ seed, store, now, uploads, demo = false, locales, site })
     log(who.key, "redirect_create", r.id, "redirect");
     return { redirect: r };
   }
+  // What the website's server applies (the publish pipeline), and what only the browser handles.
+  const servedRedirects = () => [...redirects.values()].filter((r) => r.status !== "disabled");
+  const serverRedirects = () => servedRedirects().filter((r) => (r.handledBy ?? "host") === "host").map(({ id, from, to, code, query }) => ({ id, from, to, code, query: query ?? "keep" })).sort((a, b) => a.from.localeCompare(b.from));
+  // Publishing the website: the last request to rebuild it, and by whom.
+  let lastPublish = null;
+  function recordPublish(who, result) {
+    lastPublish = { at: now(), by: who.key, ok: result.ok, status: result.status ?? null, reason: String(result.reason ?? "").trim() || null };
+    log(who.key, "site_publish", "site", "settings", { ok: result.ok });
+    return lastPublish;
+  }
   function removeRedirect(r, who) {
     redirects.delete(r.id);
     log(who.key, "redirect_delete", r.id, "redirect");
@@ -475,14 +485,14 @@ function makeLibrary({ seed, store, now, uploads, demo = false, locales, site })
     return { settings };
   }
 
-  const exportState = () => ({ data: clone({ media: [...media], redirects: [...redirects], settings, healthRun, demoVersion: 3 }), sequences: { nextMedia, nextRedirect } });
+  const exportState = () => ({ data: clone({ media: [...media], redirects: [...redirects], settings, healthRun, lastPublish, demoVersion: 3 }), sequences: { nextMedia, nextRedirect } });
   const validateState = value => {
     const incoming = codec.object(value), rows = codec.mapRows(incoming.data?.media), redirects_ = codec.mapRows(incoming.data?.redirects), settings_ = codec.object(incoming.data?.settings);
     if (!Number.isSafeInteger(settings_.version) || !Array.isArray(settings_.history) || !Array.isArray(settings_.publicLocales)) throw codec.fail("Website Manager SEO settings are incomplete.");
-    return { data: { media: rows, redirects: redirects_, settings: settings_, healthRun: incoming.data.healthRun ?? null, demoVersion: incoming.data.demoVersion ?? 0 }, sequences: { nextMedia: codec.sequence(incoming.sequences?.nextMedia, rows, "md"), nextRedirect: codec.sequence(incoming.sequences?.nextRedirect, redirects_, "rd") } };
+    return { data: { media: rows, redirects: redirects_, settings: settings_, healthRun: incoming.data.healthRun ?? null, lastPublish: incoming.data.lastPublish ?? null, demoVersion: incoming.data.demoVersion ?? 0 }, sequences: { nextMedia: codec.sequence(incoming.sequences?.nextMedia, rows, "md"), nextRedirect: codec.sequence(incoming.sequences?.nextRedirect, redirects_, "rd") } };
   };
-  const importState = value => { const incoming = validateState(value); codec.replaceMap(media, incoming.data.media); codec.replaceMap(redirects, incoming.data.redirects); codec.replaceObject(settings, incoming.data.settings); healthRun = incoming.data.healthRun; nextMedia = incoming.sequences.nextMedia; nextRedirect = incoming.sequences.nextRedirect; if (incoming.data.demoVersion < 1) ensureDemo(); else if (demo && incoming.data.demoVersion < 2) require("./seed/workflow-examples").mediaExamples(media); if (demo && incoming.data.demoVersion < 3) require("./seed/demo-states").redirectStatusExamples(redirects); };
-  return { media, redirects, settings, mediaOut, resolveMedia, updateMedia, addUpload, removeMedia, health, CHECKS, GUIDANCE, MAIN_CHECKS, hasOther, runHealth, healthRunState, missingSeo, SEO_GROUPS, checkedLocales, seoConflicts, saveRedirect, removeRedirect, REDIRECT_STATUSES, sitemap, indexingUrls, robots, setVisibility, RIGHTS, keepAddresses, previewAddresses, exportState, importState, validateState };
+  const importState = value => { const incoming = validateState(value); codec.replaceMap(media, incoming.data.media); codec.replaceMap(redirects, incoming.data.redirects); codec.replaceObject(settings, incoming.data.settings); healthRun = incoming.data.healthRun; lastPublish = incoming.data.lastPublish; nextMedia = incoming.sequences.nextMedia; nextRedirect = incoming.sequences.nextRedirect; if (incoming.data.demoVersion < 1) ensureDemo(); else if (demo && incoming.data.demoVersion < 2) require("./seed/workflow-examples").mediaExamples(media); if (demo && incoming.data.demoVersion < 3) require("./seed/demo-states").redirectStatusExamples(redirects); };
+  return { media, redirects, settings, mediaOut, resolveMedia, updateMedia, addUpload, removeMedia, serverRedirects, recordPublish, lastPublish: () => lastPublish, health, CHECKS, GUIDANCE, MAIN_CHECKS, hasOther, runHealth, healthRunState, missingSeo, SEO_GROUPS, checkedLocales, seoConflicts, saveRedirect, removeRedirect, REDIRECT_STATUSES, sitemap, indexingUrls, robots, setVisibility, RIGHTS, keepAddresses, previewAddresses, exportState, importState, validateState };
 }
 
 module.exports = { makeLibrary };
