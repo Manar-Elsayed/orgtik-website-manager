@@ -2274,7 +2274,8 @@
       "hostSaved": "Hôte canonique enregistré. Publiez le site pour l’appliquer.",
       "hostInvalid": "Utilisez une adresse https:// sans chemin, par ex. https://orgtik.ch.",
       "showPassed": "Afficher les {count} vérifications réussies",
-      "hidePassed": "Masquer les vérifications réussies"
+      "hidePassed": "Masquer les vérifications réussies",
+      "policyPublic": "Public"
     }
   },
   "Site": {

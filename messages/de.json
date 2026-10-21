@@ -2274,7 +2274,8 @@
       "hostSaved": "Canonical-Host gespeichert. Website veröffentlichen, um ihn zu übernehmen.",
       "hostInvalid": "Eine https://-Adresse ohne Pfad verwenden, z. B. https://orgtik.ch.",
       "showPassed": "{count} bestandene Prüfungen zeigen",
-      "hidePassed": "Bestandene Prüfungen ausblenden"
+      "hidePassed": "Bestandene Prüfungen ausblenden",
+      "policyPublic": "Öffentlich"
     }
   },
   "Site": {
