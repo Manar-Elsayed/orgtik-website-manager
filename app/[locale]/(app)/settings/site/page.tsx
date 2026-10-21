@@ -47,13 +47,13 @@ function SiteForm({ site }: { site: SiteSettings }) {
       <PageHeader title={t("title")} description={t("description")} />
       <Card className="grid gap-4 sm:grid-cols-2">
         <h2 className="text-label text-fg sm:col-span-2">{t("identity")}</h2><p className="text-body-sm text-fg-muted sm:col-span-2">{ti("identityHelp")}</p>
-        <Field label={t("siteName")} error={errors.siteName ? t("errorRequired") : undefined}>
+        <Field className="sm:col-span-2" label={t("siteName")} error={errors.siteName ? t("errorRequired") : undefined}>
           <Input dir="auto" disabled={!editable} value={form.siteName} onChange={(e) => setForm({ ...form, siteName: e.target.value })} />
         </Field>
       </Card>
       <Card className="grid gap-4 sm:grid-cols-2">
         <h2 className="text-label text-fg sm:col-span-2">{ti("searchSocial")}</h2><p className="text-body-sm text-fg-muted sm:col-span-2">{ti("searchSocialHelp")}</p>
-        <Field label={t("titleTemplate")} description={t("titleTemplateHelp", { preview, page: "{page}" })} error={errors.titleTemplate ? t("errorTemplate", { page: "{page}" }) : undefined}>
+        <Field className="sm:col-span-2" label={t("titleTemplate")} description={t("titleTemplateHelp", { preview, page: "{page}" })} error={errors.titleTemplate ? t("errorTemplate", { page: "{page}" }) : undefined}>
           <Input dir="auto" disabled={!editable} value={form.titleTemplate} onChange={(e) => setForm({ ...form, titleTemplate: e.target.value })} />
         </Field>
         <Field
@@ -64,7 +64,7 @@ function SiteForm({ site }: { site: SiteSettings }) {
         >
           <Textarea dir="auto" rows={2} disabled={!editable} value={form.defaultDescription} onChange={(e) => setForm({ ...form, defaultDescription: e.target.value })} />
         </Field>
-        <Field label={t("defaultImage")} description={t("defaultImageHelp")}>
+        <Field className="sm:col-span-2" label={t("defaultImage")} description={t("defaultImageHelp")}>
           <Select
             disabled={!editable}
             value={form.defaultOgImage ?? "none"}
@@ -94,7 +94,7 @@ function SiteForm({ site }: { site: SiteSettings }) {
       <Card className="flex flex-col gap-4">
         <h2 className="text-label text-fg">{t("forms")}</h2><p className="text-body-sm text-fg-muted">{ti("formsHelp")}</p>
         <Field label={t("formsMode")} description={t("formsModeHelp")} error={errors.formsMode === "privacy_first" ? t("errorPrivacyFirst") : undefined}>
-          <Select disabled={!editable} value={form.formsMode} onValueChange={(v) => v && setForm({ ...form, formsMode: v as Form["formsMode"] })} options={(["preview", "live"] as const).map((m) => ({ value: m, label: t(`formsModes.${m}`) }))} className="max-w-sm" />
+          <Select disabled={!editable} value={form.formsMode} onValueChange={(v) => v && setForm({ ...form, formsMode: v as Form["formsMode"] })} options={(["preview", "live"] as const).map((m) => ({ value: m, label: t(`formsModes.${m}`) }))} />
         </Field>
       </Card>
 
