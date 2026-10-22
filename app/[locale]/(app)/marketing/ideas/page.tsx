@@ -57,7 +57,6 @@ function IdeasList() {
                 <Link dir="auto" href={`/marketing/ideas/${x.id}?returnTo=${encodeURIComponent(url.href)}`} className="truncate text-start font-semibold text-fg hover:underline focus-visible:outline-2 focus-visible:outline-focus">
                   {x.title}
                 </Link>
-                {x.sample ? <Badge size="sm">{t("sample")}</Badge> : null}
                 {x.discussion?.some(comment => comment.status === "pending") ? <Badge size="sm" tone="warning">{t("discussion.waiting", { count: x.discussion.filter(comment => comment.status === "pending").length })}</Badge> : null}
               </span>
               <span dir="auto" className="max-w-full truncate text-caption text-fg-subtle">{x.body}</span>

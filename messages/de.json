@@ -119,7 +119,7 @@
       "user_create": "Konto erstellt",
       "user_update": "Konto aktualisiert",
       "user_roles": "Website-Rollen geändert",
-      "sample_revision": "Beispielrevision hinzugefügt",
+      "sample_revision": "Version hinzugefügt",
       "manager_order": "Manager-Einträge neu angeordnet",
       "role_permissions": "Rollenberechtigungen geändert",
       "role_create": "Rolle erstellt",
@@ -1114,7 +1114,7 @@
     "erase": "Persönliche Daten löschen",
     "eraseTitle": "Persönliche Daten dieser Person löschen?",
     "eraseImpact": "Name und E-Mail-Adresse werden entfernt. Die Idee und ihr Verlauf bleiben erhalten. Dies kann nicht rückgängig gemacht werden.",
-    "sampleComments": "Beispielkommentare",
+    "sampleComments": "Frühere Kommentare",
     "discussion": {
       "title": "Besucherkommentare",
       "status": "Status",

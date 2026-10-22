@@ -119,7 +119,7 @@
       "user_create": "Created account",
       "user_update": "Updated account",
       "user_roles": "Changed website roles",
-      "sample_revision": "Added sample revision",
+      "sample_revision": "Added a revision",
       "manager_order": "Reordered manager entries",
       "role_permissions": "Changed role permissions",
       "role_create": "Created a role",
@@ -1114,7 +1114,7 @@
     "erase": "Erase personal details",
     "eraseTitle": "Erase this submitter’s personal details?",
     "eraseImpact": "The submitter’s name and email will be removed. The idea and its history will remain. This cannot be undone.",
-    "sampleComments": "Sample comments",
+    "sampleComments": "Earlier comments",
     "discussion": {
       "title": "Visitor comments",
       "status": "Status",

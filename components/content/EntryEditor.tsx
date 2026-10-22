@@ -11,7 +11,6 @@ import { Link, useRouter } from "@/i18n/routing";
 import { useLocale, useTranslations } from "next-intl";
 import {
   ClockCounterClockwise,
-  Flask,
   Translate,
 } from "@phosphor-icons/react";
 import {
@@ -828,15 +827,7 @@ function Editor({ entry, type, seoOnly = false }: { entry: Entry; type: ContentT
             {entry.hasDraft && entry.updatedBy?.key === "assistant" ? (
               <Badge tone="brand">{t("suggested")}</Badge>
             ) : null}
-            {type.figures ? (
-              entry.figures === "sample" ? (
-                <Badge tone="warning" icon={<Flask weight="bold" />}>
-                  {t("figuresSample")}
-                </Badge>
-              ) : (
-                <Badge tone="success">{t("figuresApproved")}</Badge>
-              )
-            ) : null}
+            {type.figures && entry.figures !== "sample" ? <Badge tone="success">{t("figuresApproved")}</Badge> : null}
           </span>
         }
         actions={
@@ -937,40 +928,6 @@ function Editor({ entry, type, seoOnly = false }: { entry: Entry; type: ContentT
         </p>
       ) : null}
 
-      {type.figures && entry.figures === "sample" ? (
-        <div
-          role="note"
-          className="flex flex-wrap items-center gap-3 rounded-card border border-warning bg-warning-subtle px-4 py-3"
-        >
-          <Flask
-            aria-hidden="true"
-            weight="fill"
-            className="size-5 shrink-0 text-warning"
-          />
-          <p className="min-w-0 flex-1 text-body-sm text-fg">
-            {t("figuresBanner")}
-            {dirty ? <span className="mt-1 block text-caption">{t("caseStudyDisplay.saveBeforeConfirm")}</span> : null}
-          </p>
-          {can("claims:approve") ? (
-            <ConfirmDialog
-              trigger={
-                <Button size="sm" variant="secondary" disabled={dirty || saving.isLoading || savingAction.busy || Boolean(savingAction.pending)}>
-                  {t("approveFigures")}
-                </Button>
-              }
-              tone="primary"
-              title={t("approveFiguresTitle")}
-              impact={t("approveFiguresImpact")}
-              acknowledgement={t("approveFiguresAck")}
-              confirmLabel={t("approveFigures")}
-              onConfirm={() =>
-                approveFigures({ ...ref, version: entry.version }).unwrap()
-              }
-            />
-          ) : null}
-        </div>
-      ) : null}
-
       {type.key === "caseStudy" ? (
         <CaseStudyDisplay
           mode={neutral.narrativePublished === true ? "approved" : neutral.sampleNarrativePublished === true ? "sample" : "card"}
@@ -978,6 +935,27 @@ function Editor({ entry, type, seoOnly = false }: { entry: Entry; type: ContentT
           disabled={!editable || !can("content:approve")}
           error={errors.narrativePublished ? t(errors.narrativePublished === "narrative_needs_approved_figures" ? "errorNarrativeFigures" : "errorRequired") : errors.sampleNarrativePublished ? t(errors.sampleNarrativePublished === "sample_narrative_needs_sample_figures" ? "errorSampleNarrative" : "errorRequired") : undefined}
           onChange={mode => setNeutralEdit(previous => ({ ...previous, narrativePublished: mode === "approved", sampleNarrativePublished: mode === "sample" }))}
+          // Confirming the client's results unlocks "approved results"; it lives with that choice.
+          action={type.figures && entry.figures === "sample" && can("claims:approve") ? (
+            <span className="flex flex-wrap items-center gap-3">
+              <ConfirmDialog
+                trigger={
+                  <Button size="sm" variant="secondary" disabled={dirty || saving.isLoading || savingAction.busy || Boolean(savingAction.pending)}>
+                    {t("approveFigures")}
+                  </Button>
+                }
+                tone="primary"
+                title={t("approveFiguresTitle")}
+                impact={t("approveFiguresImpact")}
+                acknowledgement={t("approveFiguresAck")}
+                confirmLabel={t("approveFigures")}
+                onConfirm={() =>
+                  approveFigures({ ...ref, version: entry.version }).unwrap()
+                }
+              />
+              {dirty ? <span className="text-caption text-fg-muted">{t("caseStudyDisplay.saveBeforeConfirm")}</span> : null}
+            </span>
+          ) : undefined}
         />
       ) : null}
 

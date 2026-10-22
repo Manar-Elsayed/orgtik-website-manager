@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { Field, RadioGroup } from "@orgtik/ui";
 
@@ -11,12 +12,15 @@ export function CaseStudyDisplay({
   disabled,
   error,
   onChange,
+  action,
 }: {
   mode: CaseStudyDisplayMode;
   approved: boolean;
   disabled: boolean;
   error?: string;
   onChange: (mode: CaseStudyDisplayMode) => void;
+  /** Shown under the choices, e.g. confirming the client's results. */
+  action?: ReactNode;
 }) {
   const t = useTranslations("Editor.caseStudyDisplay");
   return (
@@ -58,6 +62,7 @@ export function CaseStudyDisplay({
           }}
         />
       </Field>
+      {action ? <div className="mt-2">{action}</div> : null}
     </div>
   );
 }

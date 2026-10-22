@@ -47,11 +47,6 @@ export function ReviewSummary({
           >
             {text("name") || entry.name}
           </Link>
-          {data?.content.sample ? (
-            <Badge tone="warning" size="sm">
-              {t("sample")}
-            </Badge>
-          ) : null}
         </div>
         <span className="inline-flex self-start">
           {entry.visibility === "live" ? (
