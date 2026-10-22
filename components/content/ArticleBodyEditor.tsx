@@ -15,7 +15,7 @@ import {
   CaretDown,
   CaretUp,
 } from "@phosphor-icons/react";
-import { Button, Field, IconButton, Input, Textarea } from "@orgtik/ui";
+import { Button, ConfirmDialog, Field, IconButton, Input, Textarea } from "@orgtik/ui";
 import { MediaPicker } from "@/components/media/MediaPicker";
 import type { EditorContext } from "./BlockEditor";
 
@@ -102,6 +102,7 @@ export function ArticleBodyEditor({
   ctx: EditorContext;
 }) {
   const t = useTranslations("Improvements");
+  const tc = useTranslations("Confirm");
   const tf = useTranslations("Fields");
   const sections = normalize(value);
   const outlineId = useId();
@@ -288,13 +289,13 @@ export function ArticleBodyEditor({
                       disabled={index === sections.length - 1}
                       onClick={() => update(moved(sections, index, index + 1))}
                     />
-                    <IconButton
-                      label={`${t("remove")}: ${tf("articleSection")} ${index + 1}`}
-                      icon={<Trash />}
-                      className="text-danger hover:bg-danger-subtle focus-visible:outline-danger"
-                      onClick={() =>
-                        update(sections.filter((_, n) => n !== index))
-                      }
+                    {/* A section takes its text, images and videos with it, and the draft saves itself: ask. */}
+                    <ConfirmDialog
+                      trigger={<IconButton label={`${t("remove")}: ${tf("articleSection")} ${index + 1}`} icon={<Trash />} className="text-danger hover:bg-danger-subtle focus-visible:outline-danger" />}
+                      title={tc("removeTitle", { item: `${tf("articleSection")} ${index + 1}` })}
+                      impact={tc("removeImpact")}
+                      confirmLabel={tc("remove")}
+                      onConfirm={() => update(sections.filter((_, n) => n !== index))}
                     />
                   </span>
                 ) : null}
@@ -410,17 +411,12 @@ export function ArticleBodyEditor({
                                 })
                               }
                             />
-                            <IconButton
-                              label={`${t("remove")}: ${t(block.kind)} ${n + 1}`}
-                              icon={<Trash />}
-                              className="text-danger hover:bg-danger-subtle focus-visible:outline-danger"
-                              onClick={() =>
-                                editSection(index, {
-                                  blocks: section.blocks.filter(
-                                    (_, i) => i !== n,
-                                  ),
-                                })
-                              }
+                            <ConfirmDialog
+                              trigger={<IconButton label={`${t("remove")}: ${t(block.kind)} ${n + 1}`} icon={<Trash />} className="text-danger hover:bg-danger-subtle focus-visible:outline-danger" />}
+                              title={tc("removeTitle", { item: `${t(block.kind)} ${n + 1}` })}
+                              impact={tc("removeImpact")}
+                              confirmLabel={tc("remove")}
+                              onConfirm={() => editSection(index, { blocks: section.blocks.filter((_, i) => i !== n) })}
                             />
                           </span>
                         ) : null}

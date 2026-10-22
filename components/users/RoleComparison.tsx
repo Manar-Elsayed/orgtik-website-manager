@@ -12,6 +12,7 @@ import {
   Tabs,
   TabsList,
   toast,
+  ConfirmDialog,
 } from "@orgtik/ui";
 import { useCan } from "@/lib/permissions";
 import { CAPABILITY_GROUPS, ROLE_ACTIONS } from "@/lib/roleCapabilities";
@@ -100,6 +101,10 @@ export function RoleComparison() {
     });
     setProblem("");
   };
+  // Permissions this save takes away from everyone with the role.
+  const tc = useTranslations("Confirm");
+  const [confirmRemoval, setConfirmRemoval] = useState(false);
+  const removed = role && draft ? role.permissions.filter(permission => !draft.permissions.includes(permission)) : [];
   const save = async () => {
     if (!role || !draft) return;
     try {
@@ -297,10 +302,11 @@ export function RoleComparison() {
                 <Button
                   disabled={!dirty}
                   loading={updating.isLoading}
-                  onClick={save}
+                  onClick={() => (removed.length ? setConfirmRemoval(true) : void save())}
                 >
                   {t("save")}
                 </Button>
+                {role ? <ConfirmDialog open={confirmRemoval} onOpenChange={setConfirmRemoval} tone="danger" title={tc("permissionsTitle", { role: role.label })} impact={tc("permissionsImpact", { count: removed.length, people: role.assignedCount })} confirmLabel={tc("savePermissions")} onConfirm={() => save()} /> : null}
               </div>
             </div>
           ) : null}

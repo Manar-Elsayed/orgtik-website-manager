@@ -141,6 +141,7 @@ const put = (tree: Tree, path: string, v: unknown): Tree =>
   path ? { ...tree, [path]: v } : (v as Tree);
 
 function Editor({ entry, type, seoOnly = false }: { entry: Entry; type: ContentType; seoOnly?: boolean }) {
+  const tq = useTranslations("Confirm");
   const t = useTranslations("Editor");
   const ti = useTranslations("Improvements");
   const nav = useTranslations("Nav");
@@ -433,17 +434,18 @@ function Editor({ entry, type, seoOnly = false }: { entry: Entry; type: ContentT
       );
     if (state === "scheduled" && canApprove)
       return (
-        <Button
-          variant="secondary"
-          loading={moving.isLoading}
-          onClick={() =>
+        <ConfirmDialog
+          trigger={<Button variant="secondary" loading={moving.isLoading}>{t("unschedule")}</Button>}
+          tone="warning"
+          title={tq("unscheduleTitle")}
+          impact={tq("unscheduleImpact")}
+          confirmLabel={tq("unschedule")}
+          onConfirm={() =>
             act("unschedule")
               .then(() => toast.success(t("unscheduled")))
               .catch(onError)
           }
-        >
-          {t("unschedule")}
-        </Button>
+        />
       );
     if (state === "approved" && canApprove)
       return (

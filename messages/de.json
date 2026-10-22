@@ -3923,5 +3923,36 @@
         "resultsContent": "Inhalt des Ergebnisabschnitts"
       }
     }
+  },
+  "Confirm": {
+    "removeTitle": "{item} entfernen?",
+    "removeImpact": "Alles darin wird aus diesem Entwurf entfernt. Um es zurückzuholen, verwerfen Sie den Entwurf oder stellen Sie eine frühere Version wieder her.",
+    "remove": "Entfernen",
+    "disableRedirectTitle": "Weiterleitung für {from} deaktivieren?",
+    "disableRedirectImpact": "Sobald die Website veröffentlicht ist, zeigen alte Links auf {from} „Seite nicht gefunden“ statt {to} zu öffnen. Sie können sie jederzeit wieder aktivieren.",
+    "disableRedirect": "Weiterleitung deaktivieren",
+    "deactivateTitle": "Konto von {name} deaktivieren?",
+    "deactivateImpact": "{name} kann sich erst wieder bei OrgTik anmelden, wenn das Konto aktiviert wird. Arbeit und Verlauf bleiben erhalten.",
+    "deactivate": "Konto deaktivieren",
+    "unscheduleTitle": "Geplante Veröffentlichung abbrechen?",
+    "unscheduleImpact": "Es geht nicht wie geplant online. Es bleibt freigegeben, und Sie können es erneut planen.",
+    "unschedule": "Veröffentlichung abbrechen",
+    "reopenTitle": "Diese Übersetzung wieder öffnen?",
+    "reopenImpact": "Sie geht zurück in Bearbeitung und braucht eine neue Prüfung, bevor sie veröffentlicht werden kann.",
+    "reopen": "Übersetzung wieder öffnen",
+    "replaceSampleTitle": "Diese Datei durch das Beispiel ersetzen?",
+    "replaceSampleImpact": "Jede Seite, die diese Datei zeigt, zeigt stattdessen das Beispiel. Die aktuelle Datei bleibt im Verlauf.",
+    "replaceSample": "Datei ersetzen",
+    "disableWebhookTitle": "Webhook „{name}“ deaktivieren?",
+    "disableWebhookImpact": "Er zeichnet beim Veröffentlichen keine Zustellungen mehr auf, bis Sie ihn wieder aktivieren.",
+    "disableWebhook": "Webhook deaktivieren",
+    "languagesOffTitle": "{languages} von der Website nehmen?",
+    "languagesOffImpact": "Sobald die Website veröffentlicht ist, können Besucher sie nicht mehr auf {languages} öffnen. Die Übersetzungen bleiben erhalten, und Sie können die Sprachen wieder einschalten.",
+    "saveChanges": "Änderungen speichern",
+    "userAccessTitle": "Zugriff von {name} einschränken?",
+    "rolesRemovedImpact": "{name} verliert diese Rollen und was sie erlauben: {roles}.",
+    "permissionsTitle": "Berechtigungen aus {role} entfernen?",
+    "permissionsImpact": "{count, plural, one {# Berechtigung wird} other {# Berechtigungen werden}} allen mit dieser Rolle entzogen ({people, plural, one {# Person} other {# Personen}}).",
+    "savePermissions": "Berechtigungen speichern"
   }
 }

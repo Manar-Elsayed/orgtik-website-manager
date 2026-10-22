@@ -14,6 +14,7 @@ import {
   Input,
   Switch,
   toast,
+  ConfirmDialog,
 } from "@orgtik/ui";
 import {
   useMeQuery,
@@ -59,6 +60,11 @@ export function UserForm({
   const unavailableRoleSelected = !rolesUnavailable && rolesChanged && form.roles.some(key => !roles.some(role => role.key === key));
   const roleSelectionBlocked = unavailableRoleSelected || (form.roles.length > 0 && rolesChanged && rolesUnavailable);
   const hasLockedRole = form.roles.some(key => roles.some(role => role.key === key && role.protected && !accounts));
+  // What this save takes away: the account itself, or roles it had.
+  const tc = useTranslations("Confirm");
+  const [confirmLoss, setConfirmLoss] = useState(false);
+  const deactivating = Boolean(user && accounts && user.active && !form.active);
+  const rolesLost = user ? user.roles.filter(key => !form.roles.includes(key)).map(key => roles.find(role => role.key === key)?.label ?? key) : [];
   const save = async () => {
     if (readOnly || busy || roleSelectionBlocked) return;
     setProblem("");
@@ -202,6 +208,7 @@ export function UserForm({
           </Field>
         </DialogBody>
         <DialogFooter>
+          {user ? <ConfirmDialog open={confirmLoss} onOpenChange={setConfirmLoss} tone="danger" title={deactivating ? tc("deactivateTitle", {name: user.name}) : tc("userAccessTitle", {name: user.name})} impact={[deactivating ? tc("deactivateImpact", {name: user.name}) : "", rolesLost.length ? tc("rolesRemovedImpact", {name: user.name, roles: rolesLost.join(", ")}) : ""].filter(Boolean).join(" ")} confirmLabel={deactivating ? tc("deactivate") : tc("saveChanges")} onConfirm={() => save()} /> : null}
           <Button variant="secondary" disabled={busy} onClick={onClose}>
             {te("cancel")}
           </Button>
@@ -215,7 +222,7 @@ export function UserForm({
                 (!user && form.password.length < 8) ||
                 roleSelectionBlocked
               }
-              onClick={save}
+              onClick={() => (deactivating || rolesLost.length ? setConfirmLoss(true) : void save())}
             >
               {t(user ? "saveChanges" : "newAccount")}
             </Button>

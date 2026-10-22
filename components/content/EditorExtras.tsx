@@ -114,6 +114,7 @@ export function VersionRow({ entry, index, onError, readOnly = false }: { entry:
 /** Where a translation stands, and moving it through review (status matrix: translation). */
 export function TranslationBar({ entry, lang, dirty, onError }: { entry: Entry; lang: Locale; dirty: boolean; onError: (e: unknown) => void }) {
   const t = useTranslations("Editor");
+  const tc = useTranslations("Confirm");
   const can = useCan();
   const [translate, busy] = useTranslateEntryMutation();
   const state = entry.translation[lang];
@@ -135,9 +136,22 @@ export function TranslationBar({ entry, lang, dirty, onError }: { entry: Entry; 
         {actions
           .filter((a) => a.show)
           .map((a) => (
+            a.action === "reopen" ? (
+              // Reopening sends an approved translation back for a new review: ask.
+              <ConfirmDialog
+                key={a.action}
+                trigger={<Button size="sm" variant="ghost" disabled={dirty} title={dirty ? t("saveFirst") : undefined} loading={busy.isLoading}>{t("translationActions.reopen")}</Button>}
+                tone="warning"
+                title={tc("reopenTitle")}
+                impact={tc("reopenImpact")}
+                confirmLabel={tc("reopen")}
+                onConfirm={() => go(a.action)}
+              />
+            ) : (
             <Button key={a.action} size="sm" variant={a.primary ? "secondary" : "ghost"} disabled={dirty} title={dirty ? t("saveFirst") : undefined} loading={busy.isLoading} onClick={() => go(a.action)}>
               {t(`translationActions.${a.action}`)}
             </Button>
+            )
           ))}
       </span>
     </div>

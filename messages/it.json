@@ -3923,5 +3923,36 @@
         "resultsContent": "Contenuto della sezione risultati"
       }
     }
+  },
+  "Confirm": {
+    "removeTitle": "Rimuovere {item}?",
+    "removeImpact": "Tutto il suo contenuto viene tolto da questa bozza. Per recuperarlo, scarta la bozza o ripristina una versione precedente.",
+    "remove": "Rimuovi",
+    "disableRedirectTitle": "Disattivare il reindirizzamento per {from}?",
+    "disableRedirectImpact": "Dopo la pubblicazione del sito, i vecchi link a {from} mostrano “Pagina non trovata” invece di aprire {to}. Puoi riattivarlo in qualsiasi momento.",
+    "disableRedirect": "Disattiva reindirizzamento",
+    "deactivateTitle": "Disattivare l’account di {name}?",
+    "deactivateImpact": "{name} non potrà accedere a OrgTik finché l’account non viene riattivato. Il suo lavoro e la cronologia restano.",
+    "deactivate": "Disattiva account",
+    "unscheduleTitle": "Annullare la pubblicazione programmata?",
+    "unscheduleImpact": "Non andrà online come previsto. Resta approvato e puoi programmarlo di nuovo.",
+    "unschedule": "Annulla pubblicazione",
+    "reopenTitle": "Riaprire questa traduzione?",
+    "reopenImpact": "Torna in lavorazione e richiede una nuova revisione prima di poter essere pubblicata.",
+    "reopen": "Riapri traduzione",
+    "replaceSampleTitle": "Sostituire questo file con l’esempio?",
+    "replaceSampleImpact": "Ogni pagina che mostra questo file mostrerà invece l’esempio. Il file attuale resta nella cronologia.",
+    "replaceSample": "Sostituisci file",
+    "disableWebhookTitle": "Disattivare il webhook “{name}”?",
+    "disableWebhookImpact": "Smette di registrare le consegne alla pubblicazione dei contenuti, finché non lo riattivi.",
+    "disableWebhook": "Disattiva webhook",
+    "languagesOffTitle": "Togliere {languages} dal sito?",
+    "languagesOffImpact": "Dopo la pubblicazione del sito, i visitatori non potranno più aprirlo in {languages}. Le traduzioni restano e puoi riattivare le lingue.",
+    "saveChanges": "Salva modifiche",
+    "userAccessTitle": "Ridurre l’accesso di {name}?",
+    "rolesRemovedImpact": "{name} perde questi ruoli e ciò che consentono: {roles}.",
+    "permissionsTitle": "Rimuovere permessi da {role}?",
+    "permissionsImpact": "{count, plural, one {# permesso viene rimosso} other {# permessi vengono rimossi}} da tutti coloro che hanno questo ruolo ({people, plural, one {# persona} other {# persone}}).",
+    "savePermissions": "Salva permessi"
   }
 }
