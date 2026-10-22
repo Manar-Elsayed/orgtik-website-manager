@@ -22,3 +22,9 @@ nav.bg-chrome a[href*="/go/"],
 nav.bg-chrome a[href$="/tools"] {
   display: none;
 }
+
+/* Status badges read as words only (Approved, In review, Draft…): the design system's status icon
+   is left out. StatusBadge marks itself with data-status and puts the icon in its first hidden span. */
+[data-status] > span[aria-hidden="true"] {
+  display: none;
+}
