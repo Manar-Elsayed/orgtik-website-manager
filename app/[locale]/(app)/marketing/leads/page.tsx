@@ -7,7 +7,7 @@ import { useListState } from "@/lib/useListState";
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { DownloadSimple, Eye, PencilSimple, MagnifyingGlass, X } from "@phosphor-icons/react";
-import { Badge, Button, Input, MenuLinkItem, PageHeader, StatusBadge, Select, toast, useFormatter, useStatusLabel } from "@orgtik/ui";
+import { Button, Input, MenuLinkItem, PageHeader, StatusBadge, Select, toast, useFormatter, useStatusLabel } from "@orgtik/ui";
 import { DataTable, type ColumnDef } from "@orgtik/ui/table";
 import { RequirePermission } from "@/components/frame/RequirePermission";
 import { useCan } from "@/lib/permissions";
@@ -44,7 +44,6 @@ function LeadsList() {
                 <Link dir="auto" href={`/marketing/leads/${l.id}?returnTo=${encodeURIComponent(url.href)}`} className="truncate text-start font-semibold text-fg hover:underline focus-visible:outline-2 focus-visible:outline-focus">
                   {l.erased ? t("erasedName") : l.name}
                 </Link>
-                {l.sample ? <Badge size="sm">{t("sample")}</Badge> : null}
               </span>
               <span dir="auto" className="max-w-full truncate text-caption text-fg-subtle">{l.message}</span>
             </span>

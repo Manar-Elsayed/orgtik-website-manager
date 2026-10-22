@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { DotsThreeVertical, EyeSlash } from "@phosphor-icons/react";
 import {
-  Badge,
   LoadingState,
   ErrorState,
   EmptyState,
@@ -75,7 +74,6 @@ export function LeadDetail({ id }: { id: string }) {
               <span className="inline-flex flex-wrap items-center gap-2">
                 <StatusBadge entity="lead" state={lead.status} size="sm" />
                 <span dir="auto">{lead.topic}</span>
-                {lead.sample ? <Badge size="sm">{t("sample")}</Badge> : null}
               </span>
             </div>
           </div>

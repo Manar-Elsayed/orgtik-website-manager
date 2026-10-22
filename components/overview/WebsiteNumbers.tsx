@@ -5,12 +5,10 @@ import { useTranslations } from "next-intl";
 import {
   ChatCircleText,
   Eye,
-  Flask,
   Percent,
   UsersThree,
 } from "@phosphor-icons/react";
 import {
-  Badge,
   Card,
   ErrorState,
   SegmentedControl,
@@ -51,11 +49,7 @@ export function WebsiteNumbers() {
           <h2 id="site-heading" className="font-display text-title-sm text-fg">
             {t("website")}
           </h2>
-          {data?.sample ? (
-            <Badge tone="warning" icon={<Flask weight="bold" />}>
-              {t("sample")}
-            </Badge>
-          ) : null}
+
         </div>
         <SegmentedControl
           size="sm"
@@ -68,9 +62,7 @@ export function WebsiteNumbers() {
           }))}
         />
       </div>
-      {data?.sample ? (
-        <p className="-mt-2 text-body-sm text-fg-muted">{t("sampleBody")}</p>
-      ) : null}
+
 
       {isError ? (
         <Card>

@@ -119,7 +119,7 @@
       "user_create": "Account creato",
       "user_update": "Account aggiornato",
       "user_roles": "Ruoli del sito modificati",
-      "sample_revision": "Revisione dimostrativa aggiunta",
+      "sample_revision": "Ha aggiunto una versione",
       "manager_order": "Riordinato le voci del gestore",
       "role_permissions": "Autorizzazioni del ruolo modificate",
       "role_create": "Ruolo creato",
@@ -1114,7 +1114,7 @@
     "erase": "Cancella dati personali",
     "eraseTitle": "Cancellare i dati personali di questa persona?",
     "eraseImpact": "Il nome e l’indirizzo e-mail verranno rimossi. L’idea e la sua cronologia verranno conservate. Questa azione è irreversibile.",
-    "sampleComments": "Commenti di esempio",
+    "sampleComments": "Commenti precedenti",
     "discussion": {
       "title": "Commenti dei visitatori",
       "status": "Stato",

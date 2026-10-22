@@ -119,7 +119,7 @@
       "user_create": "Compte créé",
       "user_update": "Compte mis à jour",
       "user_roles": "Rôles du site modifiés",
-      "sample_revision": "Révision de démonstration ajoutée",
+      "sample_revision": "A ajouté une version",
       "manager_order": "Réorganisé les éléments du gestionnaire",
       "role_permissions": "Autorisations du rôle modifiées",
       "role_create": "Rôle créé",
@@ -1114,7 +1114,7 @@
     "erase": "Effacer les données personnelles",
     "eraseTitle": "Effacer les données personnelles de cette personne ?",
     "eraseImpact": "Le nom et l’adresse e-mail seront supprimés. L’idée et son historique seront conservés. Cette action est irréversible.",
-    "sampleComments": "Commentaires de démonstration",
+    "sampleComments": "Commentaires précédents",
     "discussion": {
       "title": "Commentaires des visiteurs",
       "status": "Statut",
