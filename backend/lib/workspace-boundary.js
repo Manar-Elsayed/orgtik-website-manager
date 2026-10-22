@@ -691,7 +691,7 @@ function createWorkspaceBoundary({ realm, config, store, accountStore, platform,
     try { json = body.length && /application\/json/.test(req.headers["content-type"] || "") ? JSON.parse(body.toString("utf8")) : {}; }
     catch { return sendJson(400, { success: false, code: "invalid_json", message: "Check the request and try again." }); }
     req.body = json;
-    const url = req.url || "/", authPublic = /^\/api\/auth\/(login|register|handoff\/exchange)(?:$|\?)/.test(url);
+    const url = req.url || "/", authPublic = /^\/api\/auth\/(login|register|handoff\/exchange|forgot-password|verify-otp|reset-password)(?:$|\?)/.test(url); // a forgotten password is reset while signed out
     const publicFile = key === 'files' && /^\/api\/v1\/public\/shares\/([\w-]+)(?:$|\/|\?)/.exec(url);
     const taskSample = key === 'tasks' && isTaskSampleRequest(req);
     const publicCms = key === 'wm' && (['GET', 'HEAD'].includes(req.method) && /^\/v2\/(?:public(?:\/|$)|media\/[^/]+(?:$|\?))/.test(url) || req.method === 'POST' && /^\/v2\/public\/(?:leads|ideas(?:\/[\w-]+\/comments)?)(?:$|\?)/.test(url));

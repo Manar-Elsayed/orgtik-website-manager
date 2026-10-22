@@ -112,8 +112,18 @@ export function WmFrame({ children }: { children: ReactNode }) {
   const [signOutFailed, setSignOutFailed] = useState(false);
   const [token, setTokenState] = useState<string | null | undefined>(undefined);
   useEffect(() => setTokenState(getToken()), [session]);
+  // To the sign-in page with the way back here, and why (a session that ended, or none yet).
+  const signInHere = (reason?: "expired") => {
+    const here = typeof window === "undefined" ? "" : window.location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, "") + window.location.search;
+    const query = new URLSearchParams();
+    if (reason) query.set("reason", reason);
+    if (here && here !== "/") query.set("redirect", here);
+    router.replace(`/signed-out${query.size ? `?${query}` : ""}`);
+  };
   useEffect(() => {
-    if (token === null) router.replace("/signed-out");
+    if (token === null) signInHere();
+    // signInHere reads the address and the router only.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, router]);
 
   const me = useMeQuery(undefined, { skip: !token });
@@ -125,8 +135,9 @@ export function WmFrame({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (statusOf(me.error) === 401) {
       clearToken();
-      router.replace("/signed-out");
+      signInHere("expired");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [me.error, router]);
 
   if (token === undefined || token === null || me.isLoading || statusOf(me.error) === 401) {
@@ -141,7 +152,7 @@ export function WmFrame({ children }: { children: ReactNode }) {
   if (statusOf(me.error) === 403) {
     return (
       <CenteredState>
-        <NoPermissionState size="compact" title={tn("title")} description={tn("body")} action={<Button variant="secondary" onClick={() => window.location.assign(SOS_URL)}>{tn("back")}</Button>} />
+        <NoPermissionState size="compact" title={tn("title")} description={tn("body")} action={<Button variant="secondary" onClick={() => { void signOutStaff().catch(clearToken).finally(() => window.location.assign(`/${locale}/signed-out`)); }}>{tn("switchAccount")}</Button>} />
       </CenteredState>
     );
   }
@@ -182,10 +193,10 @@ export function WmFrame({ children }: { children: ReactNode }) {
       notifications={{load:()=>wmRequest("/studio/notifications"),onSelect:item=>router.push(item.path),onRead:id=>wmRequest("/studio/notifications/read",{body:{ids:[id]}}),onReadAll:()=>wmRequest("/studio/notifications/read",{body:{all:true}})}}
       banner={<div className="flex flex-wrap gap-2 px-4 py-2">{me.data.roles.map(role=><Badge key={role.key} tone="brand" size="sm">{!role.labelOverridden&&tr.has(role.key)?tr(role.key):role.label}</Badge>)}</div>}
       sidebar={<Sidebar title={t("name")} sections={sections} />}
-      userMenu={<UserMenu name={`${user.firstName} ${user.lastName}`} email={user.email} avatarSrc={user.avatar??undefined} locales={routing.locales as readonly Locale[]} onLocaleChange={appearance.changeLocale} onSignOut={()=>{void signOutStaff().then(()=>window.location.assign(SOS_URL)).catch(()=>setSignOutFailed(true));}}/>}
+      userMenu={<UserMenu name={`${user.firstName} ${user.lastName}`} email={user.email} avatarSrc={user.avatar??undefined} locales={routing.locales as readonly Locale[]} onLocaleChange={appearance.changeLocale} onSignOut={()=>{void signOutStaff().then(()=>window.location.assign(`/${locale}/signed-out?reason=signed-out`)).catch(()=>setSignOutFailed(true));}}/>}
     >
       <div data-density={appearance.preferences.density||"comfortable"} className="min-w-0">{appearance.failed?<p role="alert" className="mb-4 text-body-sm text-danger">{v3("preferencesFailed")}</p>:null}{children}</div>
-      {signOutFailed && <ErrorState size="compact" title={ta("offlineTitle")} description={ta("offlineBody")} onRetry={() => { setSignOutFailed(false); void signOutStaff().then(() => window.location.assign(SOS_URL)).catch(() => setSignOutFailed(true)); }} />}
+      {signOutFailed && <ErrorState size="compact" title={ta("offlineTitle")} description={ta("offlineBody")} onRetry={() => { setSignOutFailed(false); void signOutStaff().then(() => window.location.assign(`/${locale}/signed-out?reason=signed-out`)).catch(() => setSignOutFailed(true)); }} />}
       <Toaster />
     </SuiteFrame>
   );
