@@ -3923,5 +3923,36 @@
         "resultsContent": "Results section content"
       }
     }
+  },
+  "Confirm": {
+    "removeTitle": "Remove {item}?",
+    "removeImpact": "Everything in it is taken out of this draft. To get it back, discard the draft or restore an earlier version.",
+    "remove": "Remove",
+    "disableRedirectTitle": "Disable the redirect for {from}?",
+    "disableRedirectImpact": "Once the website is published, old links to {from} show “Page not found” instead of opening {to}. You can enable it again at any time.",
+    "disableRedirect": "Disable redirect",
+    "deactivateTitle": "Deactivate {name}’s account?",
+    "deactivateImpact": "{name} can’t sign in to OrgTik until the account is turned back on. Their work and history are kept.",
+    "deactivate": "Deactivate account",
+    "unscheduleTitle": "Cancel the scheduled publication?",
+    "unscheduleImpact": "It won’t go live as planned. It stays approved, and you can schedule it again.",
+    "unschedule": "Cancel publication",
+    "reopenTitle": "Reopen this translation?",
+    "reopenImpact": "It goes back to in progress and needs a new review before it can be published.",
+    "reopen": "Reopen translation",
+    "replaceSampleTitle": "Replace this file with the sample?",
+    "replaceSampleImpact": "Every page that shows this file shows the sample instead. The current file stays in the history.",
+    "replaceSample": "Replace file",
+    "disableWebhookTitle": "Disable the webhook “{name}”?",
+    "disableWebhookImpact": "It stops recording deliveries when content is published, until you enable it again.",
+    "disableWebhook": "Disable webhook",
+    "languagesOffTitle": "Take {languages} off the website?",
+    "languagesOffImpact": "Once the website is published, visitors can’t open it in {languages}. The translations are kept, and you can turn the languages back on.",
+    "saveChanges": "Save changes",
+    "userAccessTitle": "Reduce {name}’s access?",
+    "rolesRemovedImpact": "{name} loses these roles and what they allow: {roles}.",
+    "permissionsTitle": "Remove permissions from {role}?",
+    "permissionsImpact": "{count, plural, one {# permission is} other {# permissions are}} removed from everyone with this role ({people, plural, one {# person} other {# people}}).",
+    "savePermissions": "Save permissions"
   }
 }

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Button, Card, ErrorState, Field, Input, LoadingState, NoPermissionState, PageHeader, Progress, Select, Switch, Textarea, toast } from "@orgtik/ui";
+import { Button, Card, ConfirmDialog, ErrorState, Field, Input, LoadingState, NoPermissionState, PageHeader, Progress, Select, Switch, Textarea, toast } from "@orgtik/ui";
 import { RequirePermission } from "@/components/frame/RequirePermission";
 import { useCan } from "@/lib/permissions";
 import { statusOf, useMediaQuery, useSiteQuery, useUpdateSiteMutation, type ApiError, type Locale, type SiteSettings } from "@/store/api";
@@ -26,11 +26,16 @@ function SiteForm({ site }: { site: SiteSettings }) {
   const dirty = JSON.stringify(form) !== JSON.stringify(formOf(site));
   const org = (k: keyof Form["organization"], v: string) => setForm((f) => ({ ...f, organization: { ...f.organization, [k]: v } }));
   const setLocale = (code: Locale, patch: Partial<Form["locales"][number]>) => setForm((f) => ({ ...f, locales: f.locales.map((l) => (l.code === code ? { ...l, ...patch } : l)) }));
-  const onSave = () => {
+  // Languages this save takes off the website (switched off, or no longer public).
+  const tc = useTranslations("Confirm");
+  const [confirmOff, setConfirmOff] = useState(false);
+  const goingOff = site.locales.filter((was) => { const now = form.locales.find((l) => l.code === was.code); return now && ((was.enabled && !now.enabled) || (was.public && !now.public)); }).map((l) => NATIVE[l.code] ?? l.code);
+  const onSave = () => (goingOff.length ? setConfirmOff(true) : void doSave());
+  const doSave = () => {
     setErrors({});
     const localesChanged = JSON.stringify(form.locales) !== JSON.stringify(site.locales);
     const { locales, ...rest } = form;
-    save({ version: site.version, patch: { ...rest, ...(localesChanged ? { locales } : {}) } })
+    return save({ version: site.version, patch: { ...rest, ...(localesChanged ? { locales } : {}) } })
       .unwrap()
       .then(() => toast.success(t("saved")))
       .catch((e: ApiError) => {
@@ -126,6 +131,7 @@ function SiteForm({ site }: { site: SiteSettings }) {
         <p className="text-body-sm text-fg-subtle">{t("arabicNote")}</p>
       </Card>
 
+      <ConfirmDialog open={confirmOff} onOpenChange={setConfirmOff} tone="danger" title={tc("languagesOffTitle", { languages: goingOff.join(", ") })} impact={tc("languagesOffImpact", { languages: goingOff.join(", ") })} confirmLabel={tc("saveChanges")} onConfirm={() => doSave()} />
       {dirty && editable ? (
         <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-raised/95 px-4 py-3 shadow-overlay backdrop-blur lg:ps-[340px]">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">

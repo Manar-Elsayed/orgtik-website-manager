@@ -3923,5 +3923,36 @@
         "resultsContent": "Contenu de la section résultats"
       }
     }
+  },
+  "Confirm": {
+    "removeTitle": "Retirer {item} ?",
+    "removeImpact": "Tout son contenu est retiré de ce brouillon. Pour le récupérer, abandonnez le brouillon ou restaurez une version antérieure.",
+    "remove": "Retirer",
+    "disableRedirectTitle": "Désactiver la redirection pour {from} ?",
+    "disableRedirectImpact": "Une fois le site publié, les anciens liens vers {from} affichent « Page introuvable » au lieu d’ouvrir {to}. Vous pouvez la réactiver à tout moment.",
+    "disableRedirect": "Désactiver la redirection",
+    "deactivateTitle": "Désactiver le compte de {name} ?",
+    "deactivateImpact": "{name} ne peut plus se connecter à OrgTik tant que le compte n’est pas réactivé. Son travail et son historique sont conservés.",
+    "deactivate": "Désactiver le compte",
+    "unscheduleTitle": "Annuler la publication programmée ?",
+    "unscheduleImpact": "Le contenu ne sera pas mis en ligne comme prévu. Il reste approuvé, et vous pouvez le reprogrammer.",
+    "unschedule": "Annuler la publication",
+    "reopenTitle": "Rouvrir cette traduction ?",
+    "reopenImpact": "Elle repasse en cours et doit être revue à nouveau avant de pouvoir être publiée.",
+    "reopen": "Rouvrir la traduction",
+    "replaceSampleTitle": "Remplacer ce fichier par l’exemple ?",
+    "replaceSampleImpact": "Chaque page qui affiche ce fichier affichera l’exemple à la place. Le fichier actuel reste dans l’historique.",
+    "replaceSample": "Remplacer le fichier",
+    "disableWebhookTitle": "Désactiver le webhook « {name} » ?",
+    "disableWebhookImpact": "Il n’enregistre plus les livraisons lors des publications, jusqu’à ce que vous le réactiviez.",
+    "disableWebhook": "Désactiver le webhook",
+    "languagesOffTitle": "Retirer {languages} du site ?",
+    "languagesOffImpact": "Une fois le site publié, les visiteurs ne pourront plus l’ouvrir en {languages}. Les traductions sont conservées, et vous pouvez réactiver les langues.",
+    "saveChanges": "Enregistrer les modifications",
+    "userAccessTitle": "Réduire l’accès de {name} ?",
+    "rolesRemovedImpact": "{name} perd ces rôles et ce qu’ils permettent : {roles}.",
+    "permissionsTitle": "Retirer des autorisations à {role} ?",
+    "permissionsImpact": "{count, plural, one {# autorisation est retirée} other {# autorisations sont retirées}} à toutes les personnes ayant ce rôle ({people, plural, one {# personne} other {# personnes}}).",
+    "savePermissions": "Enregistrer les autorisations"
   }
 }

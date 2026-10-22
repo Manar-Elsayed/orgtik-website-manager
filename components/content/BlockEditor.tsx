@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { ArrowDown, ArrowUp, Plus, Trash } from "@phosphor-icons/react";
 import {
   Button,
+  ConfirmDialog,
   Field,
   IconButton,
   Input,
@@ -147,6 +148,7 @@ export function ValueEditor({
   const label = useLabel(node);
   const inline = useInline();
   const tw = useTranslations("Editor");
+  const tc = useTranslations("Confirm");
   const placementText = useTranslations("PagePlacement");
   const id = useId();
   // Values in hints are addresses and marks: isolated (LRI…PDI) so they keep their order in RTL.
@@ -599,13 +601,12 @@ export function ValueEditor({
                           disabled={i === items.length - 1}
                           onClick={() => move(i, 1)}
                         />
-                        <IconButton
-                          size="sm"
-                          label={tw("removeItem", { item: inItem, n: i + 1 })}
-                          icon={<Trash />}
-                          onClick={() =>
-                            onChange(items.filter((_, j) => j !== i))
-                          }
+                        <ConfirmDialog
+                          trigger={<IconButton size="sm" label={tw("removeItem", { item: inItem, n: i + 1 })} icon={<Trash />} />}
+                          title={tc("removeTitle", { item: `${inItem} ${i + 1}` })}
+                          impact={tc("removeImpact")}
+                          confirmLabel={tc("remove")}
+                          onConfirm={() => onChange(items.filter((_, j) => j !== i))}
                         />
                       </span>
                     )}

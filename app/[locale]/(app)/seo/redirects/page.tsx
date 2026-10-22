@@ -171,6 +171,8 @@ function Redirects() {
   const url = useListState();
   const [viewing, setViewing] = useState<Redirect | null>(null);
   const [deleting, setDeleting] = useState<Redirect | null>(null);
+  const [disabling, setDisabling] = useState<Redirect | null>(null);
+  const tc = useTranslations("Confirm");
   const [tested, setTested] = useState<{ redirect: Redirect; result: RedirectTest } | null>(null);
   const editable = can("seo:edit");
   const creatable = can("seo:create"), deletable = can("seo:delete");
@@ -247,7 +249,7 @@ function Redirects() {
             <MenuItem icon={<Flask />} disabled={testing.isLoading} onClick={() => test(row.original)}>{tr("test")}</MenuItem>
             <MenuSeparator />
             {/* Disabling stops a live redirect, so it sits with Delete in the danger tone; enabling doesn't. */}
-            <MenuItem icon={<Power />} tone={row.original.status === "disabled" ? undefined : "danger"} disabled={!editable} onClick={() => toggle(row.original)}>{tr(row.original.status === "disabled" ? "enable" : "disable")}</MenuItem>
+            <MenuItem icon={<Power />} tone={row.original.status === "disabled" ? undefined : "danger"} disabled={!editable} onClick={() => (row.original.status === "disabled" ? toggle(row.original) : setDisabling(row.original))}>{tr(row.original.status === "disabled" ? "enable" : "disable")}</MenuItem>
             <MenuItem icon={<Trash />} tone="danger" disabled={!deletable} onClick={() => setDeleting(row.original)}>{ti("delete")}</MenuItem>
           </RowActionsMenu>
         ),
@@ -383,6 +385,8 @@ function Redirects() {
           </DialogContent>
         </Dialog>
       ) : null}
+      {/* Disabling stops a live redirect once the site is published: it asks first; enabling doesn't. */}
+      <ConfirmDialog open={Boolean(disabling)} onOpenChange={(open) => !open && setDisabling(null)} tone="danger" title={tc("disableRedirectTitle", { from: disabling?.from ?? "" })} impact={tc("disableRedirectImpact", { from: disabling?.from ?? "", to: disabling?.to ?? "" })} confirmLabel={tc("disableRedirect")} onConfirm={() => (disabling ? toggle(disabling) : undefined)} />
       <ConfirmDialog open={Boolean(deleting)} onOpenChange={(open) => !open && setDeleting(null)} tone="danger" title={t("deleteTitle", { from: deleting?.from ?? "" })} impact={deleting?.execution === "server" ? tr("deleteImpactLive") : t("deleteImpact")} confirmLabel={t("delete")} onConfirm={() => (deleting ? remove(deleting.id).unwrap().then(() => toast.success(t("deleted"))) : undefined)} />
       {editing ? <RedirectDialog initial={editing} onClose={() => setEditing(null)} /> : null}
     </div>

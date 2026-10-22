@@ -3923,5 +3923,36 @@
         "resultsContent": "محتوى قسم النتائج"
       }
     }
+  },
+  "Confirm": {
+    "removeTitle": "إزالة {item}؟",
+    "removeImpact": "يُزال كل ما فيه من هذه المسودة. لاستعادته، تجاهل المسودة أو استعد نسخة سابقة.",
+    "remove": "إزالة",
+    "disableRedirectTitle": "تعطيل إعادة التوجيه لـ {from}؟",
+    "disableRedirectImpact": "بعد نشر الموقع، تعرض الروابط القديمة إلى {from} «الصفحة غير موجودة» بدلًا من فتح {to}. يمكنك تفعيلها مجددًا في أي وقت.",
+    "disableRedirect": "تعطيل إعادة التوجيه",
+    "deactivateTitle": "إيقاف حساب {name}؟",
+    "deactivateImpact": "لن يتمكن {name} من تسجيل الدخول إلى OrgTik حتى يُعاد تفعيل الحساب. يُحتفظ بعمله وسجله.",
+    "deactivate": "إيقاف الحساب",
+    "unscheduleTitle": "إلغاء النشر المجدول؟",
+    "unscheduleImpact": "لن يُنشر كما هو مخطط. يبقى معتمدًا، ويمكنك جدولته مجددًا.",
+    "unschedule": "إلغاء النشر",
+    "reopenTitle": "إعادة فتح هذه الترجمة؟",
+    "reopenImpact": "تعود إلى قيد التنفيذ وتحتاج إلى مراجعة جديدة قبل نشرها.",
+    "reopen": "إعادة فتح الترجمة",
+    "replaceSampleTitle": "استبدال هذا الملف بالنموذج؟",
+    "replaceSampleImpact": "كل صفحة تعرض هذا الملف ستعرض النموذج بدلًا منه. يبقى الملف الحالي في السجل.",
+    "replaceSample": "استبدال الملف",
+    "disableWebhookTitle": "تعطيل الويب هوك «{name}»؟",
+    "disableWebhookImpact": "يتوقف عن تسجيل عمليات التسليم عند نشر المحتوى، حتى تفعّله مجددًا.",
+    "disableWebhook": "تعطيل الويب هوك",
+    "languagesOffTitle": "إزالة {languages} من الموقع؟",
+    "languagesOffImpact": "بعد نشر الموقع، لن يتمكن الزوار من فتحه بـ {languages}. تُحفظ الترجمات، ويمكنك إعادة تفعيل اللغات.",
+    "saveChanges": "حفظ التغييرات",
+    "userAccessTitle": "تقليل صلاحيات {name}؟",
+    "rolesRemovedImpact": "يفقد {name} هذه الأدوار وما تسمح به: {roles}.",
+    "permissionsTitle": "إزالة صلاحيات من {role}؟",
+    "permissionsImpact": "تُزال {count} صلاحيات من كل من لديه هذا الدور ({people} أشخاص).",
+    "savePermissions": "حفظ الصلاحيات"
   }
 }
