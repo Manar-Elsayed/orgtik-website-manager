@@ -20,12 +20,12 @@ import {
   DialogTitle,
   Field,
   Input,
-  PageHeader,
   Select,
   cn,
   toast,
   useFormatter,
 } from "@orgtik/ui";
+import { PageHeader } from "@/components/frame/PageHeader";
 import { DataTable, type ColumnDef } from "@orgtik/ui/table";
 import { SitePublishCard } from "@/components/seo/SitePublishCard";
 import { RequirePermission } from "@/components/frame/RequirePermission";

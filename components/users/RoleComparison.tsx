@@ -7,13 +7,13 @@ import {
   Checkbox,
   ErrorState,
   Input,
-  PageHeader,
   Skeleton,
   Tabs,
   TabsList,
   toast,
   ConfirmDialog,
 } from "@orgtik/ui";
+import { PageHeader } from "@/components/frame/PageHeader";
 import { useCan } from "@/lib/permissions";
 import { CAPABILITY_GROUPS, ROLE_ACTIONS } from "@/lib/roleCapabilities";
 import {

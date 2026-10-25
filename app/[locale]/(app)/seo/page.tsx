@@ -2,7 +2,8 @@
 
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
-import { Badge, Button, Input, Select, PageHeader, buttonVariants, cn, useFormatter } from "@orgtik/ui";
+import { Badge, Button, Input, Select, buttonVariants, cn, useFormatter } from "@orgtik/ui";
+import { PageHeader } from "@/components/frame/PageHeader";
 import { DataTable, type ColumnDef } from "@orgtik/ui/table";
 import { RequirePermission } from "@/components/frame/RequirePermission";
 import { SeoCountCard, revealList } from "@/components/seo/SeoCountCard";

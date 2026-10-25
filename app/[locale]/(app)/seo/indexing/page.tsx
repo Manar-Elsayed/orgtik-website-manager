@@ -2,7 +2,8 @@
 
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
-import { Badge, Input, Select, ErrorState, LoadingState, NoPermissionState, PageHeader, useFormatter } from "@orgtik/ui";
+import { Badge, Input, Select, ErrorState, LoadingState, NoPermissionState, useFormatter } from "@orgtik/ui";
+import { PageHeader } from "@/components/frame/PageHeader";
 import { DataTable, type ColumnDef } from "@orgtik/ui/table";
 import { RequirePermission } from "@/components/frame/RequirePermission";
 import { useListState } from "@/lib/useListState";

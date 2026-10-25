@@ -19,12 +19,12 @@ import {
   LocalizedField,
   NoPermissionState,
   NumberField,
-  PageHeader,
   Select,
   Textarea,
   toast,
   useFormatter,
 } from "@orgtik/ui";
+import { PageHeader } from "@/components/frame/PageHeader";
 import { DatePicker } from "@orgtik/ui/dates";
 import { MediaHistory } from "@/components/studio/PackagedMedia";
 import { RequirePermission } from "@/components/frame/RequirePermission";

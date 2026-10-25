@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Button, Card, ConfirmDialog, ErrorState, Field, Input, LoadingState, NoPermissionState, PageHeader, Progress, Select, Switch, Textarea, toast } from "@orgtik/ui";
+import { Button, Card, ConfirmDialog, ErrorState, Field, Input, LoadingState, NoPermissionState, Progress, Select, Switch, Textarea, toast } from "@orgtik/ui";
+import { PageHeader } from "@/components/frame/PageHeader";
 import { RequirePermission } from "@/components/frame/RequirePermission";
 import { useCan } from "@/lib/permissions";
 import { statusOf, useMediaQuery, useSiteQuery, useUpdateSiteMutation, type ApiError, type Locale, type SiteSettings } from "@/store/api";

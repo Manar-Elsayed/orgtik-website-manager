@@ -3,7 +3,8 @@
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { ArrowRight } from "@phosphor-icons/react";
-import { Badge, Button, FilterChips, Input, Select, PageHeader, StatusBadge, buttonVariants, cn, useFormatter } from "@orgtik/ui";
+import { Badge, Button, FilterChips, Input, Select, StatusBadge, buttonVariants, cn, useFormatter } from "@orgtik/ui";
+import { PageHeader } from "@/components/frame/PageHeader";
 import { DataTable, type ColumnDef } from "@orgtik/ui/table";
 import { RequirePermission } from "@/components/frame/RequirePermission";
 import { Link } from "@/i18n/routing";

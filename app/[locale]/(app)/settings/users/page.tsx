@@ -8,9 +8,9 @@ import {
   Input,
   MenuItem,
   MenuSeparator,
-  PageHeader,
   Select,
 } from "@orgtik/ui";
+import { PageHeader } from "@/components/frame/PageHeader";
 import { Eye, PencilSimple, Trash } from "@phosphor-icons/react";
 import { DataTable, type ColumnDef } from "@orgtik/ui/table";
 import { RequirePermission } from "@/components/frame/RequirePermission";
