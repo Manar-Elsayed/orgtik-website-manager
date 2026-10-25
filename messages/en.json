@@ -1530,15 +1530,16 @@
   },
   "Localization": {
     "title": "Translations",
-    "description": "Every page and entry in every language: what’s translated, what’s waiting for review, and what changed in English since.",
-    "readyCount": "ready or live",
+    "description": "Every page and entry in every language: which translations are complete and which are still missing.",
+    "readyCount": "complete",
     "filters": {
       "all": "All",
-      "needs_review": "Needs review",
-      "outdated": "Outdated",
-      "in_progress": "In progress",
-      "not_started": "Not started",
-      "gaps": "Missing or outdated"
+      "complete": "Complete",
+      "missing": "Missing"
+    },
+    "state": {
+      "complete": "Complete",
+      "missing": "Missing"
     },
     "type": "Kind",
     "allTypes": "All Pages",

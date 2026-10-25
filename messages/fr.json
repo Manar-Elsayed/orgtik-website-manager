@@ -1530,15 +1530,16 @@
   },
   "Localization": {
     "title": "Traductions",
-    "description": "Chaque page et entrée dans chaque langue : ce qui est traduit, ce qui attend une relecture et ce qui a changé en anglais depuis.",
-    "readyCount": "prêtes ou en ligne",
+    "description": "Chaque page et entrée dans chaque langue : quelles traductions sont complètes et lesquelles manquent encore.",
+    "readyCount": "complètes",
     "filters": {
       "all": "Toutes",
-      "needs_review": "À relire",
-      "outdated": "Obsolètes",
-      "in_progress": "En cours",
-      "not_started": "Pas commencées",
-      "gaps": "Manquant ou obsolète"
+      "complete": "Complètes",
+      "missing": "Manquantes"
+    },
+    "state": {
+      "complete": "Complète",
+      "missing": "Manquante"
     },
     "type": "Type",
     "allTypes": "Toutes les pages",

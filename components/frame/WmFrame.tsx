@@ -3,7 +3,7 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { AppWindow, ArrowsSplit, GearSix, ListChecks, Translate, Tray, Article, ArrowSquareOut, Briefcase, Browsers, Globe, Heartbeat, Images, Key, Lightbulb, MagnifyingGlass, MapTrifold, Scales, SquaresFour, Stack, Tag, Monitor, WarningCircle } from "@phosphor-icons/react";
+import { AppWindow, ArrowsSplit, GearSix, ListChecks, Translate, Tray, Article, ArrowSquareOut, Briefcase, Browsers, Globe, Heartbeat, Images, Key, Lightbulb, MagnifyingGlass, MapTrifold, Scales, SquaresFour, Stack, Tag, WarningCircle } from "@phosphor-icons/react";
 import {
   Badge,
   Button,
@@ -45,7 +45,6 @@ function useNav(): NavSection[] {
         { key: t("pages"), href: "/content/pages", icon: <Browsers />, permission: "content:view" },
         { key: t("global"), href: "/content/global", icon: <Globe />, permission: "content:view" },
         { key: t("translations"), href: "/localization", icon: <Translate />, permission: "localization:view" },
-        { key: t("preview"), href: "/preview", icon: <Monitor />, permission: "content:view" },
       ],
     },
     {

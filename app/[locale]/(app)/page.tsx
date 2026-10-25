@@ -22,7 +22,7 @@ const QUEUE: { key: keyof Overview["queue"]; icon: React.ReactNode }[] = [
 
 const DESTINATIONS: Partial<Record<keyof Overview["queue"], string>> = {
   drafts: "/content/queue?state=draft&mine=1", inReview: "/content/queue?state=in_review", scheduled: "/content/queue?state=scheduled",
-  translationGaps: "/localization?status=gaps", translationReview: "/localization?status=needs_review", seoIssues: "/seo/missing?issues=descriptionMissing", mediaIssues: "/media?issue=attention", newLeads: "/marketing/leads?status=new", pendingIdeas: "/marketing/ideas?status=pending",
+  translationGaps: "/localization?status=missing", translationReview: "/localization?status=missing", seoIssues: "/seo/missing?issues=descriptionMissing", mediaIssues: "/media?issue=attention", newLeads: "/marketing/leads?status=new", pendingIdeas: "/marketing/ideas?status=pending",
 };
 export default function OverviewPage() {
   const t = useTranslations("Overview");
