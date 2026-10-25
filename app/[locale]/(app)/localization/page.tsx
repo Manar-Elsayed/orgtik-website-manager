@@ -3,7 +3,7 @@ import { RowActionsMenu } from "@/components/content/RowActionsMenu";
 
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
-import { MenuLinkItem, Input, Card, PageHeader, Select, StatusBadge, Tabs, TabsList, useFormatter } from "@orgtik/ui";
+import { Badge, MenuLinkItem, Input, Card, PageHeader, Select, Tabs, TabsList, useFormatter } from "@orgtik/ui";
 import { DataTable, type ColumnDef } from "@orgtik/ui/table";
 import { RequirePermission } from "@/components/frame/RequirePermission";
 import { Link } from "@/i18n/routing";
@@ -16,9 +16,13 @@ import { statusOf, useSiteQuery, useLocalizationQuery, type EntryType, type Loca
 
 const LANGS: Locale[] = ["ar", "de", "fr", "it"];
 const NATIVE: Record<Locale, string> = { en: "English", ar: "العربية", de: "Deutsch", fr: "Français", it: "Italiano" };
-const FILTERS = ["all", "gaps", "needs_review", "outdated", "in_progress", "not_started"] as const;
+// Two statuses only: a translation is complete once it is ready or live; anything else is missing.
+const FILTERS = ["all", "complete", "missing"] as const;
 type Filter = (typeof FILTERS)[number];
 const DONE: TranslationState[] = ["ready", "published"];
+const isComplete = (state: TranslationState | undefined) => DONE.includes(state ?? "not_started");
+// Older links (?status=gaps, needs_review, outdated, in_progress, not_started) all mean "not complete yet".
+const toFilter = (value: string): Filter => (value === "all" || value === "complete" ? value : "missing");
 
 // Every entry in every language: where each translation stands, and a way into it.
 function Matrix() {
@@ -32,7 +36,7 @@ function Matrix() {
   const url = useListState();
   const ti = useTranslations("Improvements");
   const can = useCan();
-  const filter = url.get("status", "all") as Filter;
+  const filter = toFilter(url.get("status", "all"));
   const type = url.get("type", "all") as "all" | EntryType;
   const setFilter = (status: string) => url.set({ status });
   const setType = (type: string) => url.set({ type });
@@ -40,8 +44,8 @@ function Matrix() {
   // Prices are numbers and keys; they have nothing to translate beyond their words, kept with them.
   const all = useMemo(() => (data?.items ?? []).filter((r) => r.type !== "pricing"), [data?.items]);
   const search = url.get("search");
-  const rows = useMemo(() => all.filter((r) => (!search || entryName(r).toLowerCase().includes(search.toLowerCase())) && (type === "all" || r.type === type) && (filter === "all" || languages.some((l) => filter === "gaps" ? ["not_started", "outdated"].includes(r.translation[l] ?? "not_started") : (r.translation[l] ?? "not_started") === filter))), [all, search, type, filter, entryName, languages.join(",")]);
-  const count = (s: Filter) => (s === "all" ? all.length : all.filter((r) => languages.some((l) => r.translation[l] === s)).length);
+  // Complete: every language is complete. Missing: at least one language still is.
+  const rows = useMemo(() => all.filter((r) => (!search || entryName(r).toLowerCase().includes(search.toLowerCase())) && (type === "all" || r.type === type) && (filter === "all" || (filter === "complete" ? languages.every((l) => isComplete(r.translation[l])) : languages.some((l) => !isComplete(r.translation[l]))))), [all, search, type, filter, entryName, languages.join(",")]);
 
   const columns = useMemo<ColumnDef<LocalizationRow, any>[]>(
     () => [
@@ -67,7 +71,7 @@ function Matrix() {
         ),
         cell: ({ row }) => (
           <Link href={`/content/${TYPES[row.original.type].area}/${row.original.id}?lang=${l}&returnTo=${encodeURIComponent(url.href)}`} aria-label={t("openIn", { language: languageName(l) })} className="inline-flex rounded-pill focus-visible:outline-2 focus-visible:outline-focus">
-            <StatusBadge entity="translation" state={row.original.translation[l] ?? "not_started"} size="sm" />
+            {isComplete(row.original.translation[l]) ? <Badge tone="success" size="sm">{t("state.complete")}</Badge> : <Badge tone="warning" size="sm">{t("state.missing")}</Badge>}
           </Link>
         ),
       })),
@@ -86,7 +90,7 @@ function Matrix() {
       {data ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
           {languages.map((l) => {
-            const done = all.filter((r) => DONE.includes(r.translation[l])).length;
+            const done = all.filter((r) => isComplete(r.translation[l])).length;
             return (
               <Card key={l} padding="sm" className="flex flex-col gap-1">
                 <span lang={l} dir={l === "ar" ? "rtl" : "ltr"} className="text-start text-body-sm text-fg-muted">{languageName(l)}</span>

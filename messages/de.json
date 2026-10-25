@@ -1530,15 +1530,16 @@
   },
   "Localization": {
     "title": "Übersetzungen",
-    "description": "Jede Seite und jeder Eintrag in jeder Sprache: was übersetzt ist, was auf Prüfung wartet und was sich im Englischen seither geändert hat.",
-    "readyCount": "bereit oder online",
+    "description": "Jede Seite und jeder Eintrag in jeder Sprache: welche Übersetzungen vollständig sind und welche noch fehlen.",
+    "readyCount": "vollständig",
     "filters": {
       "all": "Alle",
-      "needs_review": "Zu prüfen",
-      "outdated": "Veraltet",
-      "in_progress": "In Arbeit",
-      "not_started": "Nicht begonnen",
-      "gaps": "Fehlend oder veraltet"
+      "complete": "Vollständig",
+      "missing": "Fehlend"
+    },
+    "state": {
+      "complete": "Vollständig",
+      "missing": "Fehlt"
     },
     "type": "Art",
     "allTypes": "Alle Seiten",

@@ -1530,15 +1530,16 @@
   },
   "Localization": {
     "title": "Traduzioni",
-    "description": "Ogni pagina e voce in ogni lingua: cosa è tradotto, cosa attende revisione e cosa è cambiato in inglese nel frattempo.",
-    "readyCount": "pronte o online",
+    "description": "Ogni pagina e voce in ogni lingua: quali traduzioni sono complete e quali mancano ancora.",
+    "readyCount": "complete",
     "filters": {
       "all": "Tutte",
-      "needs_review": "Da rivedere",
-      "outdated": "Superate",
-      "in_progress": "In corso",
-      "not_started": "Non iniziate",
-      "gaps": "Mancante o obsoleto"
+      "complete": "Complete",
+      "missing": "Mancanti"
+    },
+    "state": {
+      "complete": "Completa",
+      "missing": "Mancante"
     },
     "type": "Tipo",
     "allTypes": "Tutte le pagine",

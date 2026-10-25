@@ -355,7 +355,28 @@ function redirectExamples(redirects, now) {
       });
   }
 }
+// Seed data: a few pages translated in every language, so Translations shows Complete as well as Missing.
+// Only English is public on the website, so these copies stay out of sight until a language is made public.
+const COMPLETE_TRANSLATION_PAGES = ["pg_about", "pg_contact", "pg_legal", "pg_faq"];
+function completeTranslationExamples(entries) {
+  for (const id of COMPLETE_TRANSLATION_PAGES) {
+    const entry = entries.get(id);
+    if (!entry?.live?.locales?.en || entry.draft || entry.demoCompleteTranslations) continue;
+    // Only pages nobody has touched since the website import: no edits, no translation work.
+    if (!entry.versions.every((version) => version.by === "seed")) continue;
+    const locales = Object.keys(entry.translation).filter((locale) => locale !== "en");
+    if (locales.some((locale) => entry.translation[locale] !== "not_started")) continue;
+    for (const locale of locales) {
+      // Fill only empty languages; the imported version in the history matches what is live.
+      for (const content of [entry.live, ...entry.versions.map((version) => version.content)].filter(Boolean))
+        content.locales[locale] ??= clone(entry.live.locales.en);
+      entry.translation[locale] = "published";
+    }
+    entry.demoCompleteTranslations = true;
+  }
+}
 module.exports = {
+  completeTranslationExamples,
   contentExamples,
   legalExamples,
   publishedExamples,
