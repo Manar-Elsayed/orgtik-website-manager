@@ -2,7 +2,8 @@
 
 import { notFound, useParams, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { PageHeader, Tabs, TabsList } from "@orgtik/ui";
+import { Tabs, TabsList } from "@orgtik/ui";
+import { PageHeader } from "@/components/frame/PageHeader";
 import { RequirePermission } from "@/components/frame/RequirePermission";
 import { NewEntry } from "@/components/content/NewEntry";
 import { useCan } from "@/lib/permissions";

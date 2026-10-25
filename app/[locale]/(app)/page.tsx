@@ -2,7 +2,8 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { ChatCircleText, ClockCountdown, FileText, Globe, Image, Lightbulb, MagnifyingGlass, PencilSimple, Translate } from "@phosphor-icons/react";
-import { Card, ErrorState, PageHeader, Skeleton, useFormatter } from "@orgtik/ui";
+import { Card, ErrorState, Skeleton, useFormatter } from "@orgtik/ui";
+import { PageHeader } from "@/components/frame/PageHeader";
 import { useMeQuery, useOverviewQuery, type Overview } from "@/store/api";
 import { Link } from "@/i18n/routing";
 import { Setup } from "@/components/studio/Setup";

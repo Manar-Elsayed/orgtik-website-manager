@@ -1,7 +1,8 @@
 "use client";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Badge, Button, Checkbox, ConfirmDialog, EmptyState, Field, Input, PageHeader, useFormatter } from "@orgtik/ui";
+import { Badge, Button, Checkbox, ConfirmDialog, EmptyState, Field, Input, useFormatter } from "@orgtik/ui";
+import { PageHeader } from "@/components/frame/PageHeader";
 import { Link } from "@/i18n/routing";
 import { useCan } from "@/lib/permissions";
 import { useMeQuery } from "@/store/api";

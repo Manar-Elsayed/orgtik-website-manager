@@ -153,25 +153,25 @@ export function IdeaDetailContent({
   return (
     <div className="flex w-full min-w-0 flex-col gap-6">
       <div className="flex min-w-0 flex-col gap-5">
-        <header>
-          <h1 className="mb-3 font-display text-title-lg">
-            <span dir="auto">{idea.title}</span>
-          </h1>
-          <div>
-            <span className="inline-flex flex-wrap items-center gap-2">
-              <StatusBadge
-                entity="roadmap_idea"
-                state={idea.status}
-                size="sm"
-              />
-              <span>{t("colCategory")}: {t(`categories.${idea.category ?? "unassigned"}`)}</span>
-              <IdeaTags tags={idea.tags} empty={t("noTags")} />
-            </span>
+        <header className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3 lg:flex-nowrap">
+          <div className="min-w-0 lg:min-w-60 lg:flex-1">
+            <h1 className="mb-3 font-display text-title-lg [overflow-wrap:anywhere]">
+              <span dir="auto">{idea.title}</span>
+            </h1>
+            <div>
+              <span className="inline-flex flex-wrap items-center gap-2">
+                <StatusBadge
+                  entity="roadmap_idea"
+                  state={idea.status}
+                  size="sm"
+                />
+                <span>{t("colCategory")}: {t(`categories.${idea.category ?? "unassigned"}`)}</span>
+                <IdeaTags tags={idea.tags} empty={t("noTags")} />
+              </span>
+            </div>
           </div>
-        </header>
-        <div className="flex flex-col gap-5">
           {can("marketing:edit") ? (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap items-center gap-2 lg:min-w-0 lg:justify-end">
               <Button
                 variant="secondary"
                 disabled={saving.isLoading}
@@ -204,6 +204,8 @@ export function IdeaDetailContent({
               ))}
             </div>
           ) : null}
+        </header>
+        <div className="flex flex-col gap-5">
           <LifecycleProgress
             label={t("history")}
             current={idea.status}

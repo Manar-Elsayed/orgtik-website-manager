@@ -2,7 +2,8 @@
 
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
-import { Input, PageHeader, Select, useFormatter } from "@orgtik/ui";
+import { Input, Select, useFormatter } from "@orgtik/ui";
+import { PageHeader } from "@/components/frame/PageHeader";
 import { DataTable, type ColumnDef } from "@orgtik/ui/table";
 import { RequirePermission } from "@/components/frame/RequirePermission";
 import { Link } from "@/i18n/routing";

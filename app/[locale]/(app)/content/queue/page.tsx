@@ -1,6 +1,7 @@
 "use client";
 import { useTranslations } from "next-intl";
-import { Input, PageHeader, Select, StatusBadge } from "@orgtik/ui";
+import { Input, Select, StatusBadge } from "@orgtik/ui";
+import { PageHeader } from "@/components/frame/PageHeader";
 import { DataTable, type ColumnDef } from "@orgtik/ui/table";
 import { EntryActions } from "@/components/content/EntryActions";
 import { RequirePermission } from "@/components/frame/RequirePermission";

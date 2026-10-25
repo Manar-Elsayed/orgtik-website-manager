@@ -18,10 +18,10 @@ import {
   IconButton,
   LoadingState,
   NoPermissionState,
-  PageHeader,
   SegmentedControl,
   Spinner,
 } from "@orgtik/ui";
+import { PageHeader } from "@/components/frame/PageHeader";
 import { RequirePermission } from "@/components/frame/RequirePermission";
 import { WEBSITE_URL } from "@/lib/env";
 import {

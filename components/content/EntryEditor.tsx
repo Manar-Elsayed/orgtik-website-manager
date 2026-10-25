@@ -28,7 +28,6 @@ import {
   LoadingState,
   NoPermissionState,
   NumberField,
-  PageHeader,
   Select,
   Sheet,
   SheetContent,
@@ -42,6 +41,7 @@ import {
   toast,
   useFormatter,
 } from "@orgtik/ui";
+import { PageHeader } from "@/components/frame/PageHeader";
 import { DatePicker } from "@orgtik/ui/dates";
 import {
   ValueEditor,

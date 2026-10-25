@@ -21,7 +21,6 @@ import {
   Input,
   LoadingState,
   NoPermissionState,
-  PageHeader,
   Pagination,
   Select,
   Tabs,
@@ -29,6 +28,7 @@ import {
   toast,
   useFormatter,
 } from "@orgtik/ui";
+import { PageHeader } from "@/components/frame/PageHeader";
 import { RequirePermission } from "@/components/frame/RequirePermission";
 import { Link, useRouter } from "@/i18n/routing";
 import { Thumb } from "@/components/media/Thumb";

@@ -3,7 +3,8 @@ import { RowActionsMenu } from "@/components/content/RowActionsMenu";
 
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
-import { Badge, MenuLinkItem, Input, Card, PageHeader, Select, Tabs, TabsList, useFormatter } from "@orgtik/ui";
+import { Badge, MenuLinkItem, Input, Card, Select, Tabs, TabsList, useFormatter } from "@orgtik/ui";
+import { PageHeader } from "@/components/frame/PageHeader";
 import { DataTable, type ColumnDef } from "@orgtik/ui/table";
 import { RequirePermission } from "@/components/frame/RequirePermission";
 import { Link } from "@/i18n/routing";

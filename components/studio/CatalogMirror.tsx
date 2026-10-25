@@ -1,7 +1,8 @@
 "use client";
 import {useMemo, useState} from "react";
 import {useLocale,useTranslations} from "next-intl";
-import {Badge,Button,Input,PageHeader,Select,buttonVariants,useFormatter} from "@orgtik/ui";
+import { Badge, Button, Input, Select, buttonVariants, useFormatter } from "@orgtik/ui";
+import { PageHeader } from "@/components/frame/PageHeader";
 import {MagnifyingGlass} from "@phosphor-icons/react";
 import {DataTable, type ColumnDef} from "@orgtik/ui/table";
 import {useStudio,type CatalogItem,type CatalogMirror as Mirror} from "@/lib/studio";

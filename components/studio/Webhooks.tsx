@@ -1,7 +1,8 @@
 "use client";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Badge,Button,Checkbox,ConfirmDialog,EmptyState,Field,Input,PageHeader,Select,SimulatedTag,useFormatter } from "@orgtik/ui";
+import { Badge, Button, Checkbox, ConfirmDialog, EmptyState, Field, Input, Select, SimulatedTag, useFormatter } from "@orgtik/ui";
+import { PageHeader } from "@/components/frame/PageHeader";
 import { useCan } from "@/lib/permissions";
 import { useStudio,useStudioAction,type HookData,type Webhook } from "@/lib/studio";
 import { StudioFeedback,StudioState } from "./StudioUI";
