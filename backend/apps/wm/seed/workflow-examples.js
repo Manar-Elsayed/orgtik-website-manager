@@ -133,36 +133,27 @@ function caseStudyReviewExample({entries, audit, now}) {
   audit.unshift({at, by: 'manager', action: 'sample_revision', entry: id, type: 'caseStudy', version: 2, targetName: content.locales.en.name, sample: true});
 }
 
-const ROADMAP_REVIEW_WORDS = {
-  en: ['Sample roadmap item in review', 'Private workflow example submitted for review. This fictional roadmap item is kept off the website.', 'Planned for 2027'],
-  ar: ['عنصر خارطة طريق تجريبي قيد المراجعة', 'مثال خاص لسير العمل أُرسل للمراجعة. هذا العنصر خيالي ولا يظهر على الموقع.', 'مخطط لعام 2027'],
-  de: ['Beispiel-Roadmap-Eintrag in Prüfung', 'Privates Ablaufbeispiel, zur Prüfung eingereicht. Dieser fiktive Roadmap-Eintrag bleibt außerhalb der Website.', 'Geplant für 2027'],
-  fr: ['Élément de feuille de route d’exemple en relecture', 'Exemple de fonctionnement privé envoyé en relecture. Cet élément fictif reste hors du site.', 'Prévu pour 2027'],
-  it: ['Elemento di roadmap di esempio in revisione', 'Esempio di flusso privato inviato in revisione. Questo elemento fittizio resta fuori dal sito.', 'Previsto per il 2027'],
-};
-
-// A roadmap item waiting for review, so Roadmap's "In review" filter keeps an example after the
-// seeded items have moved on. Added once; editing or deleting it is kept.
+// Roadmap's "In review" filter shows a planned item that is already on the site, with a revision
+// waiting for review, so it carries no "Not on the site yet" tag. The private sample added before
+// is removed only while untouched; edits to any roadmap item are kept.
 function roadmapReviewExample({entries, audit, now}) {
-  const id = 'rm_demo_in_review';
-  if (entries.has(id)) return;
+  const sample = entries.get('rm_demo_in_review');
+  const untouched = sample?.workflow.state === 'in_review' && sample.workflow.version === 2 && sample.versions.length === 2;
+  const rows = [...entries.values()].filter(row => row.type === 'roadmapItem');
+  const published = rows.filter(row => row.live && !row.draft && row.workflow.visibility === 'live');
+  // Keep at least one published item without a pending revision for the "Published" filter.
+  const item = published.length > 1 && published.find(row => row.live.status === 'planned');
+  const ready = rows.some(row => row.live && row.draft?.status === 'planned' && row.workflow.state === 'in_review');
+  // The sample goes only once a planned item on the site is in review, so the filter never empties.
+  if (untouched && (ready || item)) entries.delete(sample.id);
+  if (ready || !item) return;
   const at = now();
-  const content = blankContent('roadmapItem', undefined, at);
-  Object.assign(content, {status: 'planned', period: 'next', year: '2027', progress: 0, slug: {en: 'sample-roadmap-in-review'}});
-  for (const [locale, [name, body, timing]] of Object.entries(ROADMAP_REVIEW_WORDS)) content.locales[locale] = {name, body, timing, theme: ''};
-  // Written and submitted by the manager, so an admin can approve it (two people per review).
-  entries.set(id, {
-    id, type: 'roadmapItem', siteId: 'orgtik', demoState: true,
-    order: Math.max(0, ...[...entries.values()].filter(row => row.type === 'roadmapItem').map(row => row.order || 0)) + 1,
-    marks: {}, live: null, draft: content, translators: {},
-    workflow: {state: 'in_review', visibility: 'not_on_site', version: 2, updatedAt: at, updatedBy: 'manager', lastEditor: 'manager', publishedAt: null},
-    translation: Object.fromEntries(Object.keys(ROADMAP_REVIEW_WORDS).map(locale => [locale, 'in_progress'])),
-    versions: [
-      {version: 2, state: 'in_review', at, by: 'manager', note: 'Sample submitted for review; private fictional roadmap item.', content: clone(content)},
-      {version: 1, state: 'draft', at, by: 'manager', note: 'Sample draft of a private fictional roadmap item.', content: clone(content)},
-    ],
-  });
-  audit.unshift({at, by: 'manager', action: 'sample_revision', entry: id, type: 'roadmapItem', version: 2, targetName: content.locales.en.name, sample: true});
+  item.draft = clone(item.live);
+  item.demoState = true;
+  // Submitted by the manager, so an admin can approve it (two people per review).
+  item.workflow = {...item.workflow, state: 'in_review', version: item.workflow.version + 1, updatedAt: at, updatedBy: 'manager', lastEditor: 'manager'};
+  item.versions.unshift({version: item.workflow.version, state: 'in_review', at, by: 'manager', note: 'Sample revision submitted for review; the published roadmap item is unchanged.', content: clone(item.draft)});
+  audit.unshift({at, by: 'manager', action: 'sample_revision', entry: item.id, type: 'roadmapItem', version: item.workflow.version, targetName: item.live.locales.en.name, sample: true});
 }
 
 // Insights shows a real published article instead of the generic "Sample published article":
