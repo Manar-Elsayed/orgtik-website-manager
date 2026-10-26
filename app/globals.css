@@ -15,6 +15,12 @@ body {
 .wm-table-filters > .wm-search { flex: 1 1 18rem; width: auto; align-self: flex-end; }
 .wm-table-filters > .wm-filter-hug { flex: 0 0 auto; width: max-content; max-width: 100%; }
 @media (max-width: 767px) { .wm-table-filters { flex-wrap: wrap; } .wm-table-filters > * { flex: 1 1 9rem; } .wm-table-filters > .wm-search { flex-basis: 100%; } }
+/* Filters past the first two fold behind "Show more" on phones (FilterFold); the group itself takes no box. */
+.wm-table-filters > .wm-filter-more { display: contents; }
+.wm-table-filters > .wm-filter-more > * { min-width: 0; flex: 0 1 12rem; }
+@media (max-width: 767px) { .wm-table-filters > .wm-filter-more > * { flex: 1 1 9rem; } .wm-table-filters > .wm-filter-more[data-folded] { display: none; } }
+/* Long chip filters keep three chips on phones until "Show more"; chips that are on stay visible. */
+@media (max-width: 767px) { .wm-chips-folded > button[aria-pressed="false"]:nth-child(n+4) { display: none; } }
 
 /* Standalone copy: the suite's other apps (Tasks, Files, HR, Console…) are not part of this
    deployment, so the app rail keeps only the OrgTik home and the Website Manager itself. */

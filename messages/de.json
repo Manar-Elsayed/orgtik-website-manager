@@ -3955,5 +3955,9 @@
     "permissionsTitle": "Berechtigungen aus {role} entfernen?",
     "permissionsImpact": "{count, plural, one {# Berechtigung wird} other {# Berechtigungen werden}} allen mit dieser Rolle entzogen ({people, plural, one {# Person} other {# Personen}}).",
     "savePermissions": "Berechtigungen speichern"
+  },
+  "Filters": {
+    "showMore": "Mehr anzeigen",
+    "showLess": "Weniger anzeigen"
   }
 }

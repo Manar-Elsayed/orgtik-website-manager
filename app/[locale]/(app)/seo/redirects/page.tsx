@@ -26,6 +26,7 @@ import {
   useFormatter,
 } from "@orgtik/ui";
 import { PageHeader } from "@/components/frame/PageHeader";
+import { FilterFold } from "@/components/frame/FilterFold";
 import { DataTable, type ColumnDef } from "@orgtik/ui/table";
 import { SitePublishCard } from "@/components/seo/SitePublishCard";
 import { RequirePermission } from "@/components/frame/RequirePermission";
@@ -301,13 +302,13 @@ function Redirects() {
           </p>
         )
       ) : null}
-      <div className="wm-table-filters">
+      <FilterFold open={["origin", "execution"].some(k => !["", "all"].includes(url.get(k)))}>
         <Input aria-label={tr("searchLabel")} placeholder={tr("searchLabel")} value={url.get("search")} onChange={(e) => url.set({ search: e.target.value })} className="wm-search" />
         <Select label={tr("colType")} value={url.get("kind", "all")} onValueChange={(kind) => url.set({ kind })} options={[{ value: "all", label: ti("all") }, { value: "301", label: t("code301") }, { value: "302", label: t("code302") }]} />
         <Select label={tr("colStatus")} value={url.get("status", "all")} onValueChange={(status) => url.set({ status })} options={[{ value: "all", label: ti("all") }, ...STATUSES.map((value) => ({ value, label: value === "attention" ? tr("needsAttention") : t(`redirectStatus.${value}`) }))]} />
         <Select label={tr("colOrigin")} value={url.get("origin", "all")} onValueChange={(origin) => url.set({ origin })} options={[{ value: "all", label: ti("all") }, ...ORIGINS.map((value) => ({ value, label: tr(`origin.${value}`) }))]} />
         <Select label={tr("colExecution")} value={url.get("execution", "all")} onValueChange={(execution) => url.set({ execution })} options={[{ value: "all", label: ti("all") }, ...EXECUTIONS.map((value) => ({ value, label: tr(`execution.${value}`) }))]} />
-      </div>
+      </FilterFold>
       <DataTable
         className={TABLE_ROWS}
         mode="server"

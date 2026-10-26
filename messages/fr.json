@@ -3955,5 +3955,9 @@
     "permissionsTitle": "Retirer des autorisations à {role} ?",
     "permissionsImpact": "{count, plural, one {# autorisation est retirée} other {# autorisations sont retirées}} à toutes les personnes ayant ce rôle ({people, plural, one {# personne} other {# personnes}}).",
     "savePermissions": "Enregistrer les autorisations"
+  },
+  "Filters": {
+    "showMore": "Afficher plus",
+    "showLess": "Afficher moins"
   }
 }

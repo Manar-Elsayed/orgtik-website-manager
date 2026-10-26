@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { ArrowRight } from "@phosphor-icons/react";
 import { Badge, Button, FilterChips, Input, Select, StatusBadge, buttonVariants, cn, useFormatter } from "@orgtik/ui";
 import { PageHeader } from "@/components/frame/PageHeader";
+import { FoldToggle } from "@/components/frame/FilterFold";
 import { DataTable, type ColumnDef } from "@orgtik/ui/table";
 import { RequirePermission } from "@/components/frame/RequirePermission";
 import { Link } from "@/i18n/routing";
@@ -44,6 +45,8 @@ function Missing() {
   const pickedKey = picked.join(",");
   // Rows whose folded issues have been opened with "+N".
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
+  // On phones the issue chips show three until "Show more".
+  const [chipsOpen, setChipsOpen] = useState(false);
   const toggle = (id: string) => setExpanded((open) => { const next = new Set(open); if (next.has(id)) next.delete(id); else next.add(id); return next; });
   const columns = useMemo<ColumnDef<SeoMissingRow, unknown>[]>(() => {
     const returnTo = encodeURIComponent(url.href);
@@ -152,7 +155,12 @@ function Missing() {
           {url.get("entry") ? <Button size="sm" variant="ghost" onClick={clear}>{tm("showAllPages")}</Button> : null}
         </div>
         <section aria-label={tm("title")} className="flex flex-col gap-4">
-          {chips.length ? <FilterChips label={tm("issueFilter")} chips={chips} value={picked} onValueChange={(value) => url.set({ issues: value.join(",") })} /> : null}
+          {chips.length ? (
+            <div className="flex flex-col items-start gap-2">
+              <FilterChips label={tm("issueFilter")} chips={chips} value={picked} onValueChange={(value) => url.set({ issues: value.join(",") })} className={chipsOpen ? undefined : "wm-chips-folded"} />
+              {chips.filter((c, i) => i >= 3 && !picked.includes(c.value)).length ? <FoldToggle open={chipsOpen} onToggle={() => setChipsOpen(!chipsOpen)} className="self-start" /> : null}
+            </div>
+          ) : null}
           <DataTable
             label={tm("title")}
             columns={columns.map((column) => ({ ...column, enableSorting: false }))}
