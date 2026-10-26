@@ -135,12 +135,12 @@ export function LeadDetail({ id }: { id: string }) {
           </section>
           <section
             aria-labelledby="lead-context"
-            className="flex flex-col gap-1 text-body-sm"
+            className="rounded-card border border-line bg-raised p-5 text-body-sm"
           >
             <h3 id="lead-context" className="text-label text-fg">
               {t("contextTitle")}
             </h3>
-            <dl className="grid grid-cols-[8rem_1fr] gap-x-3 gap-y-1">
+            <dl className="mt-4 grid grid-cols-[minmax(5rem,8rem)_minmax(0,1fr)] gap-x-4 gap-y-3 [&_dd]:break-words">
               <dt className="text-fg-muted">{t("page")}</dt>
               <dd dir="ltr" className="text-start font-mono text-fg">
                 {lead.page || "—"}
@@ -178,31 +178,36 @@ export function LeadDetail({ id }: { id: string }) {
               </dd>
             </dl>
           </section>
-          <Field label={t("owner")}>
-            <Select
-              readOnly={!editable}
-              value={lead.owner?.key ?? "none"}
-              onValueChange={(v) =>
-                v &&
-                assign({
-                  id: lead.id,
-                  version: lead.version,
-                  owner: v === "none" ? null : v,
-                })
-                  .unwrap()
-                  .then(() => toast.success(t("assigned")))
-                  .catch(() => toast.error(t("failed")))
-              }
-              options={[
-                { value: "none", label: t("noOwner") },
-                ...owners.map((m) => ({
-                  value: m.key,
-                  label: <bdi dir="auto">{m.name}</bdi>,
-                })),
-              ]}
-            />
-          </Field>
-          <section aria-labelledby="lead-notes" className="flex flex-col gap-2">
+          <section className="rounded-card border border-line bg-raised p-5">
+            <Field label={t("owner")}>
+              <Select
+                readOnly={!editable}
+                value={lead.owner?.key ?? "none"}
+                onValueChange={(v) =>
+                  v &&
+                  assign({
+                    id: lead.id,
+                    version: lead.version,
+                    owner: v === "none" ? null : v,
+                  })
+                    .unwrap()
+                    .then(() => toast.success(t("assigned")))
+                    .catch(() => toast.error(t("failed")))
+                }
+                options={[
+                  { value: "none", label: t("noOwner") },
+                  ...owners.map((m) => ({
+                    value: m.key,
+                    label: <bdi dir="auto">{m.name}</bdi>,
+                  })),
+                ]}
+              />
+            </Field>
+          </section>
+          <section
+            aria-labelledby="lead-notes"
+            className="flex flex-col gap-3 rounded-card border border-line bg-raised p-5"
+          >
             <h3 id="lead-notes" className="text-label text-fg">
               {t("notes")}
             </h3>
@@ -251,7 +256,7 @@ export function LeadDetail({ id }: { id: string }) {
           </section>
           <section
             aria-labelledby="lead-history"
-            className="flex flex-col gap-2"
+            className="flex flex-col gap-3 rounded-card border border-line bg-raised p-5"
           >
             <h3 id="lead-history" className="text-label text-fg">
               {t("history")}
