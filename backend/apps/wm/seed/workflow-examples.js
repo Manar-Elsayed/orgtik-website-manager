@@ -133,6 +133,38 @@ function caseStudyReviewExample({entries, audit, now}) {
   audit.unshift({at, by: 'manager', action: 'sample_revision', entry: id, type: 'caseStudy', version: 2, targetName: content.locales.en.name, sample: true});
 }
 
+const ROADMAP_REVIEW_WORDS = {
+  en: ['Sample roadmap item in review', 'Private workflow example submitted for review. This fictional roadmap item is kept off the website.', 'Planned for 2027'],
+  ar: ['عنصر خارطة طريق تجريبي قيد المراجعة', 'مثال خاص لسير العمل أُرسل للمراجعة. هذا العنصر خيالي ولا يظهر على الموقع.', 'مخطط لعام 2027'],
+  de: ['Beispiel-Roadmap-Eintrag in Prüfung', 'Privates Ablaufbeispiel, zur Prüfung eingereicht. Dieser fiktive Roadmap-Eintrag bleibt außerhalb der Website.', 'Geplant für 2027'],
+  fr: ['Élément de feuille de route d’exemple en relecture', 'Exemple de fonctionnement privé envoyé en relecture. Cet élément fictif reste hors du site.', 'Prévu pour 2027'],
+  it: ['Elemento di roadmap di esempio in revisione', 'Esempio di flusso privato inviato in revisione. Questo elemento fittizio resta fuori dal sito.', 'Previsto per il 2027'],
+};
+
+// A roadmap item waiting for review, so Roadmap's "In review" filter keeps an example after the
+// seeded items have moved on. Added once; editing or deleting it is kept.
+function roadmapReviewExample({entries, audit, now}) {
+  const id = 'rm_demo_in_review';
+  if (entries.has(id)) return;
+  const at = now();
+  const content = blankContent('roadmapItem', undefined, at);
+  Object.assign(content, {status: 'planned', period: 'next', year: '2027', progress: 0, slug: {en: 'sample-roadmap-in-review'}});
+  for (const [locale, [name, body, timing]] of Object.entries(ROADMAP_REVIEW_WORDS)) content.locales[locale] = {name, body, timing, theme: ''};
+  // Written and submitted by the manager, so an admin can approve it (two people per review).
+  entries.set(id, {
+    id, type: 'roadmapItem', siteId: 'orgtik', demoState: true,
+    order: Math.max(0, ...[...entries.values()].filter(row => row.type === 'roadmapItem').map(row => row.order || 0)) + 1,
+    marks: {}, live: null, draft: content, translators: {},
+    workflow: {state: 'in_review', visibility: 'not_on_site', version: 2, updatedAt: at, updatedBy: 'manager', lastEditor: 'manager', publishedAt: null},
+    translation: Object.fromEntries(Object.keys(ROADMAP_REVIEW_WORDS).map(locale => [locale, 'in_progress'])),
+    versions: [
+      {version: 2, state: 'in_review', at, by: 'manager', note: 'Sample submitted for review; private fictional roadmap item.', content: clone(content)},
+      {version: 1, state: 'draft', at, by: 'manager', note: 'Sample draft of a private fictional roadmap item.', content: clone(content)},
+    ],
+  });
+  audit.unshift({at, by: 'manager', action: 'sample_revision', entry: id, type: 'roadmapItem', version: 2, targetName: content.locales.en.name, sample: true});
+}
+
 // Insights shows a real published article instead of the generic "Sample published article":
 // "Performance budgets…" is published with Claude's image description approved. Only the untouched
 // sample is removed, and only Claude's untouched suggestion is published; anyone's edits are kept.
@@ -153,6 +185,7 @@ function contentExamples(context) {
   ideaExamples(context.ideas, context.now);
   caseStudyExamples(context);
   caseStudyReviewExample(context);
+  roadmapReviewExample(context);
   insightsPublishedExample(context);
 }
 
@@ -175,4 +208,4 @@ function mediaExamples(media) {
   }
 }
 
-module.exports = {contentExamples, caseStudyReviewExample, insightsPublishedExample, mediaExamples, IDEA_CLASSIFICATION};
+module.exports = {contentExamples, caseStudyReviewExample, roadmapReviewExample, insightsPublishedExample, mediaExamples, IDEA_CLASSIFICATION};
