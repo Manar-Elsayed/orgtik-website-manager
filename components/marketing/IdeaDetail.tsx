@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { LoadingState, ErrorState, EmptyState, Textarea, Button, ConfirmDialog, Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, Field, Input, Select, StatusBadge, TagInput, toast, useFormatter, useStatusLabel } from "@orgtik/ui";
 
 
+import { Link } from "@/i18n/routing";
 import { useCan } from "@/lib/permissions";
 import { LifecycleProgress } from "./LifecycleProgress";
 import { IdeaComments } from "./IdeaComments";
@@ -23,6 +24,21 @@ import {
   type IdeaAction,
   type IdeaStatus,
 } from "@/store/api";
+
+// The idea this one was merged into, by title, linking to its detail; the id stays as a fallback.
+function MergedInto({ id }: { id: string }) {
+  const params = useSearchParams();
+  const { data } = useIdeaQuery(id);
+  const returnTo = params.get("returnTo");
+  return (
+    <Link
+      href={`/marketing/ideas/${encodeURIComponent(id)}${returnTo ? `?returnTo=${encodeURIComponent(returnTo)}` : ""}`}
+      className="text-fg-brand underline"
+    >
+      {data ? <span dir="auto">{data.title}</span> : <span dir="ltr">{id}</span>}
+    </Link>
+  );
+}
 
 // The tabs: what needs a decision first, then the public lifecycle, then everything closed.
 // What can be done from each status (status matrix roadmap_idea). The first one is the main action.
@@ -398,7 +414,7 @@ export function IdeaDetailContent({
           {idea.mergedInto ? (
             <p className="text-body-sm text-fg">
               <span className="font-semibold">{t("mergedInto")}:</span>{" "}
-              <span dir="ltr">{idea.mergedInto}</span>
+              <MergedInto id={idea.mergedInto} />
             </p>
           ) : null}
           <section
