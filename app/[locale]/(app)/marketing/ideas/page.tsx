@@ -16,7 +16,7 @@ import { RequirePermission } from "@/components/frame/RequirePermission";
 import { useCan } from "@/lib/permissions";
 import { statusOf, useIdeasQuery, type Idea, type IdeaAction } from "@/store/api";
 
-const STATUSES = ["all", "pending", "open", "planned", "in_progress", "shipped", "closed"] as const;
+const STATUSES = ["all", "pending", "open", "planned", "in_progress", "shipped", "closed", "declined", "hidden", "merged"] as const;
 type StatusFilter = (typeof STATUSES)[number];
 function IdeasList() {
   const t = useTranslations("Ideas");
