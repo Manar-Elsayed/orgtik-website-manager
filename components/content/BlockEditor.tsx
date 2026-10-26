@@ -173,7 +173,7 @@ export function ValueEditor({
     case "image":
       return <Field label={label(node.label)} description={hintOf(node)}><MediaPicker imagesOnly alwaysOpen={ctx.mediaAlwaysOpen} value={str(value)} onChange={onChange} disabled={ctx.readOnly || ctx.numbersLocked} /></Field>;
     case "icon":
-      return <Field label={label(node.label)} description={hintOf(node)}><IconPicker value={str(value)} onChange={onChange} disabled={ctx.readOnly || ctx.numbersLocked} /></Field>;
+      return <Field label={label(node.label)} description={hintOf(node)}><IconPicker value={str(value)} onChange={onChange} disabled={ctx.readOnly || ctx.numbersLocked} social={/(^|\.)networks\.\d+\.icon$/.test(path) || /\bph-[a-z0-9-]+-logo\b/.test(str(value))} /></Field>;
     case "text":
     case "color":
       return (
