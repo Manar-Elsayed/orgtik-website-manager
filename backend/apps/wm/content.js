@@ -647,7 +647,7 @@ function makeStore(now, { demo = false } = {}) {
     return { currency: live?.currency ?? "CHF", priceMode: live?.priceMode ?? "indicative", managedIn: live?.managedIn ?? null, modules: Object.fromEntries((live?.locales.en.items ?? []).map((m) => [m.id, { monthly: m.monthly }])) };
   };
   const ensureDemo = () => { if (demo) { require("./seed/demo-states").contentExamples({ entries, audit, ideas, now }); require("./seed/workflow-examples").contentExamples({ entries, audit, ideas, now }); } };
-  const exportState = () => clone({ cmsVersion: 1, demoVersion: 11, entries: [...entries], audit, managerOrders, contentLocales: LOCALES, ideas: [...ideas] });
+  const exportState = () => clone({ cmsVersion: 1, demoVersion: 12, entries: [...entries], audit, managerOrders, contentLocales: LOCALES, ideas: [...ideas] });
   const validateState = value => {
     const incoming = codec.object(value), rows = codec.mapRows(incoming.entries), ideas_ = codec.mapRows(incoming.ideas);
     if (!Array.isArray(incoming.audit) || rows.some(([, row]) => !row.workflow || !Array.isArray(row.versions) || !row.translation || !TYPES.includes(row.type))) throw codec.fail("Website Manager content state is incomplete.");
@@ -684,6 +684,7 @@ function makeStore(now, { demo = false } = {}) {
     if (demo && incoming.demoVersion < 9) require("./seed/demo-states").completeTranslationExamples(entries);
     if (demo && incoming.demoVersion < 10) require("./seed/workflow-examples").caseStudyReviewExample({ entries, audit, now });
     if (demo && incoming.demoVersion < 11) require("./seed/workflow-examples").insightsPublishedExample({ entries, audit, now });
+    if (demo && incoming.demoVersion < 12) require("./seed/workflow-examples").roadmapReviewExample({ entries, audit, now });
   };
   return { managerOrders, ensureDemo, create, setVisibility, remove, CREATABLE, seed, tick, translate, versionOf, restore, entries, audit, ideas, moderate, rollbackPublished, IDEA_ACTIONS, VISIBLE, pricing, summary, detail, save, transition, approveFigures, queue, LOCALES, exportState, importState, validateState };
 }
