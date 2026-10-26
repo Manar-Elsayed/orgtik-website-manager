@@ -338,9 +338,11 @@ function makeStore(now, { demo = false } = {}) {
     return { entry: e };
   }
   // Deleting is for what never reached the site; anything published is taken off it instead.
+  // A super admin may also delete a roadmap item that has been on the site.
   function remove(e, who) {
     if (mirrored(e)) return MIRRORED;
-    if (e.live || e.workflow.publishedAt) return { status: 409, code: "published_before", message: "This has been on the site: take it off instead." };
+    const superAdminRoadmap = e.type === "roadmapItem" && who.roles?.includes("wm_super_admin");
+    if (!superAdminRoadmap && (e.live || e.workflow.publishedAt)) return { status: 409, code: "published_before", message: "This has been on the site: take it off instead." };
     entries.delete(e.id);
     log(who.key, "delete", e);
     return { ok: true };
@@ -645,7 +647,7 @@ function makeStore(now, { demo = false } = {}) {
     return { currency: live?.currency ?? "CHF", priceMode: live?.priceMode ?? "indicative", managedIn: live?.managedIn ?? null, modules: Object.fromEntries((live?.locales.en.items ?? []).map((m) => [m.id, { monthly: m.monthly }])) };
   };
   const ensureDemo = () => { if (demo) { require("./seed/demo-states").contentExamples({ entries, audit, ideas, now }); require("./seed/workflow-examples").contentExamples({ entries, audit, ideas, now }); } };
-  const exportState = () => clone({ cmsVersion: 1, demoVersion: 9, entries: [...entries], audit, managerOrders, contentLocales: LOCALES, ideas: [...ideas] });
+  const exportState = () => clone({ cmsVersion: 1, demoVersion: 11, entries: [...entries], audit, managerOrders, contentLocales: LOCALES, ideas: [...ideas] });
   const validateState = value => {
     const incoming = codec.object(value), rows = codec.mapRows(incoming.entries), ideas_ = codec.mapRows(incoming.ideas);
     if (!Array.isArray(incoming.audit) || rows.some(([, row]) => !row.workflow || !Array.isArray(row.versions) || !row.translation || !TYPES.includes(row.type))) throw codec.fail("Website Manager content state is incomplete.");
@@ -680,6 +682,8 @@ function makeStore(now, { demo = false } = {}) {
     if (demo && incoming.demoVersion < 5) require("./seed/workflow-examples").contentExamples({ entries, audit, ideas, now });
     if (incoming.demoVersion < 8) require("./seed/seo-translations").seoTranslations(entries);
     if (demo && incoming.demoVersion < 9) require("./seed/demo-states").completeTranslationExamples(entries);
+    if (demo && incoming.demoVersion < 10) require("./seed/workflow-examples").caseStudyReviewExample({ entries, audit, now });
+    if (demo && incoming.demoVersion < 11) require("./seed/workflow-examples").insightsPublishedExample({ entries, audit, now });
   };
   return { managerOrders, ensureDemo, create, setVisibility, remove, CREATABLE, seed, tick, translate, versionOf, restore, entries, audit, ideas, moderate, rollbackPublished, IDEA_ACTIONS, VISIBLE, pricing, summary, detail, save, transition, approveFigures, queue, LOCALES, exportState, importState, validateState };
 }

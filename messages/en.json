@@ -1211,6 +1211,7 @@
     "missingLanguages": "Missing languages",
     "deliveryStatus": "Delivery status",
     "protectedDelete": "Fixed or published content cannot be deleted. Archive eligible published records from their editor.",
+    "superAdminDelete": "Only a super admin can delete a roadmap item that has been on the site. Others can take it off the site from its editor.",
     "deleteName": "Delete {name}?",
     "deleteImpact": "This removes the unpublished record and its draft history.",
     "formattedPreview": "Formatted preview",
