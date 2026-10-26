@@ -1073,9 +1073,6 @@
       "in_progress": "Nichts in Arbeit",
       "shipped": "Noch nichts ausgeliefert",
       "closed": "Keine geschlossenen Ideen",
-      "declined": "Keine abgelehnten Ideen",
-      "hidden": "Keine ausgeblendeten Ideen",
-      "merged": "Keine zusammengeführten Ideen",
       "all": "Noch keine Ideen"
     },
     "actions": {

@@ -1073,9 +1073,6 @@
       "in_progress": "Rien en cours",
       "shipped": "Rien de livré pour l’instant",
       "closed": "Aucune idée fermée",
-      "declined": "Aucune idée refusée",
-      "hidden": "Aucune idée masquée",
-      "merged": "Aucune idée fusionnée",
       "all": "Aucune idée pour le moment"
     },
     "actions": {
