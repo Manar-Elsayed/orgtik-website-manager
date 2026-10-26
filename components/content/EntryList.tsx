@@ -16,6 +16,7 @@ import {
 } from "@orgtik/ui";
 import { DataTable, type ColumnDef } from "@orgtik/ui/table";
 import { LanguageDots } from "@/components/content/LanguageDots";
+import { FilterFold } from "@/components/frame/FilterFold";
 import { CollectionOrder } from "./CollectionOrder";
 import { PricingAuthority } from "@/components/content/PricingAuthority";
 import { ReviewSummary, ReviewOrder } from "@/components/content/ReviewSummary";
@@ -367,7 +368,7 @@ export function EntryList({ type: key }: { type: EntryType }) {
     <div className="flex flex-col gap-4">
       {key === "pricing" || key === "softwareModule" ? <PricingAuthority historical={key === "pricing"} /> : null}
       {["service", "caseStudy", "article"].includes(key) ? <CollectionOrder type={key} disabled={!can("content:edit")} /> : null}
-      <div className="wm-table-filters">
+      <FilterFold open={["period", "year"].some(k => !["", "all"].includes(url.get(k)))}>
         <Input
           size="sm"
           type="search"
@@ -380,11 +381,11 @@ export function EntryList({ type: key }: { type: EntryType }) {
         />
         <Select className={key === "review" ? "w-full sm:w-52" : undefined} size="sm" label={t("colState")} aria-label={t("colState")} value={url.get("state", "all")} onValueChange={state => url.set({ state })} options={[{ value: "all", label: ti("all") }, ...(["draft", "in_review", "approved", "scheduled", "published"] as const).map(value => ({ value, label: <StatusBadge entity="cms_revision" state={value} size="sm" /> }))]} />
         {key === "page" ? <Select size="sm" label={t("colLanguages")} aria-label={t("colLanguages")} value={url.get("missingLanguages", "all")} onValueChange={missingLanguages => url.set({ missingLanguages })} options={[{ value: "all", label: ti("all") }, { value: "true", label: ti("missingLanguages") }]} /> : null}
-        {key === "roadmapItem" ? <>
-          <Select size="sm" label={ti("deliveryStatus")} aria-label={ti("deliveryStatus")} value={url.get("deliveryStatus", "all")} onValueChange={deliveryStatus => url.set({ deliveryStatus })} options={[{ value: "all", label: ti("all") }, ...(["open", "planned", "in_progress", "shipped"] as const).map(value => ({ value, label: <StatusBadge entity="roadmap_idea" state={value} size="sm" /> }))]} />
-          <Select size="sm" label={t("colTimeline")} aria-label={t("colTimeline")} value={url.get("period", "all")} onValueChange={period => url.set({ period })} options={[{ value: "all", label: ti("all") }, ...["past", "now", "next"].map(value => ({ value, label: t(`periods.${value}`) }))]} />
-          {!yearTabs ? <Select size="sm" label={ti("year")} value={year || "all"} onValueChange={year => url.set({ year })} options={[{ value: "all", label: ti("allYears") }, ...roadmapYears.map(value => ({ value, label: <span dir="ltr">{value}</span> }))]} /> : null}
-        </> : null}
+        {key === "roadmapItem" ? [
+          <Select key="deliveryStatus" size="sm" label={ti("deliveryStatus")} aria-label={ti("deliveryStatus")} value={url.get("deliveryStatus", "all")} onValueChange={deliveryStatus => url.set({ deliveryStatus })} options={[{ value: "all", label: ti("all") }, ...(["open", "planned", "in_progress", "shipped"] as const).map(value => ({ value, label: <StatusBadge entity="roadmap_idea" state={value} size="sm" /> }))]} />,
+          <Select key="period" size="sm" label={t("colTimeline")} aria-label={t("colTimeline")} value={url.get("period", "all")} onValueChange={period => url.set({ period })} options={[{ value: "all", label: ti("all") }, ...["past", "now", "next"].map(value => ({ value, label: t(`periods.${value}`) }))]} />,
+          !yearTabs ? <Select key="year" size="sm" label={ti("year")} value={year || "all"} onValueChange={year => url.set({ year })} options={[{ value: "all", label: ti("allYears") }, ...roadmapYears.map(value => ({ value, label: <span dir="ltr">{value}</span> }))]} /> : null,
+        ] : null}
         {filterOptions ? (
           <Select
             size="sm"
@@ -396,8 +397,7 @@ export function EntryList({ type: key }: { type: EntryType }) {
             className={key === "caseStudy" ? "wm-filter-hug" : "w-56"}
           />
         ) : null}
-
-      </div>
+      </FilterFold>
       {key === "roadmapItem" && yearTabs ? (
         <Tabs role="group" aria-label={ti("year")} value={year || "all"} onValueChange={year => url.set({ year })}>
           <TabsList items={[{ value: "all", label: ti("allYears") }, ...roadmapYears.map(value => ({ value, label: <span dir="ltr">{value}</span> }))]} />

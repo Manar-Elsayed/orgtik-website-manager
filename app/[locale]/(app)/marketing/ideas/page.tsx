@@ -10,6 +10,7 @@ import { useTranslations } from "next-intl";
 import { Eye, PencilSimple, MagnifyingGlass, X } from "@phosphor-icons/react";
 import { Badge, Button, Input, Select, MenuItem, MenuLinkItem, StatusBadge, useFormatter, useStatusLabel } from "@orgtik/ui";
 import { PageHeader } from "@/components/frame/PageHeader";
+import { FilterFold } from "@/components/frame/FilterFold";
 import { DataTable, type ColumnDef } from "@orgtik/ui/table";
 import { RequirePermission } from "@/components/frame/RequirePermission";
 import { useCan } from "@/lib/permissions";
@@ -83,7 +84,7 @@ function IdeasList() {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader title={t("title")} description={t("description")} />
-      <div className="wm-table-filters">
+      <FilterFold open={Boolean(tag)}>
         <Input size="sm" type="search" value={search} onChange={(event) => setSearch(event.target.value)} aria-label={t("search")} placeholder={t("search")} startIcon={<MagnifyingGlass className="size-4" />} className="wm-search" />
         <Select
           size="sm"
@@ -98,7 +99,7 @@ function IdeasList() {
         />
         <Select size="sm" className="md:basis-64!" label={t("colCategory")} aria-label={t("colCategory")} value={category || "all"} onValueChange={value => url.set({ category: value })} options={[{ value: "all", label: ti("all") }, { value: "unassigned", label: t("categories.unassigned") }, ...IDEA_CATEGORIES.map(value => ({ value, label: t(`categories.${value}`) }))]} />
         <Select size="sm" label={t("colTags")} aria-label={t("colTags")} value={tag ? `tag:${tag}` : "all"} onValueChange={setTag} options={[{ value: "all", label: ti("all") }, ...tags.map(value => ({ value: `tag:${value}`, label: value }))]} />
-      </div>
+      </FilterFold>
       <DataTable
         mode="server"
         rowCount={data?.total ?? 0}

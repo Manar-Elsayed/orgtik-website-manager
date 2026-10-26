@@ -3955,5 +3955,9 @@
     "permissionsTitle": "إزالة صلاحيات من {role}؟",
     "permissionsImpact": "تُزال {count} صلاحيات من كل من لديه هذا الدور ({people} أشخاص).",
     "savePermissions": "حفظ الصلاحيات"
+  },
+  "Filters": {
+    "showMore": "عرض المزيد",
+    "showLess": "عرض أقل"
   }
 }

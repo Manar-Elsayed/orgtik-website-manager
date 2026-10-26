@@ -3955,5 +3955,9 @@
     "permissionsTitle": "Remove permissions from {role}?",
     "permissionsImpact": "{count, plural, one {# permission is} other {# permissions are}} removed from everyone with this role ({people, plural, one {# person} other {# people}}).",
     "savePermissions": "Save permissions"
+  },
+  "Filters": {
+    "showMore": "Show more",
+    "showLess": "Show less"
   }
 }
