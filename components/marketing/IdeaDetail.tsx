@@ -370,7 +370,7 @@ export function IdeaDetailContent({
                 {idea.commentPreview.map((comment) => (
                   <li
                     key={comment.id}
-                    className="rounded-field border border-line p-3"
+                    className="rounded-card border border-line bg-raised p-4"
                   >
                     <p dir="auto" className="text-label">
                       {comment.author}
@@ -403,7 +403,7 @@ export function IdeaDetailContent({
           ) : null}
           <section
             aria-labelledby="idea-history"
-            className="flex flex-col gap-2"
+            className="flex flex-col gap-3 rounded-card border border-line bg-raised p-4 sm:p-5"
           >
             <h3 id="idea-history" className="text-label text-fg">
               {t("history")}
