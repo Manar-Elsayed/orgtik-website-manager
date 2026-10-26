@@ -61,6 +61,8 @@ function legalExamples({ entries, audit, now }) {
 }
 function publishedExamples({ entries, audit, now }) {
   for (const type of TYPES) {
+    // Insights publishes a real article instead (workflow-examples insightsPublishedExample).
+    if (type === "article") continue;
     const rows = [...entries.values()].filter((entry) => entry.type === type);
     if (!rows.length || rows.some((entry) => !entry.draft)) continue;
     const id = `demo_published_${type}`;
@@ -355,6 +357,18 @@ function redirectExamples(redirects, now) {
       });
   }
 }
+// Two more samples so every Execution filter has a row once the live site is compared: one saved here
+// but not in the live build yet ("Not on the site yet") and one switched off and not live ("Configured").
+// Added once by id; editing or deleting them is kept.
+function redirectExecutionExamples(redirects, now) {
+  for (const [id, from, to, code, status, note] of [
+    ["rd_demo_not_live", "/sample-new-page", "/services", 301, "active", "Sample redirect saved here and waiting for the next website publish."],
+    ["rd_demo_paused", "/sample-paused", "/work", 302, "disabled", "Sample redirect switched off, so it isn't on the live site."],
+  ]) {
+    if (redirects.has(id)) continue;
+    redirects.set(id, { id, from, to, code, status, source: "manager", handledBy: "host", note, createdBy: "manager", createdAt: now(), version: 1, sample: true });
+  }
+}
 // Seed data: a few pages translated in every language, so Translations shows Complete as well as Missing.
 // Only English is public on the website, so these copies stay out of sight until a language is made public.
 const COMPLETE_TRANSLATION_PAGES = ["pg_about", "pg_contact", "pg_legal", "pg_faq"];
@@ -383,5 +397,6 @@ module.exports = {
   populateTranslationExamples,
   leadExamples,
   redirectExamples,
+  redirectExecutionExamples,
   redirectStatusExamples,
 };

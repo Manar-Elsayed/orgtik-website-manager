@@ -95,9 +95,65 @@ function caseStudyExamples({entries, audit, now}) {
   }
 }
 
+const REVIEW_WORDS = {
+  en: ['Story waiting for review', 'Private workflow example submitted for review. This fictional record contains no client results and is kept off the website.'],
+  ar: ['قصة بانتظار المراجعة', 'مثال خاص لسير العمل أُرسل للمراجعة. هذا السجل خيالي ولا يحتوي على نتائج عملاء ولا يظهر على الموقع.'],
+  de: ['Geschichte wartet auf Prüfung', 'Privates Ablaufbeispiel, zur Prüfung eingereicht. Dieser fiktive Datensatz enthält keine Kundenergebnisse und bleibt außerhalb der Website.'],
+  fr: ['Récit en attente de relecture', 'Exemple de fonctionnement privé envoyé en relecture. Cette fiche fictive ne contient aucun résultat client et reste hors du site.'],
+  it: ['Storia in attesa di revisione', 'Esempio di flusso privato inviato in revisione. Questa scheda fittizia non contiene risultati dei clienti e resta fuori dal sito.'],
+};
+
+// A case study waiting for review, so Work's "In review" filter always has an example even
+// after the seeded stories have moved on. Added once; editing or deleting it is kept.
+function caseStudyReviewExample({entries, audit, now}) {
+  const id = 'cs_demo_in_review';
+  if (entries.has(id)) return;
+  const at = now();
+  const content = blankContent('caseStudy', 'design', at);
+  Object.assign(content, {
+    narrativePublished: false, sampleNarrativePublished: false,
+    provenance: {figures: 'sample', sampleLabel: {en: 'Fictional workflow example · no client results'}},
+    slug: {en: 'mock-in-review'},
+    seo: {en: {title: 'Mock case study in review', description: REVIEW_WORDS.en[1], robots: 'noindex', inSitemap: false}},
+  });
+  const english = clone(content.locales.en);
+  for (const [locale, [name, summary]] of Object.entries(REVIEW_WORDS)) content.locales[locale] = {...clone(english), name: 'Mock · ' + name, summary};
+  // Written and submitted by the manager, so an admin can approve it (two people per review).
+  entries.set(id, {
+    id, type: 'caseStudy', siteId: 'orgtik', department: 'design', format: 'Design journal', demoState: true,
+    order: Math.max(0, ...[...entries.values()].filter(row => row.type === 'caseStudy').map(row => row.order || 0)) + 1,
+    marks: {}, live: null, draft: content, translators: {},
+    workflow: {state: 'in_review', visibility: 'not_on_site', version: 2, updatedAt: at, updatedBy: 'manager', lastEditor: 'manager', publishedAt: null},
+    translation: Object.fromEntries(Object.keys(REVIEW_WORDS).map(locale => [locale, 'in_progress'])),
+    versions: [
+      {version: 2, state: 'in_review', at, by: 'manager', note: 'Sample submitted for review; private synthetic example with no customer results.', content: clone(content)},
+      {version: 1, state: 'draft', at, by: 'manager', note: 'Sample draft of a private synthetic example.', content: clone(content)},
+    ],
+  });
+  audit.unshift({at, by: 'manager', action: 'sample_revision', entry: id, type: 'caseStudy', version: 2, targetName: content.locales.en.name, sample: true});
+}
+
+// Insights shows a real published article instead of the generic "Sample published article":
+// "Performance budgets…" is published with Claude's image description approved. Only the untouched
+// sample is removed, and only Claude's untouched suggestion is published; anyone's edits are kept.
+function insightsPublishedExample({entries, audit, now}) {
+  const sample = entries.get('demo_published_article');
+  if (sample?.demoPublished && sample.workflow.version === 1 && sample.versions.length === 1) entries.delete(sample.id);
+  const article = entries.get('ar_06');
+  if (!article?.draft || article.workflow.state !== 'draft' || article.workflow.lastEditor !== 'assistant' || article.versions[0]?.by !== 'assistant') return;
+  const at = now();
+  article.live = clone(article.draft);
+  article.draft = null;
+  article.workflow = {...article.workflow, state: 'published', visibility: 'live', version: article.workflow.version + 1, updatedAt: at, updatedBy: 'manager', lastEditor: 'manager', publishedAt: at};
+  article.versions.unshift({version: article.workflow.version, state: 'published', at, by: 'manager', note: "Sample published revision: Claude's image description was reviewed and published.", content: clone(article.live)});
+  audit.unshift({at, by: 'manager', action: 'publish', entry: article.id, type: 'article', version: article.workflow.version, targetName: article.live.locales.en.name, sample: true});
+}
+
 function contentExamples(context) {
   ideaExamples(context.ideas, context.now);
   caseStudyExamples(context);
+  caseStudyReviewExample(context);
+  insightsPublishedExample(context);
 }
 
 const MEDIA_WORDS = {
@@ -119,4 +175,4 @@ function mediaExamples(media) {
   }
 }
 
-module.exports = {contentExamples, mediaExamples, IDEA_CLASSIFICATION};
+module.exports = {contentExamples, caseStudyReviewExample, insightsPublishedExample, mediaExamples, IDEA_CLASSIFICATION};

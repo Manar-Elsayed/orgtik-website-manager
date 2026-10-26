@@ -13,7 +13,7 @@ import { useEntryName } from "@/lib/entryName";
 import { Link } from "@/i18n/routing";
 import { useCan } from "@/lib/permissions";
 import { TYPES } from "@/lib/contentTypes";
-import { type EntrySummary, useDeleteEntryMutation } from "@/store/api";
+import { type EntrySummary, useDeleteEntryMutation, useMeQuery } from "@/store/api";
 
 export function EntryActions({
   entry,
@@ -28,9 +28,13 @@ export function EntryActions({
   const [deleting, setDeleting] = useState(false);
   const [remove] = useDeleteEntryMutation();
   const href = `/content/${TYPES[entry.type].area}/${entry.id}?returnTo=${encodeURIComponent(returnTo)}`;
+  const me = useMeQuery();
+  // A super admin may also delete a roadmap item that has been on the site; the API checks the role again.
+  const superAdminRoadmap = entry.type === "roadmapItem" && Boolean(me.data?.roles.some((role) => role.key === "wm_super_admin"));
   const deletable =
-    ["article", "caseStudy", "roadmapItem", "review", "legalDocument"].includes(entry.type) &&
-    entry.visibility === "not_on_site";
+    superAdminRoadmap ||
+    (["article", "caseStudy", "roadmapItem", "review", "legalDocument"].includes(entry.type) &&
+      entry.visibility === "not_on_site");
   return (
     <span onClick={(event) => event.stopPropagation()}>
       <RowActionsMenu target={name(entry)}>
@@ -47,7 +51,7 @@ export function EntryActions({
           icon={<Trash />}
           tone="danger"
           disabled={!can("content:delete") || !deletable}
-          title={!deletable ? t("protectedDelete") : undefined}
+          title={!deletable ? t(entry.type === "roadmapItem" ? "superAdminDelete" : "protectedDelete") : undefined}
           onClick={() => setDeleting(true)}
         >
           {t("delete")}

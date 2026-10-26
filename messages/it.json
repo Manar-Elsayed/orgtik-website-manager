@@ -1211,6 +1211,7 @@
     "missingLanguages": "Lingue mancanti",
     "deliveryStatus": "Stato di realizzazione",
     "protectedDelete": "I contenuti fissi o pubblicati non possono essere eliminati. Archivia le voci idonee nel loro editor.",
+    "superAdminDelete": "Solo un super amministratore può eliminare una voce della roadmap già pubblicata sul sito. Gli altri possono toglierla dal sito dal suo editor.",
     "deleteName": "Eliminare {name}?",
     "deleteImpact": "Questa azione elimina la voce non pubblicata e la cronologia delle bozze.",
     "formattedPreview": "Anteprima del testo",

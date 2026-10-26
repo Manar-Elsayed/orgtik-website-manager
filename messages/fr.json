@@ -1211,6 +1211,7 @@
     "missingLanguages": "Langues manquantes",
     "deliveryStatus": "État de réalisation",
     "protectedDelete": "Les contenus fixes ou publiés ne peuvent pas être supprimés. Archivez les entrées admissibles dans leur éditeur.",
+    "superAdminDelete": "Seul un super administrateur peut supprimer un élément de la feuille de route déjà publié sur le site. Les autres peuvent le retirer du site depuis son éditeur.",
     "deleteName": "Supprimer {name} ?",
     "deleteImpact": "Cette action supprime cette entrée non publiée et son historique de brouillons.",
     "formattedPreview": "Aperçu du texte",

@@ -1211,6 +1211,7 @@
     "missingLanguages": "Fehlende Sprachen",
     "deliveryStatus": "Umsetzungsstatus",
     "protectedDelete": "Feste oder veröffentlichte Inhalte können nicht gelöscht werden. Archivieren Sie geeignete Einträge im Editor.",
+    "superAdminDelete": "Nur ein Super-Admin kann einen Roadmap-Eintrag löschen, der schon auf der Website war. Andere können ihn im Editor von der Website nehmen.",
     "deleteName": "{name} löschen?",
     "deleteImpact": "Der unveröffentlichte Eintrag und sein Entwurfsverlauf werden entfernt.",
     "formattedPreview": "Formatierte Vorschau",
